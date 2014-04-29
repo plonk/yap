@@ -1,0 +1,10 @@
+style "font"
+{
+font_name = "Meiryo 9"
+}
+style "mspgothic"
+{
+font_name = "MS PGothic 14"
+}
+widget_class "*" style "font"
+widget "*ascii_art" style "mspgothic"

@@ -1,0 +1,46 @@
+# -*- coding: utf-8 -*-
+require 'gtk2'
+require_relative 'utility'
+
+class LinePrompt < Gtk::Dialog
+  include Gtk
+  include GtkHelper
+  attr_accessor :validator
+
+  def initialize(title = "ラインプロンプト", parent = nil, mode = Dialog::MODAL)
+    super(title, parent, mode)
+
+    @ok_button = add_button(Stock::OK, Dialog::RESPONSE_OK)
+    add_button(Stock::CANCEL, Dialog::RESPONSE_CANCEL)
+
+    vbox.spacing = 10
+    @entry = create(Entry,
+                    on_activate: method(:on_entry_activate),
+                    on_changed: method(:on_entry_changed))
+    vbox.pack_start(@entry, false)
+
+    vbox.pack_end(HSeparator.new, false)
+
+    signal_connect("show", &method(:on_show))
+
+    self.validator = proc { |text| true }
+  end
+
+  def on_show dialog
+    @ok_button.sensitive = validator.call("")
+  end
+
+  def on_entry_changed entry
+    @ok_button.sensitive = validator.call(entry.text)
+  end
+
+  def on_entry_activate entry
+    if validator.call(entry.text)
+      response(Dialog::RESPONSE_OK)
+    end
+  end
+
+  def text
+    @entry.text
+  end
+end
