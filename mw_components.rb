@@ -177,19 +177,6 @@ class MainWindow
       $window.destroy
     end
 
-    @channel_list_view.signal_connect("row-activated") do |t, path, column|
-      iter = t.model.get_iter(path)
-      ch = YellowPage.get_channel(iter[0])
-      if ch.playable?
-        @model.play(ch)
-      end
-    end
-
-    # 行が選択された時に実行される
-    @channel_list_view.signal_connect("cursor-changed") do |t|
-      display_selected_channel
-    end
-
     @clear_button.signal_connect("clicked") do
       @model.search_term = ""
     end

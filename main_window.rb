@@ -136,6 +136,10 @@ class MainWindow
     end
   end
 
+  def selected_channel_changed
+    display_selected_channel
+  end
+
   def display_selected_channel
     ch = @channel_list_view.get_selected_channel
 

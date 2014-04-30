@@ -123,9 +123,7 @@ class ChannelListView < Gtk::TreeView
     renderer.markup = get_highlighted_markup(iter[2], @mw_model.search_term)
   end
 
-  # 以下の動作をする手続きオブジェクトを返す。
-  # 別のコラムでソートされていたら、column_id のコラムに変える。
-  # 既に column_id でソートされていたら、メニューを表示する。
+  # ソートするカラムを column_id に切り替える手続きオブジェクトを返す。
   def sort_changer(column_id, order)
     raise ArgumentError, "unknown sort order" unless [SORT_ASCENDING, SORT_DESCENDING].include? order
     lambda do |tree_view_column|
@@ -192,9 +190,22 @@ class ChannelListView < Gtk::TreeView
     @list_store.set_sort_column_id 0, SORT_ASCENDING
 
     @context_menu = ContextMenu.new(@mw_model)
-    # ここにあるべきではない。
+
     self.events = Gdk::Event::BUTTON_PRESS_MASK
     signal_connect("button_press_event", &method(:on_button_press_event))
+
+    signal_connect("row-activated") do |treeview, path, column|
+      iter = model.get_iter(path)
+      ch = YellowPage.get_channel(iter[FLD_CHNAME])
+      if ch.playable?
+        @mw_model.play(ch)
+      end
+    end
+
+    # 行が選択された時に実行される
+    signal_connect("cursor-changed") do |treeview|
+      @mw_model.select_channel(get_selected_channel)
+    end
   end
 
   def on_button_press_event w, event
@@ -247,6 +258,7 @@ class ChannelListView < Gtk::TreeView
     self.model = @list_store
   end
 
+  # hash で判断するように変える。
   def get_selected_channel
     path, column = cursor
 

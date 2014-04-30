@@ -22,6 +22,8 @@ class MainWindowModel
   # 検索中の言葉。
   attr_reader :search_term
 
+  attr_reader :selected_channel
+
   def initialize
     super
 
@@ -32,6 +34,12 @@ class MainWindowModel
     @notification = ""
     @master_table = []
     @update_first_time = true
+  end
+
+  def select_channel ch
+    @selected_channel = ch
+    changed
+    notify_observers(:selected_channel_changed)
   end
 
   def toggle_favorite
