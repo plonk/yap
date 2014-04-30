@@ -25,10 +25,6 @@ require "net/http"
 require "csv"
 require "dbm"
 
-# 内部的には UTF-8 を使う。
-# ↓をやると -Ku をつけなくても p を使った時に日本語が読める
-Encoding.default_external = "utf-8"
-
 require_relative 'settings'
 require_relative "utility"
 require_relative "channel"
