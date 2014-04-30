@@ -4,7 +4,7 @@ task :default => ["yap"]
 
 SRC = %w[main_window.rb mw_model.rb mw_components.rb line_prompt.rb notification.rb
          channel_info_label.rb channel_name_label.rb
-	 channel.rb help_dialog.rb settings_dialog.rb yellowpage.rb
+	 channel.rb settings_dialog.rb yellowpage.rb
          channeldb.rb info_dialog.rb sound.rb config.rb extensions.rb
          resource.rb threadhack.rb favorite_dialog.rb log_dialog.rb
          settings.rb yap.rb] 
