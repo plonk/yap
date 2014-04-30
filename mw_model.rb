@@ -3,13 +3,24 @@ require 'observer'
 require_relative 'favorites'
 require_relative 'launcher'
 
+# アプリケーションモデルとかプレゼンターとかそんなの。
 class MainWindowModel
   include Observable
 
+  # お気に入りオブジェクト。
   attr_reader :favorites
+
+  # 通知テキスト。
   attr_reader :notification
+
+  # 配信中の全てのチャンネル。
   attr_reader :master_table
-  attr_reader :just_began, :finished
+  attr_reader :just_began
+  # 終了チャンネル。
+  attr_reader :finished
+
+  # 検索中の言葉。
+  attr_reader :search_term
 
   def initialize
     super
@@ -51,13 +62,10 @@ class MainWindowModel
     notify_observers :search_term_changed, term
   end
 
-  attr_reader :search_term
-
   def finalize
     @favorites.delete_observer(self)
     @favorites.save
-    @reload_button_state_helper.kill
-    @updater_thread.kill
+    stop_helper_threads
   end
 
   def start_helper_threads
@@ -65,19 +73,32 @@ class MainWindowModel
     start_updater_thread
   end
 
-  def start_updater_thread
-    # 自動更新スレッド
-    @updater_thread = Thread.start do
-      loop do
-        update_channel_list
-        sleep UPDATE_INTERVAL_MINUTE * 60
-      end
+  def stop_helper_threads
+    @reload_button_state_helper.kill
+    @updater_thread.kill
+  end
+
+  def reload
+    @reload_history.push Time.now
+    Thread.new do 
+      update_channel_list
     end
   end
 
-  # チャンネルリストを取得する
-  def update_channel_list
-    puts "Updating channels..."
+  private 
+
+  # チャンネル DB に追加・更新。
+  def update_channel_db
+    YellowPage.all.each do |yp|
+      yp.each_channel do |ch|
+        $CDB[ch.name] = [yp.timestamp.to_i, ch.contact_url].to_csv
+      end
+    end
+    changed
+    notify_observers(:channel_db_updated)
+  end
+
+  def spawn_yp_updater_threads
     threads = []
     YellowPage.all.each do |yp|
       threads << Thread.new do 
@@ -86,16 +107,11 @@ class MainWindowModel
         end
       end
     end
-    # wait for all the threads to finish
-    threads.each &:join
-    puts "Done."
+    threads
+  end
 
-    new_table = YellowPage.all.map(&:to_a).inject(:+)
-    @finished = @master_table - new_table
-    @just_began = new_table - @master_table
-    @master_table = new_table
-
-    # 通知を表示する。ここのロジックはモデルへ移動するべき。
+  # 通知テキストを更新する。
+  def update_notification
     if @update_first_time
       @update_first_time = false
     else
@@ -108,38 +124,32 @@ class MainWindowModel
                               .join("、") + " が配信を開始しています。"
                           end
     end
+  end
+
+  # チャンネルリストを取得する。
+  def update_channel_list
+    puts "Updating channels..."
+    spawn_yp_updater_threads().each &:join
+    puts "Done."
+
+    new_table = YellowPage.all.map(&:to_a).inject(:+)
+    @finished = @master_table - new_table
+    @just_began = new_table - @master_table
+    @master_table = new_table
 
     changed
     notify_observers(:channel_list_updated)
+
+    update_notification
 
     # ついでにチャンネルDBを更新する。
     update_channel_db
   end
 
-
-  def update_channel_db
-    # channel DB に追加あるいは DB のエントリーを更新
-    YellowPage.all.each do |yp|
-      yp.each_channel do |ch|
-        $CDB[ch.name] = [yp.timestamp.to_i, ch.contact_url].to_csv
-      end
-    end
-    changed
-    notify_observers(:channel_db_updated)
-  end
-
-  def reload
-    @reload_history.push Time.now
-    Thread.new do 
-      update_channel_list
-    end
-  end
-
-  private 
+  # 更新ボタンの有効無効を管理するスレッドを開始する。
   def start_reload_button_manager_thread
     @reload_history = []
 
-    # 更新ボタンの有効無効を管理するスレッド
     @reload_button_state_helper = Thread.start do
       while true
         now = Time.now
@@ -153,6 +163,16 @@ class MainWindowModel
           notify_observers(:until_reload_toolbutton_available, i)
         end
         sleep 1
+      end
+    end
+  end
+
+  def start_updater_thread
+    # 自動更新スレッド
+    @updater_thread = Thread.start do
+      loop do
+        update_channel_list
+        sleep UPDATE_INTERVAL_MINUTE * 60
       end
     end
   end
