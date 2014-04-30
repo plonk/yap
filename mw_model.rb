@@ -39,7 +39,6 @@ class MainWindowModel
     @update_first_time = true
     @yellow_pages = []
 
-
     add_yp YellowPage.new("SP",       "http://bayonet.ddo.jp/sp/", nil)
     add_yp YellowPage.new("TP",       "http://temp.orz.hm/yp/")
     add_yp YellowPage.new("event",    "http://eventyp.xrea.jp/", nil, nil)

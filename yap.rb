@@ -176,8 +176,12 @@ def get_favicon_pixbuf_for(ch, fallback = QUESTION_16)
         loader.close
         pixbuf = loader.pixbuf
       end
-    rescue Gdk::PixbufError::UnknownType
-      puts "Unknown image format"
+    rescue Gdk::PixbufError => e
+      if e.code == Gdk::PixbufError::UNKNOWN_TYPE
+        puts "Unknown image format"
+      else
+        raise
+      end
     end
   end
   pixbuf
