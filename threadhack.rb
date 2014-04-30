@@ -1,3 +1,5 @@
+require 'monitor'
+
 class ThreadSafeQueue
   class EmptyQueueException < StandardError
   end
