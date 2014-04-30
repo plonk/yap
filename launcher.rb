@@ -54,6 +54,6 @@ class Launcher
   end
 
   def spawn(channel)
-    Kernel.spawn *interpolate(channel).shellsplit
+    Kernel.spawn *interpolate(channel).shellsplit.map { |s| s.encode(Encoding.default_external) }
   end
 end
