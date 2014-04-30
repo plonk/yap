@@ -3,7 +3,9 @@ class InfoDialog < Gtk::Dialog
   include Gtk
   include GtkHelper
 
-  def initialize(ch)
+  def initialize(parent, ch)
+    super "#{ch.name}のチャンネル情報", parent, Dialog::MODAL, [ Stock::OK, Dialog::RESPONSE_NONE ]
+    
     table = Table.new(2, 8)
     table.row_spacings = 5
     table.column_spacings = 10
@@ -70,9 +72,31 @@ class InfoDialog < Gtk::Dialog
     table.attach_defaults(h1, 0, 1, 7, 8)
     table.attach_defaults(h2, 1, 2, 7, 8)
     
-    super("#{ch.name}のチャンネル情報", $window, Dialog::MODAL, [ Stock::OK, Dialog::RESPONSE_NONE ])
-    
     vbox.pack_start(table)
   end
-end
 
+
+  def get_favicon_image_for(url)
+    buf = get_page(url)
+    image = Gtk::Image.new
+    if buf =~ /<link rel="?(shortcut )?icon"? href="([^"]+)"/i
+      puts "favicon is specified"
+      favicon_url = $2
+      p favicon_url
+      uri = URI.join(url, favicon_url)
+      Gdk::PixbufLoader.open do |loader|
+        loader.write get_favicon(uri.to_s)
+        loader.close
+        image.pixbuf = loader.pixbuf
+      end
+    else
+      image.pixbuf = Gtk::IconFactory
+        .lookup_default("gtk-network")
+        .render_icon(self.style,
+                     Gtk::Widget::TEXT_DIR_RTL,
+                     Gtk::STATE_NORMAL,
+                     Gtk::IconSize::LARGE_TOOLBAR)
+    end
+    return image
+  end
+end

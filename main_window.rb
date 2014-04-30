@@ -35,7 +35,15 @@ class MainWindow
     @search_field.show
   end
 
-  def update message, *args
+  def show_channel_info ch
+    dialog = InfoDialog.new(self, ch)
+    dialog.show_all
+    dialog.run do |response|
+      dialog.destroy
+    end
+  end
+
+ def update message, *args
     if self.respond_to? message
       # 別スレッドから呼ばれる可能性があるはず。
       Gtk.queue do 

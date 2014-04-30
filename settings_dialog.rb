@@ -51,9 +51,9 @@ class SettingsDialog < Gtk::Dialog
     return true
   end
 
-  def initialize
+  def initialize(parent)
     # ピアキャストのポート番号、動画プレーヤーのパス？
-    super("設定", $window, Dialog::MODAL)
+    super("設定", parent, Dialog::MODAL)
     table = Table.new(3, 2)
     table.row_spacings = 5
     table.column_spacings = 10
@@ -106,7 +106,7 @@ class SettingsDialog < Gtk::Dialog
       when Dialog::RESPONSE_OK
         player = b2.filename # nil if unset
         if player and not File.exist? player
-          md = MessageDialog.new($window,
+          md = MessageDialog.new(parent,
                                  Dialog::DESTROY_WITH_PARENT,
                                  MessageDialog::ERROR,
                                  MessageDialog::BUTTONS_OK,

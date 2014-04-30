@@ -45,12 +45,9 @@ class ChannelListView::ContextMenu < Gtk::Menu
 
     @info = MenuItem.new("チャンネル情報")
     @info.signal_connect("activate") do |w|
-      if @channel
-        dialog = InfoDialog.new(@channel)
-        dialog.show_all
-        dialog.run
-        dialog.destroy
-      end
+      fail unless @channel
+
+      @mw_model.show_channel_info(@channel)
     end
     append(@info)
   end

@@ -3,8 +3,8 @@
 class ChannelDBDialog < Gtk::Dialog
   include Gtk
 
-  def initialize
-    super("チャンネルDB", $window, Dialog::MODAL)
+  def initialize(parent)
+    super("チャンネルDB", parent, Dialog::MODAL)
     set_default_size(512, 512)
 
     top_hbox = HBox.new

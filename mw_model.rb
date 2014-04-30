@@ -36,6 +36,13 @@ class MainWindowModel
     @update_first_time = true
   end
 
+  def show_channel_info ch
+    if master_table.include? ch
+      changed
+      notify_observers(:show_channel_info, ch)
+    end
+  end
+
   def select_channel ch
     @selected_channel = ch
     changed

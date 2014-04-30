@@ -157,24 +157,24 @@ class MainWindow
 
     if $ENABLE_VIEWLOG
       @viewlog_toolbutton.signal_connect("clicked") do
-        d = LogDialog.new
+        d = LogDialog.new(self)
         d.show_all
       end
     end
 
     @settings_toolbutton.signal_connect("clicked") do
-      d = SettingsDialog.new
+      d = SettingsDialog.new(self)
       d.show_all
     end
 
     @channeldb_toolbutton.signal_connect("clicked") do 
-      d = ChannelDBDialog.new
+      d = ChannelDBDialog.new(self)
       d.show_all
     end
 
     @restart_toolbutton.signal_connect("clicked") do
       $RESTART_FLAG = true
-      $window.destroy
+      destroy
     end
 
     @clear_button.signal_connect("clicked") do

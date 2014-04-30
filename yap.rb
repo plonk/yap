@@ -183,25 +183,6 @@ def get_favicon_pixbuf_for(ch, fallback = QUESTION_16)
   pixbuf
 end
 
-def get_favicon_image_for(url)
-  buf = get_page(url)
-  image = Gtk::Image.new
-  if buf =~ /<link rel="?(shortcut )?icon"? href="([^"]+)"/i
-    puts "favicon is specified"
-    favicon_url = $2
-    p favicon_url
-    uri = URI.join(url, favicon_url)
-    Gdk::PixbufLoader.open do |loader|
-      loader.write get_favicon(uri.to_s)
-      loader.close
-      image.pixbuf = loader.pixbuf
-    end
-  else
-    image.pixbuf = Gtk::IconFactory.lookup_default("gtk-network").render_icon($window.style, Gtk::Widget::TEXT_DIR_RTL, Gtk::STATE_NORMAL, Gtk::IconSize::LARGE_TOOLBAR)
-  end
-  return image
-end
-
 def get_page_title(url)
   buf = get_page(url)
   return nil unless buf
@@ -257,9 +238,9 @@ YellowPage.add("アスチェ", "http://asuka--sen-nin.ddo.jp/checker/", nil, nil
 
 require_relative "main_window"
 
-$window = MainWindow.new
+window = MainWindow.new
 unless defined? Ocra
-  $window.show_all 
+  window.show_all 
 end
 
 begin

@@ -2,8 +2,8 @@
 class LogDialog < Gtk::Dialog
   include Gtk
 
-  def initialize
-    super("ログ", $window, Dialog::MODAL)
+  def initialize(parent)
+    super("ログ", parent, Dialog::MODAL)
     add_button(Stock::OK, Dialog::RESPONSE_OK)
     buf = TextBuffer.new
     buf.text = $log.string
