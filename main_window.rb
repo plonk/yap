@@ -137,11 +137,7 @@ class MainWindow
   end
 
   def selected_channel_changed
-    display_selected_channel
-  end
-
-  def display_selected_channel
-    ch = @channel_list_view.get_selected_channel
+    ch = @model.selected_channel
 
     @chname_label.show_channel(ch)
     @info_label.show_channel(ch)
@@ -192,7 +188,6 @@ class MainWindow
     # set favorite menu to toolbutton
     @favorite_toolbutton.menu = create_favorite_menu
     update_window_title
-    display_selected_channel
   end
 
   def update_favorite_toolbutton_label
