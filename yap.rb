@@ -240,7 +240,6 @@ def get_pixbuf_from_url(url)
 end
 
 require_relative "info_dialog"
-require_relative "help_dialog"
 require_relative "log_dialog"
 require_relative "favorite_dialog"
 require_relative "settings_dialog"

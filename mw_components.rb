@@ -43,8 +43,6 @@ class MainWindow
 
     @restart_toolbutton = create(ToolButton, Stock::QUIT, label: "再起動", important: true)
 
-    @help_toolbutton = create(ToolButton, Stock::HELP, important: true)
-
     @about_toolbutton = create(ToolButton, Stock::ABOUT, important: true)
 
     @toolbar.add @reload_toolbutton
@@ -54,7 +52,6 @@ class MainWindow
     @toolbar.add @channeldb_toolbutton
     @toolbar.add @spring
     @toolbar.add @restart_toolbutton
-    @toolbar.add @help_toolbutton
     @toolbar.add @about_toolbutton
 
     @outermost_vbox.pack_start(@toolbar, false)
@@ -178,11 +175,6 @@ class MainWindow
     @restart_toolbutton.signal_connect("clicked") do
       $RESTART_FLAG = true
       $window.destroy
-    end
-
-    @help_toolbutton.signal_connect("clicked") do
-      d = HelpDialog.new
-      d.show_all
     end
 
     @channel_list_view.signal_connect("row-activated") do |t, path, column|
