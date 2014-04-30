@@ -210,6 +210,7 @@ class MainWindow
     @chname_label.show_channel(ch)
     @info_label.show_channel(ch)
 
+    update_play_button
     update_link_button
     update_favorite_toggle_button
 
