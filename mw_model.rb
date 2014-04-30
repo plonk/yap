@@ -23,6 +23,9 @@ class MainWindowModel
   attr_reader :search_term
 
   attr_reader :selected_channel
+  
+  # YP リスト
+  attr_reader :yellow_pages
 
   def initialize
     super
@@ -34,6 +37,55 @@ class MainWindowModel
     @notification = ""
     @master_table = []
     @update_first_time = true
+    @yellow_pages = []
+
+
+    add_yp YellowPage.new("SP",       "http://bayonet.ddo.jp/sp/", nil)
+    add_yp YellowPage.new("TP",       "http://temp.orz.hm/yp/")
+    add_yp YellowPage.new("event",    "http://eventyp.xrea.jp/", nil, nil)
+    add_yp YellowPage.new("DP",       "http://dp.prgrssv.net/")
+    add_yp YellowPage.new("multi-yp", "http://peercast.takami98.net/multi-yp/", nil, nil)
+    add_yp YellowPage.new("アスチェ", "http://asuka--sen-nin.ddo.jp/checker/", nil, nil)
+  end
+
+
+  def total_channel_count
+    master_table.size
+  end
+
+  def is_on_air?(name)
+    @yellow_pages.any? do |yp|
+      yp.any? { |ch| ch.name == name }
+    end
+  end
+
+  def find_channel_by_hash(hash)
+    @yellow_pages.each do |yp|
+      yp.each_channel do |ch|
+        return ch if ch.hash == hash
+      end
+    end
+    nil
+  end
+
+  def get_channel(name)
+    @yellow_pages.each do |yp|
+      yp.each_channel do |ch|
+        return ch if ch.name == name
+      end
+    end
+    return nil
+  end
+
+  def get_channels(name)
+    @yellow_pages.flat_map do |yp|
+      ch = yp.get_channel(name)
+      ch ? [ch] : []
+    end
+  end
+
+  def add_yp(yp)
+    @yellow_pages << yp
   end
 
   def show_channel_info ch
@@ -104,7 +156,7 @@ class MainWindowModel
 
   # チャンネル DB に追加・更新。
   def update_channel_db
-    YellowPage.all.each do |yp|
+    @yellow_pages.each do |yp|
       yp.each_channel do |ch|
         $CDB[ch.name] = [yp.timestamp.to_i, ch.contact_url].to_csv
       end
@@ -115,7 +167,7 @@ class MainWindowModel
 
   def spawn_yp_updater_threads
     threads = []
-    YellowPage.all.each do |yp|
+    @yellow_pages.each do |yp|
       threads << Thread.new do 
         unless yp.retrieve
           puts "Failed in retrieving from #{yp.name}"
@@ -147,7 +199,7 @@ class MainWindowModel
     spawn_yp_updater_threads().each &:join
     puts "Done."
 
-    new_table = YellowPage.all.map(&:to_a).inject(:+)
+    new_table = @yellow_pages.map(&:to_a).inject(:+)
     @finished = @master_table - new_table
     @just_began = new_table - @master_table
     @master_table = new_table
@@ -192,3 +244,4 @@ class MainWindowModel
     end
   end
 end
+

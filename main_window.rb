@@ -94,10 +94,10 @@ class MainWindow
 
       # 配信中のお気に入り配信をメニューに追加する。
       @model.favorites.sort.each do |name|
-        if YellowPage.is_on_air?(name)
+        if @model.is_on_air?(name)
           MenuItem.new(name).tap do |item|
             item.signal_connect("activate") do
-              chs = YellowPage.get_channels(name)
+              chs = @model.get_channels(name)
               if chs.size > 1
                 STDERR.puts "Warning: more than one #{name}\n"
               end
@@ -228,7 +228,7 @@ class MainWindow
   end
 
   def update_favorite_toolbutton_label
-    numfavs = (YellowPage.all.flat_map(&:channel_names) & @model.favorites.to_a).size
+    numfavs = (@model.yellow_pages.flat_map(&:channel_names) & @model.favorites.to_a).size
     @favorite_toolbutton.label = "お気に入り (#{numfavs})"
   end
 
@@ -244,7 +244,7 @@ class MainWindow
 
   def update_window_title
     # ウィンドウタイトルを更新する
-    str = "YAP - #{Time.now.strftime('%H時%M分')}現在 #{YellowPage.count} chが配信中"
+    str = "YAP - #{Time.now.strftime('%H時%M分')}現在 #{@model.total_channel_count} chが配信中"
     # str += "interval = #{UPDATE_INTERVAL_MINUTE}"
     self.title = str
   end

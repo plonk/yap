@@ -8,58 +8,6 @@ class YellowPage
 
   include Enumerable
 
-  @@YP_LIST = []
-
-  class << self
-    def all
-      @@YP_LIST
-    end
-
-    def count
-      sum = 0 
-      @@YP_LIST.each do |yp|
-        sum += yp.count
-      end
-      return sum
-    end
-
-    def is_on_air?(name)
-      @@YP_LIST.any? do |yp|
-        yp.any? { |ch| ch.name == name }
-      end
-    end
-
-    def find_channel_by_hash(hash)
-      @@YP_LIST.each do |yp|
-        yp.each_channel do |ch|
-          return ch if ch.hash == hash
-        end
-      end
-      nil
-    end
-
-    def get_channel(name)
-      @@YP_LIST.each do |yp|
-        yp.each_channel do |ch|
-          return ch if ch.name == name
-        end
-      end
-      return nil
-    end
-
-    def get_channels(name)
-      rv = []
-      @@YP_LIST.each do |yp|
-        ch = yp.get_channel(name)
-        rv << ch  if ch
-      end
-      return rv
-    end
-
-    def add(*args)
-      @@YP_LIST << YellowPage.new(*args)
-    end
-  end
 
   def initialize(name, url, chat = "chat.php?cn=", stat = "getgmt.php?cn=")
     @name = name

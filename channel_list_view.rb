@@ -109,7 +109,7 @@ class ChannelListView < Gtk::TreeView
   end
 
   def yp_cell_data_func col, renderer, model, iter
-    ch = YellowPage.find_channel_by_hash(iter[FLD_HASH].to_i(16))
+    ch = @mw_model.find_channel_by_hash(iter[FLD_HASH].to_i(16))
     if ch
       renderer.pixbuf = get_pixbuf_from_url(ch.yp.favicon_url)
         .scale(16, 16, Gdk::Pixbuf::INTERP_BILINEAR)
@@ -196,7 +196,7 @@ class ChannelListView < Gtk::TreeView
 
     signal_connect("row-activated") do |treeview, path, column|
       iter = model.get_iter(path)
-      ch = YellowPage.get_channel(iter[FLD_CHNAME])
+      ch = @mw_model.get_channel(iter[FLD_CHNAME])
       if ch.playable?
         @mw_model.play(ch)
       end
@@ -264,7 +264,7 @@ class ChannelListView < Gtk::TreeView
 
     if path
       iter = self.model.get_iter(path)
-      YellowPage.get_channel(iter[FLD_CHNAME])
+      @mw_model.get_channel(iter[FLD_CHNAME])
     else
       nil
     end

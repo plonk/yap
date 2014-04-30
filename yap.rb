@@ -229,13 +229,6 @@ require_relative "settings_dialog"
 
 require_relative 'settings'
 
-YellowPage.add("SP",       "http://bayonet.ddo.jp/sp/", nil)
-YellowPage.add("TP",       "http://temp.orz.hm/yp/")
-YellowPage.add("event",    "http://eventyp.xrea.jp/", nil, nil)
-YellowPage.add("DP",       "http://dp.prgrssv.net/")
-YellowPage.add("multi-yp", "http://peercast.takami98.net/multi-yp/", nil, nil)
-YellowPage.add("アスチェ", "http://asuka--sen-nin.ddo.jp/checker/", nil, nil)
-
 require_relative "main_window"
 
 window = MainWindow.new
