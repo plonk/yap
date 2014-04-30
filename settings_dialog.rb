@@ -58,13 +58,16 @@ class SettingsDialog < Gtk::Dialog
     table.row_spacings = 5
     table.column_spacings = 10
 
+    self.border_width = 5
     self.resizable = false
 
     a1 = head("peercast のホスト名とポート\n（通常 localhost:7144）")
-    a2 = Entry.new
+    @host_entry = a2 = Entry.new
+    a2.no_show_all = true
     a2.text = ::Settings[:USER_PEERCAST] if ::Settings[:USER_PEERCAST]
     @peercast_entry = a2 
     a3 = Button.new("チェック")
+    a3.no_show_all = true
     a3.signal_connect ("clicked") do 
       if a2.text != "" and check_peercast
         show_message("#{@peercast_entry.text} に問題は見つかりませんでした。",
@@ -73,20 +76,11 @@ class SettingsDialog < Gtk::Dialog
       end
     end
     b1 = head("プレーヤー")
-    b2 = FileChooserButton.new("動画プレーヤーを選択してください", FileChooser::ACTION_OPEN) #Entry.new
-    b2.current_folder = "\\"
-    if RUBY_PLATFORM =~ /cygwin/ or
-        RUBY_PLATFORM =~ /mingw/
-      filter = FileFilter.new
-      filter.add_pattern("*.exe")
-      filter.name = "実行ファイル (*.exe)"
-      b2.add_filter filter
-    end
-    b2.filename = ::Settings[:USER_PLAYER] if ::Settings[:USER_PLAYER]
-    b3 = Button.new("クリア")
+    @player_entry = b2 = Entry.new
+    b2.text = ::Settings[:USER_PLAYER] if ::Settings[:USER_PLAYER]
+    b3 = Button.new("ヘルプ")
     b3.signal_connect("clicked") do
-      b2.filename = ""
-      b2.current_folder = "\\"
+      # 後で書く。
     end
     table.attach_defaults(a1, 0, 1, 0, 1)
     table.attach_defaults(a2, 1, 2, 0, 1)
@@ -99,28 +93,17 @@ class SettingsDialog < Gtk::Dialog
     add_button(Stock::OK, Dialog::RESPONSE_OK)
     add_button(Stock::CANCEL, Dialog::RESPONSE_CANCEL)
 
-    self.border_width = 5
-
     signal_connect("response") do |d, res|
       case res
       when Dialog::RESPONSE_OK
-        player = b2.filename # nil if unset
-        if player and not File.exist? player
-          md = MessageDialog.new(parent,
-                                 Dialog::DESTROY_WITH_PARENT,
-                                 MessageDialog::ERROR,
-                                 MessageDialog::BUTTONS_OK,
-                                 "'%s'は存在しません" % player)
-          md.title = "エラー"
-          md.run do |response|
-            md.destroy
-          end
+        player = b2.text
+        if false # player のバリデーションを考える。
         elsif not check_peercast
           # do not save settings
         else
           ::Settings[:USER_PLAYER] = player
-          s = @peercast_entry.text
-          if s == nil or s.empty?
+
+          if (s = @peercast_entry.text).empty?
             ::Settings[:USER_PEERCAST] = nil
           else
             ::Settings[:USER_PEERCAST] = s
@@ -135,5 +118,11 @@ class SettingsDialog < Gtk::Dialog
     end
 
     vbox.pack_start(table)
+  end
+
+  def show_all
+    super
+    @host_entry.show
+    @player_entry.show
   end
 end

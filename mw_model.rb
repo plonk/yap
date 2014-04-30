@@ -106,7 +106,7 @@ class MainWindowModel
   end
 
   def play(channel)
-    player = Launcher.new("mplayer $Y")
+    player = Launcher.new(Settings[:USER_PLAYER])
     STDERR.puts "Launching #{player.interpolate(channel)}"
     player.spawn(channel)
   end
