@@ -136,15 +136,8 @@ class MainWindow
     end
   end
 
-  def selected_channel_changed
-    ch = @model.selected_channel
-
-    @chname_label.show_channel(ch)
-    @info_label.show_channel(ch)
-
-    if ch
-      @play_button.sensitive = ch.playable?
-
+  def update_link_button
+    if ch = @model.selected_channel
       if ch.contact_url.empty?
         @link_button.child.text = "今からpeercastでゲーム実況配信"
         @link_button.uri = "http://yy25.60.kg/peercastjikkyou/"
@@ -152,10 +145,27 @@ class MainWindow
         @link_button.child.text = ch.contact_url
         @link_button.uri = ch.contact_url
       end
+    else
+      @link_button.child.text = ''
+      @link_button.uri = ''
+    end
+  end
 
+  def update_favorite_toggle_button
+    if ch = @model.selected_channel
       @favorite_toggle_button.sensitive = true
       @favorite_toggle_button.active = @model.favorites.include? ch.name
+    else
+      @favorite_toggle_button.sensitive = false
+    end
+  end
 
+  def update_play_button
+    @play_button.sensitive = (ch = @model.selected_channel and ch.playable?)
+  end
+
+  def update_favicon_image
+    if ch = @model.selected_channel
       pixbuf = $URL2PIXBUF[ch.contact_url]
       if pixbuf
         @favicon_image.pixbuf = pixbuf
@@ -166,18 +176,37 @@ class MainWindow
           pixbuf = pixbuf.scale(16, 16, Gdk::Pixbuf::INTERP_NEAREST)
           $URL2PIXBUF[ch.contact_url] = pixbuf
           Gtk.queue do 
-            current_channel = @channel_list_view.get_selected_channel
-            if current_channel.name == ch.name
+            current_channel = @model.selected_channel
+            if current_channel == ch
               @favicon_image.pixbuf = pixbuf
             end
           end
         end
       end
-      
+    else
+      @favicon_iamge.pixbuf = nil
+    end
+  end
+  
+  def update_genre_label
+    if ch = @model.selected_channel
       @genre_label.text = ch.genre
     else
-      @favorite_toggle_button.sensitive = false
-   end
+      @genre_label.text = ''
+    end
+  end
+
+  def selected_channel_changed
+    ch = @model.selected_channel
+
+    @chname_label.show_channel(ch)
+    @info_label.show_channel(ch)
+
+    update_link_button
+    update_favorite_toggle_button
+
+    update_favicon_image
+    update_genre_label
   end
 
   # -- class MainWindow --
