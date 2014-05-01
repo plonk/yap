@@ -1,3 +1,4 @@
+# -*- coding: undecided -*-
 require 'monitor'
 
 class ThreadSafeQueue
@@ -56,6 +57,8 @@ module Gtk
     old_main
   end
 
+  # Gtk.queue: キューに処理を追加する。サブスレッドが Gtk の機能を使うと
+  # きは必ず使う。
   def self.queue &block
     @queue << block
   end
