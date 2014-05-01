@@ -52,7 +52,7 @@ class Favorites
 
   def save
     File.open(FAVORITES_FILE, "w") do |fm|
-      fm.puts self.map { |chname| chname + "\n" }.join
+      fm.print self.map { |chname| chname + "\n" }.join
     end
   end
 
