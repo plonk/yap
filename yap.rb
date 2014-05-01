@@ -1,24 +1,7 @@
 #!ruby
 # -*- coding: utf-8 -*-
 # イエローページビュアーあるいは yap (Yet Another PCYP)
-# サブスレッドから Gtk の機能を呼び出すとフリーズする。
-# すべての Gtk の使用をメインスレッドから行うために、以下の
-# クラスメソッドが追加されている。
-# Gtk.queue: キューに処理を追加する。サブスレッド Gtk の機能を使うときは必ず使う。
-#            追加するだけで、処理を終了させずに次の文へ移るので注意。
-# Gtk.main_with_queue: Gtk.main と同じ。ただしキューの中のブロックも適当に実行する
-
-
-def require_gem name
-  begin
-    require name
-  rescue LoadError
-    puts "#{name} が見付かりません。\n[sudo] gem install #{name} とするとインストールできます。"
-    exit 1
-  end
-end
-  
-require_gem 'gtk2'
+require 'gtk2'
 require "resolv"
 require "nkf"
 require "net/http"
