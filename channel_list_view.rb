@@ -283,7 +283,7 @@ class ChannelListView < Gtk::TreeView
   # チャンネルリストとListStoreをマージする
   def refresh
     model.to_enum.flat_map { |model, path, iter|
-      if @mw_model.finished.any? { |ch| ch.hash == iter[FLD_HASH] }
+      if @mw_model.finished.any? { |ch| ch.hash.to_s(16) == iter[FLD_HASH] }
         [ TreeRowReference.new(model, path) ]
       else
         []
