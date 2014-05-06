@@ -3,7 +3,8 @@
 require_relative "channel.rb"
 require 'shellwords'
 
-# アプリケーションローンチャ
+# アプリケーションローンチャ。変数入りのコマンドラインで初期化して
+# spawn で実行する。
 class Launcher
   # 定数関数。
   K = lambda { |constant| proc { |ch| constant } }
@@ -54,6 +55,9 @@ class Launcher
   end
 
   def spawn(channel)
-    Kernel.spawn *interpolate(channel).shellsplit.map { |s| s.encode(Encoding.default_external) }
+    cmdline = interpolate(channel).encode(Encoding.default_external)
+    id = Kernel.spawn cmdline
+    # ゾンビプロセスが残らないように detach する。
+    Process.detach id
   end
 end
