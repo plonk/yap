@@ -1,4 +1,5 @@
-#!ruby
+# -*- coding: utf-8 -*-
+>#!ruby
 # -*- coding: utf-8 -*-
 # イエローページビュアーあるいは yap (Yet Another PCYP)
 require 'gtk2'
@@ -129,20 +130,6 @@ def get_favicon(url)
   end
 end
 
-# 見つからなければ nil
-def get_specified_favicon_url(url)
-  puts "get_specified_favicon_url"
-  p [:get_specified_favicon_url, url]
-  buf = get_page(url)
-  if buf =~ /<link rel="?(shortcut )?icon"? href="([^"]+)"/i
-    puts "found!"
-    (URI.parse(url) + $2).to_s
-  else
-    puts 'not found'
-    nil
-  end
-end
-
 def get_favicon_pixbuf_for(ch, fallback = QUESTION_16)
   pixbuf = fallback
 
@@ -236,4 +223,5 @@ end
 # spawn でプロセス番号を変えよう。このプロセスの終了は迅速なので、
 # 多重起動禁止処理に引っかかったりはしないようだ。
 #exec("ruby.exe", "yap.rb") if $RESTART_FLAG
-spawn("ruby.exe", "yap.rb") if $RESTART_FLAG
+spawn("ruby", "yap.rb") 
+#load $0 if $RESTART_FLAG

@@ -108,7 +108,7 @@ class Channel
   end
 
   def playable?
-    (not tip.empty?) and
+    !tip.empty? and
       @id !=  "000000000000000000000000000000000" and
       @type == "WMV"
   end
@@ -140,6 +140,20 @@ class Channel
       rescue
         nil
       end
+    end
+  end
+  
+  # 見つからなければ nil
+  def get_specified_favicon_url(url)
+    puts "get_specified_favicon_url"
+    p [:get_specified_favicon_url, url]
+    buf = get_page(url)
+    if buf =~ /<link rel="?(shortcut )?icon"? href="([^"]+)"/i
+      puts "found!"
+      (URI.parse(url) + $2).to_s
+    else
+      puts 'not found'
+      nil
     end
   end
 end
