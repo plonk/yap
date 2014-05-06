@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
->#!ruby
+#!ruby
 # -*- coding: utf-8 -*-
 # イエローページビュアーあるいは yap (Yet Another PCYP)
 require 'gtk2'
@@ -223,5 +222,5 @@ end
 # spawn でプロセス番号を変えよう。このプロセスの終了は迅速なので、
 # 多重起動禁止処理に引っかかったりはしないようだ。
 #exec("ruby.exe", "yap.rb") if $RESTART_FLAG
-spawn("ruby", "yap.rb") 
+spawn("ruby", "yap.rb") if $RESTART_FLAG
 #load $0 if $RESTART_FLAG
