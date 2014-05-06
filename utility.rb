@@ -119,7 +119,7 @@ module GtkHelper
   def cell(str)
     label = Gtk::Label.new(str)
     label.selectable = true
-    label.yalign = 0
+    label.yalign = 0.5
     label.xalign = 0
     return label
   end    
