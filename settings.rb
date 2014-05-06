@@ -10,7 +10,7 @@ class Settings_
 
   SETTINGS_DIR = ENV['HOME'] / ".yap"
 
-  VARIABLES = %w[USER_PLAYER USER_PEERCAST].map(&:to_sym)
+  VARIABLES = %w[USER_PLAYER USER_PEERCAST TYPE_ASSOC].map(&:to_sym)
 
   def initialize
     super
@@ -20,7 +20,7 @@ class Settings_
       Dir.mkdir(SETTINGS_DIR)
     end
 
-    @variables = Hash.new
+    @variables = { :TYPE_ASSOC => [["WMV|FLV", "mplayer $Y"]] }
   end
 
   def [] sym
@@ -38,9 +38,9 @@ class Settings_
 
   def load
     begin
-      data = YAML.load_file(SETTINGS_DIR / "settings.yml", "r")
-      @variables = Hash[*data.flat_map { |str, val| [str.to_sym, val] }]
-    rescue
+      data = YAML.load_file(SETTINGS_DIR / "settings.yml")
+      @variables = @variables.merge Hash[*data.flat_map { |str, val| [str.to_sym, val] }]
+    rescue Errno::ENOENT
       # do nothing
     end
     changed

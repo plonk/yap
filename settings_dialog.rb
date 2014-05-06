@@ -2,6 +2,7 @@
 require 'gtk2'
 require_relative 'settings'
 require_relative 'utility'
+require_relative 'object_list'
 
 class SettingsDialog < Gtk::Dialog
   include Gtk
@@ -64,10 +65,9 @@ class SettingsDialog < Gtk::Dialog
     a1 = head("peercast のホスト名とポート\n（通常 localhost:7144）")
     @host_entry = a2 = Entry.new
     a2.no_show_all = true
-    a2.text = ::Settings[:USER_PEERCAST] if ::Settings[:USER_PEERCAST]
+    a2.text = ::Settings[:USER_PEERCAST] || ""
     @peercast_entry = a2 
     a3 = Button.new("チェック")
-    a3.no_show_all = true
     a3.signal_connect ("clicked") do 
       if a2.text != "" and check_peercast
         show_message("#{@peercast_entry.text} に問題は見つかりませんでした。",
@@ -76,19 +76,14 @@ class SettingsDialog < Gtk::Dialog
       end
     end
     b1 = head("プレーヤー")
-    @player_entry = b2 = Entry.new
-    b2.text = ::Settings[:USER_PLAYER] if ::Settings[:USER_PLAYER]
-    b3 = Button.new("ヘルプ")
-    b3.signal_connect("clicked") do
-      # 後で書く。
-    end
+    @file_assoc_button = b2 = create(Button, '設定', on_clicked: method(:cb_file_assoc_button_clicked))
+
     table.attach_defaults(a1, 0, 1, 0, 1)
     table.attach_defaults(a2, 1, 2, 0, 1)
     table.attach_defaults(a3, 2, 3, 0, 1)
 
     table.attach_defaults(b1, 0, 1, 1, 2)
-    table.attach_defaults(b2, 1, 2, 1, 2)
-    table.attach_defaults(b3, 2, 3, 1, 2)
+    table.attach_defaults(b2, 1, 3, 1, 2)
 
     add_button(Stock::OK, Dialog::RESPONSE_OK)
     add_button(Stock::CANCEL, Dialog::RESPONSE_CANCEL)
@@ -96,33 +91,68 @@ class SettingsDialog < Gtk::Dialog
     signal_connect("response") do |d, res|
       case res
       when Dialog::RESPONSE_OK
-        player = b2.text
-        if false # player のバリデーションを考える。
-        elsif not check_peercast
+        if not check_peercast
           # do not save settings
         else
-          ::Settings[:USER_PLAYER] = player
-
           if (s = @peercast_entry.text).empty?
             ::Settings[:USER_PEERCAST] = nil
           else
             ::Settings[:USER_PEERCAST] = s
           end
           ::Settings.save
-          destroy
         end
-      else
-        # 破棄して閉じる
-        destroy # なんか warning 出てる？
+      else # CANCEL
+        ::Settings.load
       end
+      destroy
     end
 
     vbox.pack_start(table)
+    vbox.pack_end(HSeparator.new)
+  end
+
+  class FileAssocDialog < Gtk::Dialog
+    include Gtk
+    include GtkHelper
+
+    attr_reader :type_assoc
+
+    def initialize parent
+      super("タイプ関連付け", parent, Dialog::MODAL)
+      @type_assoc = ::Settings[:TYPE_ASSOC]
+
+      self.set_size_request(320, 240)
+
+      @object_list = ObjectList.new(['タイプ', 'コマンドライン'], 
+                                    [
+                                     proc { |obj| obj[0] },
+                                     proc { |obj| obj[1] }
+                                    ],
+                                    [
+                                     proc { |obj, val| obj[0] = val }, 
+                                     proc { |obj, val| obj[1] = val },
+                                    ])
+      @object_list.set @type_assoc
+      vbox.pack_start(@object_list)
+
+      add_button(Stock::OK, RESPONSE_OK)
+      add_button(Stock::CANCEL, RESPONSE_CANCEL)
+    end
+  end
+
+  def cb_file_assoc_button_clicked button
+    dialog = FileAssocDialog.new(self).show_all
+    dialog.run do |response|
+      case response
+      when RESPONSE_OK
+        ::Settings[:TYPE_ASSOC] = dialog.type_assoc
+      end
+      dialog.destroy
+    end
   end
 
   def show_all
     super
     @host_entry.show
-    @player_entry.show
   end
 end

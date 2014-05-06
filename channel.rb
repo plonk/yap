@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'digest/md5'
 require_relative 'launcher'
+require_relative 'type_association'
 
 class Channel
   attr_reader :genre, :id, :tip, :comment, :contact_url, :type
@@ -110,7 +111,7 @@ class Channel
   def playable?
     !tip.empty? and
       @id !=  "000000000000000000000000000000000" and
-      @type == "WMV"
+      TypeAssociation.instance.launcher(@type) != nil
   end
 
   def listener

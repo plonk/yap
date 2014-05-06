@@ -2,6 +2,7 @@
 require 'observer'
 require_relative 'favorites'
 require_relative 'launcher'
+require_relative 'type_association'
 
 # アプリケーションモデルとかプレゼンターとかそんなの。
 class MainWindowModel
@@ -106,9 +107,11 @@ class MainWindowModel
   end
 
   def play(channel)
-    player = Launcher.new(Settings[:USER_PLAYER])
-    STDERR.puts "Launching #{player.interpolate(channel)}"
-    player.spawn(channel)
+    player = TypeAssociation.instance.launcher(channel.type)
+    if player
+      STDERR.puts "Launching #{player.interpolate(channel)}"
+      player.spawn(channel)
+    end
   end
 
   def notification=(text)
