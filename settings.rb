@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+require 'singleton'
 require 'observer'
+require 'yaml'
 require_relative 'extensions'
 
 class Settings_
+  include Singleton
   include Observable
 
   SETTINGS_DIR = ENV['HOME'] / ".yap"
@@ -35,12 +38,8 @@ class Settings_
 
   def load
     begin
-      File.open(SETTINGS_DIR / "settings.txt", "r") do |f|
-        f.each_line.map do |line|
-          var, val = line.chomp.split(/ = /, 2)
-          self[var.to_sym] = eval(val)
-        end
-      end
+      data = YAML.load_file(SETTINGS_DIR / "settings.yml", "r")
+      @variables = Hash[*data.flat_map { |str, val| [str.to_sym, val] }]
     rescue
       # do nothing
     end
@@ -49,13 +48,12 @@ class Settings_
   end
 
   def save
-    File.open(SETTINGS_DIR / "settings.txt", "w") do |f|
-      @variables.each_pair do |var, val|
-        f.puts "#{var.to_s} = #{val.inspect}" if @variables[var.to_sym] != nil
-      end
+    File.open(SETTINGS_DIR / "settings.yml", "w") do |f|
+      data = Hash[*@variables.flat_map { |sym, val| [sym.to_s, val] }]
+      f.write YAML.dump(data)
     end
   end
 end
 
-Settings = Settings_.new
+Settings = Settings_.instance
 Settings.load
