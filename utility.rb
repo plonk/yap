@@ -103,7 +103,7 @@ module GtkHelper
     end
 
     if block
-      block.call
+      block.call(widget)
     end
 
     widget
