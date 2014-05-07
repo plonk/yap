@@ -50,6 +50,7 @@ class MainWindowModel
     add_yp YellowPage.new("DP",       "http://dp.prgrssv.net/")
     add_yp YellowPage.new("multi-yp", "http://peercast.takami98.net/multi-yp/", nil, nil)
     add_yp YellowPage.new("アスチェ", "http://asuka--sen-nin.ddo.jp/checker/", nil, nil)
+    add_yp YellowPage.new("cavetube", "http://rss.cavelis.net/", nil, nil)
   end
 
   def child_process_changed
