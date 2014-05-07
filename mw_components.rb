@@ -57,7 +57,10 @@ class MainWindow
     @outermost_vbox.pack_start(@toolbar, false)
 
     @mainarea_vbox = create(VBox, homogeneous: false, spacing: 5, border_width: 10)
-    @outermost_vbox.pack_start(@mainarea_vbox)
+
+    expander = Expander.new('チャンネル情報')
+    expander.add @mainarea_vbox
+    @outermost_vbox.pack_start(expander, false)
 
     @channel_list_view = ChannelListView.new(@model)
 
@@ -142,7 +145,7 @@ class MainWindow
 
     @mainarea_vbox.pack_start(@link_hbox, false)
 
-    @mainarea_vbox.pack_start(@channel_list_view_scrolled_window)
+    @outermost_vbox.pack_start(@channel_list_view_scrolled_window, true)
 
     @notification = Notification.new
     @outermost_vbox.pack_start(@notification, false)
