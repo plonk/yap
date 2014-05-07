@@ -3,6 +3,7 @@ require 'observer'
 require_relative 'favorites'
 require_relative 'launcher'
 require_relative 'type_association'
+require_relative 'child_process'
 
 # アプリケーションモデルとかプレゼンターとかそんなの。
 class MainWindowModel
@@ -28,6 +29,8 @@ class MainWindowModel
   # YP リスト
   attr_reader :yellow_pages
 
+  attr_reader :child_processes
+
   def initialize
     super
 
@@ -39,6 +42,7 @@ class MainWindowModel
     @master_table = []
     @update_first_time = true
     @yellow_pages = []
+    @child_processes = []
 
     add_yp YellowPage.new("SP",       "http://bayonet.ddo.jp/sp/", nil)
     add_yp YellowPage.new("TP",       "http://temp.orz.hm/yp/")
@@ -48,6 +52,10 @@ class MainWindowModel
     add_yp YellowPage.new("アスチェ", "http://asuka--sen-nin.ddo.jp/checker/", nil, nil)
   end
 
+  def child_process_changed
+    changed
+    notify_observers(:child_process_changed)
+  end
 
   def total_channel_count
     master_table.size
@@ -110,8 +118,21 @@ class MainWindowModel
     player = TypeAssociation.instance.launcher(channel.type)
     if player
       STDERR.puts "Launching #{player.interpolate(channel)}"
-      player.spawn(channel)
+      child = player.spawn(channel)
+      child.add_observer(self, :child_process_changed)
+      @child_processes << child
+      changed
+      notify_observers(:child_process_changed)
     end
+  end
+
+  def clear_finished_child_processes
+    @child_processes.select(&:finished?).each do |cp|
+      cp.delete_observer(self)
+      @child_processes.delete(cp)
+    end
+    changed
+    notify_observers(:child_process_changed)
   end
 
   def notification=(text)

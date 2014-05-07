@@ -3,6 +3,7 @@ require 'gtk2'
 require_relative "mw_model"
 require_relative 'channel_info_label'
 require_relative 'channel_name_label'
+require_relative 'process_manager'
 
 class MainWindow < Gtk::Window
 end
@@ -19,6 +20,7 @@ class MainWindow
 
     initialize_components
 
+    setup_accel_keys
     signal_connect("destroy", &method(:main_window_destroy_callback))
 
     @model.add_observer(self, :update)
@@ -114,10 +116,25 @@ class MainWindow
     end
   end
 
-  def main_window_destroy_callback widget
-    puts "destroying main window"
+  def setup_accel_keys
+    accel_group = Gtk::AccelGroup.new
+    accel_group.connect(Gdk::Keyval::GDK_A,
+                        Gdk::Window::CONTROL_MASK,
+                        Gtk::ACCEL_VISIBLE) do
+      ProcessManager.new(self, @model).show_all
+    end
+
+    add_accel_group(accel_group)
+  end
+
+  def finalize
     @model.finalize
     @model.delete_observer(self)
+  end
+
+  def main_window_destroy_callback widget
+    puts "destroying main window"
+    finalize
 
     Gtk.main_quit
   end

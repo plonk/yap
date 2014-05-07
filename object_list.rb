@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+require 'observer'
+
 class ObjectList < Gtk::ScrolledWindow
   include Gtk
   include GtkHelper
+  include Observable
 
   attr_reader :treeview
   attr_reader :selected
@@ -79,11 +82,13 @@ class ObjectList < Gtk::ScrolledWindow
   def on_cursor_changed *_
     if iter = @treeview.selection.selected
       object_id = iter[0]
-      obj = @objects.select { |obj| obj.object_id == object_id }.first
+      obj = @objects.select { |obj| obj.object_id.to_s == object_id }.first
       @selected = obj
     else
       @selected = nil
     end
+    changed
+    notify_observers
   end
 
   def set ary
@@ -100,6 +105,8 @@ class ObjectList < Gtk::ScrolledWindow
       }
     end
     @treeview.columns.each {|c| c.sort_indicator = false }
+    changed
+    notify_observers
   end
 
   def get
