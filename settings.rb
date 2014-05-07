@@ -5,8 +5,7 @@ require 'yaml'
 require_relative 'extensions'
 
 class Settings_
-  include Singleton
-  include Observable
+  include Singleton, Observable
 
   SETTINGS_DIR = ENV['HOME'] / ".yap"
 

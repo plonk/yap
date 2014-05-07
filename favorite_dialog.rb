@@ -4,8 +4,7 @@ require_relative 'utility'
 require_relative 'line_prompt'
 
 class FavoriteDialog < Gtk::Dialog
-  include Gtk
-  include GtkHelper
+  include Gtk, GtkHelper
   attr_reader :list
 
   def initialize(parent_window, list)

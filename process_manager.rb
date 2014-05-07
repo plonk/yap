@@ -2,8 +2,7 @@
 require 'gtk2'
 
 class ProcessManager < Gtk::Dialog
-  include Gtk
-  include GtkHelper
+  include Gtk, GtkHelper
 
   def initialize(parent, model)
     super('プロセス管理', parent)

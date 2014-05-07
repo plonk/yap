@@ -3,8 +3,7 @@ require 'gtk2'
 require_relative 'utility'
 
 class LinePrompt < Gtk::Dialog
-  include Gtk
-  include GtkHelper
+  include Gtk, GtkHelper
   attr_accessor :validator
 
   def initialize(title = "ラインプロンプト", parent = nil, mode = Dialog::MODAL)

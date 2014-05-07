@@ -2,8 +2,7 @@
 require 'gtk2'
 
 class ChannelInfoLabel < Gtk::Label
-  include Gtk
-  include Pango
+  include Gtk, Pango
 
   def initialize
     super

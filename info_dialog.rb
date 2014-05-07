@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 class InfoDialog < Gtk::Dialog
-  include Gtk
-  include GtkHelper
+  include Gtk, GtkHelper
 
   def initialize(parent, ch)
     super "#{ch.name}のチャンネル情報", parent, Dialog::MODAL, [ Stock::OK, Dialog::RESPONSE_NONE ]

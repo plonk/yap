@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 class TypeAssocDialog < Gtk::Dialog
-  include Gtk
-  include GtkHelper
+  include Gtk, GtkHelper, Gtk::Stock
 
   attr_reader :type_assoc
 
   def initialize parent
-    super("タイプ関連付け", parent, Dialog::MODAL)
+    super("タイプ関連付け", parent, MODAL)
 
     @type_assoc = ::Settings[:TYPE_ASSOC]
 
@@ -30,7 +29,7 @@ class TypeAssocDialog < Gtk::Dialog
       create(VButtonBox,
              layout_style: ButtonBox::START,
              spacing: 5) do |bbox|
-        buttons = [Stock::ADD, Stock::DELETE, Stock::GO_UP, Stock::GO_DOWN]
+        buttons = [ADD, DELETE, GO_UP, GO_DOWN]
           .map { |type| create(Button, type, sensitive: false) }
 
         [:pack_start, :pack_start, :pack_end, :pack_end].zip(buttons)
@@ -45,8 +44,8 @@ class TypeAssocDialog < Gtk::Dialog
     end
     self.vbox.pack_end(HSeparator.new, false)
 
-    add_button(Stock::OK,     RESPONSE_OK)
-    add_button(Stock::CANCEL, RESPONSE_CANCEL)
+    add_button(OK,     RESPONSE_OK)
+    add_button(CANCEL, RESPONSE_CANCEL)
   end
 
   def create_assoc_list

@@ -3,8 +3,7 @@ require 'gtk2'
 require_relative 'utility'
 
 class Notification < Gtk::InfoBar
-  include Gtk
-  include GtkHelper
+  include Gtk, GtkHelper
 
   def initialize
     super

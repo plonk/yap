@@ -6,8 +6,7 @@ require_relative 'object_list'
 require_relative 'type_assoc_dialog'
 
 class SettingsDialog < Gtk::Dialog
-  include Gtk
-  include GtkHelper
+  include Gtk, GtkHelper
 
   def show_message(message, title, kind = MessageDialog::ERROR)
     md = MessageDialog.new(self,

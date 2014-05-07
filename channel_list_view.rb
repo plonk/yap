@@ -5,9 +5,7 @@ end
 require_relative 'clv_context_menu'
 
 class ChannelListView < Gtk::TreeView
-  include Gtk
-  include GtkHelper
-  include Pango
+  include Gtk, GtkHelper, Pango
 
   FLD_CHNAME   = 0
   FLD_GENRE    = 1

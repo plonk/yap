@@ -3,8 +3,7 @@ require 'observer'
 require_relative 'utility'
 
 class Favorites
-  include Enumerable
-  include Observable
+  include Enumerable, Observable
 
   FAVORITES_FILE = ENV['HOME'] / ".yap/favorites.txt"
 

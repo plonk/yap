@@ -2,9 +2,7 @@
 require 'observer'
 
 class ObjectList < Gtk::ScrolledWindow
-  include Gtk
-  include GtkHelper
-  include Observable
+  include Gtk, GtkHelper, Observable
 
   attr_reader :treeview
   attr_reader :selected
