@@ -19,12 +19,19 @@ class MainWindow
     @model = MainWindowModel.new
 
     initialize_components
+    create_status_icon
 
     setup_accel_keys
     signal_connect("destroy", &method(:main_window_destroy_callback))
 
     @model.add_observer(self, :update)
     @model.start_helper_threads
+  end
+
+  def create_status_icon
+    @status_icon = create(StatusIcon,
+                          pixbuf: Gdk::Pixbuf.new(Resource.path('yap.png')),
+                          tooltip: "YAP")
   end
 
   def favorite_toggled
