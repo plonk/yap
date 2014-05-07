@@ -21,7 +21,6 @@ module Relation
 
   def relation_update
     @_relations.each do |dest, writer, subject, reader, transform|
-      p [dest, writer, subject, reader, transform]
       dest.__send__(writer, transform.call(subject.__send__(reader)))
     end
   end
@@ -29,6 +28,7 @@ module Relation
   private
   def do_add_relation listener, writer, subject, reader, transform
     @_relations ||= []
+    listener.__send__(writer, transform.call(subject.__send__(reader))) # first sync
     @_relations << [listener, writer, subject, reader, transform]
   end
 
