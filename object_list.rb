@@ -32,6 +32,7 @@ class ObjectList < Gtk::ScrolledWindow
     add @treeview
   end
 
+  private
   def get_object(iter)
     @objects.select { |obj| obj.object_id.to_s == iter[0] }.first
   end
@@ -76,7 +77,6 @@ class ObjectList < Gtk::ScrolledWindow
     end
   end
 
-
   def on_cursor_changed *_
     if iter = @treeview.selection.selected
       object_id = iter[0]
@@ -89,6 +89,7 @@ class ObjectList < Gtk::ScrolledWindow
     notify_observers
   end
 
+  public
   def set ary
     fail unless ary.is_a? Array
 
@@ -98,9 +99,7 @@ class ObjectList < Gtk::ScrolledWindow
       iter = @list_store.append
       values = @reader_list.map { |f| f.call(obj) }
       iter[0] = obj.object_id.to_s
-      values.each_with_index { |val, i|
-        iter[i+1] = val
-      }
+      values.each_with_index { |val, i| iter[i+1] = val }
     end
     @treeview.columns.each {|c| c.sort_indicator = false }
     changed
