@@ -32,11 +32,11 @@ class ProcessManager < Gtk::Dialog
         end
         bbox.add @kill_button
 
-        clear_button = Button.new(Stock::CLEAR)
-        clear_button.signal_connect('clicked') do
+        @clear_button = Button.new(Stock::CLEAR, sensitive: false)
+        @clear_button.signal_connect('clicked') do
           @model.clear_finished_child_processes
         end
-        bbox.add clear_button
+        bbox.add @clear_button
         hbox.pack_start(bbox, false)
       end
 
@@ -59,6 +59,7 @@ class ProcessManager < Gtk::Dialog
 
   def object_list_update
     @kill_button.sensitive = @object_list.selected and !@object_list.selected.finished?
+    @clear_button.sensitive = !@object_list.get.select(&:finished?).empty?
   end
 
   def model_update(what, *args)
