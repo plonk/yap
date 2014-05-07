@@ -3,6 +3,7 @@ require 'gtk2'
 require_relative 'settings'
 require_relative 'utility'
 require_relative 'object_list'
+require_relative 'file_assoc_dialog'
 
 class SettingsDialog < Gtk::Dialog
   include Gtk
@@ -109,35 +110,6 @@ class SettingsDialog < Gtk::Dialog
 
     vbox.pack_start(table)
     vbox.pack_end(HSeparator.new)
-  end
-
-  class FileAssocDialog < Gtk::Dialog
-    include Gtk
-    include GtkHelper
-
-    attr_reader :type_assoc
-
-    def initialize parent
-      super("タイプ関連付け", parent, Dialog::MODAL)
-      @type_assoc = ::Settings[:TYPE_ASSOC]
-
-      self.set_size_request(320, 240)
-
-      @object_list = ObjectList.new(['タイプ', 'コマンドライン'], 
-                                    [
-                                     proc { |obj| obj[0] },
-                                     proc { |obj| obj[1] }
-                                    ],
-                                    [
-                                     proc { |obj, val| obj[0] = val }, 
-                                     proc { |obj, val| obj[1] = val },
-                                    ])
-      @object_list.set @type_assoc
-      vbox.pack_start(@object_list)
-
-      add_button(Stock::OK, RESPONSE_OK)
-      add_button(Stock::CANCEL, RESPONSE_CANCEL)
-    end
   end
 
   def cb_file_assoc_button_clicked button
