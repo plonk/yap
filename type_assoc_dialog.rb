@@ -7,7 +7,7 @@ class TypeAssocDialog < Gtk::Dialog
   def initialize parent
     super("タイプ関連付け", parent, MODAL)
 
-    @type_assoc = ::Settings[:TYPE_ASSOC]
+    @type_assoc = ::Settings[:TYPE_ASSOC].dup
 
     layout
     load
