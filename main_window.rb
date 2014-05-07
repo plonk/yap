@@ -73,7 +73,7 @@ class MainWindow
   end
 
   def favorites_changed
-    update_favorite_toolbutton_label
+    update_favorite_toolbutton
   end
 
   def create_favorite_menu
@@ -238,16 +238,15 @@ class MainWindow
   # -- class MainWindow --
 
   def channel_list_updated
-    update_favorite_toolbutton_label
+    update_favorite_toolbutton
     @channel_list_view.refresh
-    # set favorite menu to toolbutton
-    @favorite_toolbutton.menu = create_favorite_menu
     update_window_title
   end
 
-  def update_favorite_toolbutton_label
+  def update_favorite_toolbutton
     numfavs = (@model.yellow_pages.flat_map(&:channel_names) & @model.favorites.to_a).size
     @favorite_toolbutton.label = "お気に入り (#{numfavs})"
+    @favorite_toolbutton.menu = create_favorite_menu
   end
 
   # -- class MainWindow
