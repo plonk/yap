@@ -19,7 +19,8 @@ class Settings_
       Dir.mkdir(SETTINGS_DIR)
     end
 
-    @variables = { :TYPE_ASSOC => [["WMV|FLV", "mplayer $Y"]] }
+    @variables = { :TYPE_ASSOC => [["WMV|FLV", "mplayer $Y"],
+                                   ["OPV", "xdg-open $3"]] }
   end
 
   def [] sym
