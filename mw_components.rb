@@ -188,23 +188,6 @@ class MainWindow
 
     @favorite_toggle_button.signal_connect("toggled", &method(:favorite_toggle_button_toggled_callback))
 
-    @about_toolbutton.signal_connect('clicked') do 
-      comments = <<EOS
-GTK+ #{Gtk::VERSION.join('.')}
-Ruby/GTK: #{Gtk::BINDING_VERSION.join('.')} (built for #{Gtk::BUILD_VERSION.join('.')})
-Ruby: #{RUBY_VERSION} [#{RUBY_PLATFORM}]
-EOS
-      comments = comments.chomp
-      dialog = create(AboutDialog,
-                      modal: true,
-                      program_name: "YAP",
-                      version: "0.0.3",
-                      comments: comments,
-                      authors: ['予定地'],
-                      website: 'https://github.com/plonk/yap')
-      dialog.run do |response|
-        dialog.destroy
-      end
-    end
+    @about_toolbutton.signal_connect('clicked', &method(:on_about_toolbutton_clicked))
   end
 end
