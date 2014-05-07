@@ -150,8 +150,9 @@ class MainWindow
     @notification = Notification.new
     @outermost_vbox.pack_start(@notification, false)
 
-    set_default_size( 640, 640)
-    border_width = 0 # 10
+    set_default_size(640, 640)
+    self.icon = Resource.path 'yap.png'
+    self.border_width = 0 # 10
     add @outermost_vbox
   end
 

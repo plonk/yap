@@ -32,6 +32,77 @@ class MainWindow
     @status_icon = create(StatusIcon,
                           pixbuf: Gdk::Pixbuf.new(Resource.path('yap.png')),
                           tooltip: "YAP")
+
+    # クリックされたらメインウィンドウの表示・非表示を切り替える。
+    @status_icon.signal_connect('activate') do
+      if visible?
+        hide
+      else
+        show
+        deiconify
+      end
+    end
+
+    menu = create_status_icon_menu
+    @status_icon.signal_connect('popup-menu') do |tray, button, time|
+      menu.popup(nil, nil, button, time)
+    end
+
+    # メインウィンドウが最小化されたら非表示にする。
+    self.signal_connect('window-state-event') do |win, e|
+      # p [:changed_mask, e.changed_mask]
+      # p [:new_state, e.new_window_state]
+      if e.changed_mask.iconified?
+        if e.new_window_state.iconified? and !e.new_window_state.withdrawn?
+          self.hide
+          next true
+        end
+      end
+      false
+    end
+  end
+
+  def create_status_icon_menu
+    create(Menu) do |menu|
+      create(ImageMenuItem, Stock::INFO) do |info|
+        info.signal_connect('activate') do
+          run_about_dialog
+        end
+        menu.append(info)
+      end
+
+      menu.append(Gtk::SeparatorMenuItem.new)
+
+      create(ImageMenuItem, Stock::QUIT) do |quit|
+        quit.signal_connect('activate') do self.quit end
+        menu.append(quit)
+      end
+
+      menu.show_all
+    end
+  end
+
+  def on_about_toolbutton_clicked toolbutton
+    run_about_dialog
+  end
+
+  def run_about_dialog
+    comments = <<EOS
+GTK+ #{Gtk::VERSION.join('.')}
+Ruby/GTK: #{Gtk::BINDING_VERSION.join('.')} (built for #{Gtk::BUILD_VERSION.join('.')})
+Ruby: #{RUBY_VERSION} [#{RUBY_PLATFORM}]
+EOS
+    comments = comments.chomp
+    dialog = create(AboutDialog,
+                    modal: true,
+                    program_name: "YAP",
+                    version: "0.0.3",
+                    comments: comments,
+                    authors: ['予定地'],
+                    website: 'https://github.com/plonk/yap')
+    dialog.run do |response|
+      dialog.destroy
+    end
   end
 
   def favorite_toggled
@@ -141,8 +212,10 @@ class MainWindow
 
   def main_window_destroy_callback widget
     puts "destroying main window"
-    finalize
+  end
 
+  def quit
+    finalize
     Gtk.main_quit
   end
 
