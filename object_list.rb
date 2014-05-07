@@ -89,19 +89,17 @@ class ObjectList < Gtk::ScrolledWindow
   def set ary
     fail unless ary.is_a? Array
 
-    if @objects != ary
-      @objects = ary
-      @list_store.clear
-      ary.each do |obj|
-        iter = @list_store.append
-        values = @reader_list.map { |f| f.call(obj) }
-        iter[0] = obj.object_id.to_s
-        values.each_with_index { |val, i|
-          iter[i+1] = val
-        }
-      end
-      @treeview.columns.each {|c| c.sort_indicator = false }
+    @objects = ary
+    @list_store.clear
+    ary.each do |obj|
+      iter = @list_store.append
+      values = @reader_list.map { |f| f.call(obj) }
+      iter[0] = obj.object_id.to_s
+      values.each_with_index { |val, i|
+        iter[i+1] = val
+      }
     end
+    @treeview.columns.each {|c| c.sort_indicator = false }
   end
 
   def get
