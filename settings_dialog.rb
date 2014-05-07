@@ -3,7 +3,7 @@ require 'gtk2'
 require_relative 'settings'
 require_relative 'utility'
 require_relative 'object_list'
-require_relative 'file_assoc_dialog'
+require_relative 'type_assoc_dialog'
 
 class SettingsDialog < Gtk::Dialog
   include Gtk
@@ -113,7 +113,7 @@ class SettingsDialog < Gtk::Dialog
   end
 
   def cb_file_assoc_button_clicked button
-    dialog = FileAssocDialog.new(self).show_all
+    dialog = TypeAssocDialog.new(self).show_all
     dialog.run do |response|
       case response
       when RESPONSE_OK
