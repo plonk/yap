@@ -126,13 +126,7 @@ class ObjectList < Gtk::ScrolledWindow
   end
 
   def can_go_up?
-    if selected == nil
-      false
-    elsif @objects.index(selected) != 0
-      true
-    else
-      false
-    end
+    selected and @objects.index(selected) != 0
   end
 
   def go_up
@@ -148,13 +142,7 @@ class ObjectList < Gtk::ScrolledWindow
   end
 
   def can_go_down?
-    if selected == nil
-      false
-    elsif @objects.index(selected) != @objects.size - 1
-      true
-    else
-      false
-    end
+    selected and @objects.index(selected) != @objects.size - 1
   end
 
   def go_down
