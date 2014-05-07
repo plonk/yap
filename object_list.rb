@@ -28,7 +28,7 @@ class ObjectList < Gtk::ScrolledWindow
     install_columns(headers)
     @treeview.search_column = 1
 
-    @treeview.signal_connect('cursor-changed', &method(:on_cursor_changed))
+    @treeview.selection.signal_connect('changed', &method(:on_cursor_changed))
     add @treeview
   end
 
@@ -89,24 +89,92 @@ class ObjectList < Gtk::ScrolledWindow
     notify_observers
   end
 
-  public
-  def set ary
-    fail unless ary.is_a? Array
-
-    @objects = ary
+  def populate_table
     @list_store.clear
-    ary.each do |obj|
+    @objects.each do |obj|
       iter = @list_store.append
       values = @reader_list.map { |f| f.call(obj) }
       iter[0] = obj.object_id.to_s
       values.each_with_index { |val, i| iter[i+1] = val }
     end
     @treeview.columns.each {|c| c.sort_indicator = false }
+  end
+
+  def select_row index
+    i = 0
+    @list_store.each do |model, path, iter|
+      if i==index
+        @treeview.selection.select_iter iter
+        break
+      end
+      i += 1
+    end
+  end
+
+  public
+  def set ary
+    fail unless ary.is_a? Array
+
+    @objects = ary
+    populate_table
     changed
     notify_observers
   end
 
   def get
     @objects
+  end
+
+  def can_go_up?
+    if selected == nil
+      false
+    elsif @objects.index(selected) != 0
+      true
+    else
+      false
+    end
+  end
+
+  def go_up
+    return unless can_go_up?
+    obj = selected
+    old_pos = @objects.index(obj)
+    @objects.delete(obj)
+    @objects.insert(old_pos - 1, obj)
+    populate_table
+    select_row(old_pos-1)
+    changed
+    notify_observers
+  end
+
+  def can_go_down?
+    if selected == nil
+      false
+    elsif @objects.index(selected) != @objects.size - 1
+      true
+    else
+      false
+    end
+  end
+
+  def go_down
+    return unless can_go_down?
+    obj = selected
+    old_pos = @objects.index(obj)
+    @objects.delete(obj)
+    @objects.insert(old_pos + 1, obj)
+    populate_table
+    select_row(old_pos+1)
+    changed
+    notify_observers
+  end
+
+  def delete
+    if selected
+      @objects.delete(selected)
+      populate_table
+      changed
+      notify_observers
+    end
   end
 end

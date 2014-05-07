@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+require_relative 'relation'
+# -*- coding: utf-8 -*-
 class TypeAssocDialog < Gtk::Dialog
   include Gtk, GtkHelper, Gtk::Stock
+  include Relation
 
   attr_reader :type_assoc
 
@@ -11,6 +14,24 @@ class TypeAssocDialog < Gtk::Dialog
 
     layout
     load
+
+    @delete_button.signal_connect('clicked') do
+      @assoc_list.delete
+    end
+    @up_button.signal_connect('clicked') do
+      @assoc_list.go_up
+    end
+    @down_button.signal_connect('clicked') do
+      @assoc_list.go_down
+    end
+
+    relation '@delete_button.sensitive mimics @assoc_list.selected'
+    relation '@up_button.sensitive mimics @assoc_list.can_go_up?'
+    relation '@down_button.sensitive mimics @assoc_list.can_go_down?'
+
+    signal_connect('destroy') do
+      dissolve_relations
+    end
   end
 
   def load
@@ -54,6 +75,8 @@ class TypeAssocDialog < Gtk::Dialog
                 proc { |obj| obj[1] } ]
     writers = [ proc { |obj, val| obj[0] = val },
                 proc { |obj, val| obj[1] = val } ]
-    return ObjectList.new(headers, readers, writers)
+    assoc_list = create(ObjectList, headers, readers, writers,
+                        vscrollbar_policy: POLICY_AUTOMATIC)
+    
   end
 end
