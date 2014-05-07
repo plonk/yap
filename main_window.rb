@@ -212,6 +212,7 @@ EOS
 
   def main_window_destroy_callback widget
     puts "destroying main window"
+    quit
   end
 
   def quit
