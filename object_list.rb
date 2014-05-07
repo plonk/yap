@@ -11,7 +11,7 @@ class ObjectList < Gtk::ScrolledWindow
   UP_ARROW = Gtk::SORT_DESCENDING
   DOWN_ARROW = Gtk::SORT_ASCENDING
 
-  def initialize headers, reader_list, writer_list
+  def initialize headers, reader_list, writer_list, constructor = nil
     super()
 
     self.hscrollbar_policy = POLICY_AUTOMATIC
@@ -26,6 +26,8 @@ class ObjectList < Gtk::ScrolledWindow
     @treeview = create(TreeView, @list_store)
 
     install_columns(headers)
+    @headers = headers
+    @constructor = constructor
     @treeview.search_column = 1
 
     @treeview.selection.signal_connect('changed', &method(:on_cursor_changed))
@@ -164,5 +166,61 @@ class ObjectList < Gtk::ScrolledWindow
       changed
       notify_observers
     end
+  end
+
+  class AddItemDialog < Gtk::Dialog
+    include Gtk::Stock, GtkHelper, Gtk
+
+    attr_reader :result
+
+    def initialize parent, headers, constructor
+      super('項目を追加する', parent, MODAL)
+
+      @constructor = constructor
+      @entries = []
+
+      headers.each do |text|
+        create Label, text do |label|
+          self.vbox.pack_start(label, false)
+        end
+
+        create Entry do |entry|
+          @entries << entry
+          self.vbox.pack_start(entry, false)
+        end
+      end
+
+      self.vbox.pack_start(HSeparator.new, false)
+
+      add_button(OK, RESPONSE_OK)
+      add_button(CANCEL, RESPONSE_CANCEL)
+    end
+
+    def result
+      @constructor.call(*@entries.map(&:text))
+    end
+  end
+
+  def run_add_dialog parent
+    raise "object constructor not set" unless @constructor
+
+    dialog = AddItemDialog.new(parent, @headers, @constructor).show_all
+    result = nil
+    dialog.run do |response|
+      if response == RESPONSE_OK
+        result = dialog.result
+      end
+    end
+    dialog.destroy
+    if result
+      add_object(result)
+    end
+  end
+
+  def add_object(result)
+    @objects << result
+    populate_table
+    changed
+    notify_observers
   end
 end

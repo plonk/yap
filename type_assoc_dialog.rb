@@ -15,6 +15,9 @@ class TypeAssocDialog < Gtk::Dialog
     layout
     load
 
+    @add_button.signal_connect('clicked') do
+      @assoc_list.run_add_dialog(self)
+    end
     @delete_button.signal_connect('clicked') do
       @assoc_list.delete
     end
@@ -51,7 +54,7 @@ class TypeAssocDialog < Gtk::Dialog
              layout_style: ButtonBox::START,
              spacing: 5) do |bbox|
         buttons = [ADD, DELETE, GO_UP, GO_DOWN]
-          .map { |type| create(Button, type, sensitive: false) }
+          .map { |type| create(Button, type) }
 
         [:pack_start, :pack_start, :pack_end, :pack_end].zip(buttons)
           .each do |pack, button|
@@ -75,7 +78,8 @@ class TypeAssocDialog < Gtk::Dialog
                 proc { |obj| obj[1] } ]
     writers = [ proc { |obj, val| obj[0] = val },
                 proc { |obj, val| obj[1] = val } ]
-    assoc_list = create(ObjectList, headers, readers, writers,
+    constructor = Array.method(:[])
+    assoc_list = create(ObjectList, headers, readers, writers, constructor,
                         vscrollbar_policy: POLICY_AUTOMATIC)
     
   end
