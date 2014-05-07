@@ -208,6 +208,9 @@ end
 begin
   puts "Going into the main loop"
   Gtk.main
+rescue Interrupt
+  # なんか変だ
+  window.finalize
 ensure
   if $RUNNING_ON_RUBYW
     File.open("outlog.txt", "w") do |f|
