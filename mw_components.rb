@@ -15,8 +15,8 @@ class MainWindow
   def create_default_action_group
     action_group = ActionGroup.new('default action group')
     action_group.add_actions [
-                              ["FileMenuAction", nil, "ファイル(_F)", "", nil, proc { }],
-                              ["ReloadAction",     Stock::REFRESH, "更新(_X)",    "", nil, proc { @model.reload }],
+                              ["FileMenuAction", Stock::FILE, "ファイル(_F)", "", nil, proc { }],
+                              ["ReloadAction",     Stock::REFRESH, "更新(_R)",    "", nil, proc { @model.reload }],
                               ["ExitAction",     Stock::QUIT, "終了(_X)",    "", nil, proc { quit }],
 
                               ["ViewMenuAction", nil, "表示(_V)",     "", nil, proc { }],
@@ -30,8 +30,8 @@ class MainWindow
                               ["YellowPageAction", nil, "YP 設定(_Y)",     "", nil, proc { }],
                               ["ProcessManagerAction", nil, "プロセスマネージャ(_P)",     "", nil, proc { open_process_manager }],
 
-                              ["HelpMenuAction", nil, "ヘルプ(_H)",     "", nil, proc { }],
-                              ["AboutAction",    nil, "このアプリケーションについて(_A)",    "", nil, proc { run_about_dialog }],
+                              ["HelpMenuAction", Stock::HELP, "ヘルプ(_H)",     "", nil, proc { }],
+                              ["AboutAction",    Stock::ABOUT, "このアプリケーションについて(_A)",    "", nil, proc { run_about_dialog }],
                              ]
 
     # [name, stock_id, label, accelarator, tooltip, proc, is_active]
