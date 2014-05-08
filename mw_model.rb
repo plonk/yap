@@ -37,6 +37,9 @@ class MainWindowModel
     @favorites = Favorites.new
     @favorites.load
     @favorites.add_observer(self, :favorites_changed)
+
+    Settings.add_observer(self, :settings_changed)
+
     @search_term = ""
     @notification = ""
     @master_table = []
@@ -51,6 +54,11 @@ class MainWindowModel
     add_yp YellowPage.new("multi-yp", "http://peercast.takami98.net/multi-yp/", nil, nil)
     add_yp YellowPage.new("アスチェ", "http://asuka--sen-nin.ddo.jp/checker/", nil, nil)
     add_yp YellowPage.new("cavetube", "http://rss.cavelis.net/", nil, nil)
+  end
+
+  def settings_changed
+    changed
+    notify_observers(:settings_changed)
   end
 
   def child_process_changed
@@ -156,6 +164,10 @@ class MainWindowModel
   def finalize
     @favorites.delete_observer(self)
     @favorites.save
+
+    Settings.delete_observer(self)
+    Settings.save
+
     stop_helper_threads
   end
 

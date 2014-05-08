@@ -62,6 +62,19 @@ class MainWindow
     end
   end
 
+  def settings_changed
+    @toolbar.visible = ::Settings[:TOOLBAR_VISIBLE]
+    @mainarea_vbox.visible = ::Settings[:CHANNEL_INFO_VISIBLE]
+  end
+
+  def toggle_toolbar_visibility
+    ::Settings[:TOOLBAR_VISIBLE] = !::Settings[:TOOLBAR_VISIBLE]
+  end
+
+  def toggle_channel_info_visibility
+    ::Settings[:CHANNEL_INFO_VISIBLE] = !::Settings[:CHANNEL_INFO_VISIBLE]
+  end
+
   def create_status_icon_menu
     create(Menu) do |menu|
       create(ImageMenuItem, Stock::INFO) do |info|
@@ -113,6 +126,8 @@ EOS
     super
     # フォーカスバグを回避するために Entry の show を遅らせる。
     @search_field.show
+    @toolbar.visible = ::Settings[:TOOLBAR_VISIBLE]
+    @mainarea_vbox.visible = ::Settings[:CHANNEL_INFO_VISIBLE]
   end
 
   def show_channel_info ch
@@ -154,18 +169,22 @@ EOS
     update_favorite_toolbutton
   end
 
+  def run_favorite_dialog
+    dialog = FavoriteDialog.new(self, @model.favorites.to_a)
+    dialog.show_all
+    dialog.run do |response|
+      if response==Dialog::RESPONSE_OK
+        @model.favorites.replace(dialog.list)
+      end
+    end
+    dialog.destroy
+  end
+
   def create_favorite_menu
     Menu.new.tap do |menu|
       MenuItem.new("お気に入りの整理...").tap do |edit|
         edit.signal_connect("activate") do
-          dialog = FavoriteDialog.new(self, @model.favorites.to_a)
-          dialog.show_all
-          dialog.run do |response|
-            if response==Dialog::RESPONSE_OK
-              @model.favorites.replace(dialog.list)
-            end
-          end
-          dialog.destroy
+          run_favorite_dialog
         end
         menu.append edit
       end
@@ -194,15 +213,25 @@ EOS
     end
   end
 
+
+  def open_settings_dialog
+    d = SettingsDialog.new(self)
+    d.show_all
+  end
+
   def setup_accel_keys
     accel_group = Gtk::AccelGroup.new
     accel_group.connect(Gdk::Keyval::GDK_A,
                         Gdk::Window::CONTROL_MASK,
                         Gtk::ACCEL_VISIBLE) do
-      ProcessManager.new(self, @model).show_all
+      open_process_manager
     end
 
     add_accel_group(accel_group)
+  end
+
+  def open_process_manager
+    ProcessManager.new(self, @model).show_all
   end
 
   def finalize

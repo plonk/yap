@@ -9,7 +9,7 @@ class Settings_
 
   SETTINGS_DIR = ENV['HOME'] / ".yap"
 
-  VARIABLES = %w[USER_PLAYER USER_PEERCAST TYPE_ASSOC].map(&:to_sym)
+  VARIABLES = %w[USER_PLAYER USER_PEERCAST TYPE_ASSOC TOOLBAR_VISIBLE CHANNEL_INFO_VISIBLE].map(&:to_sym)
 
   def initialize
     super
@@ -19,8 +19,12 @@ class Settings_
       Dir.mkdir(SETTINGS_DIR)
     end
 
-    @variables = { :TYPE_ASSOC => [["WMV|FLV", "mplayer $Y"],
-                                   ["OPV", "xdg-open $3"]] }
+    @variables = {
+      :TYPE_ASSOC => [["WMV|FLV", "mplayer $Y"],
+                      ["OPV", "xdg-open $3"]],
+      :TOOLBAR_VISIBLE => true,
+      :CHANNEL_INFO_VISIBLE => true,
+    }
   end
 
   def [] sym

@@ -102,7 +102,7 @@ class SettingsDialog < Gtk::Dialog
           ::Settings.save
         end
       else # CANCEL
-        ::Settings.load
+        # ::Settings.load
       end
       destroy
     end
