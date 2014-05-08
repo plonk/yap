@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 require_relative 'relation'
+require_relative 'type'
+
 # -*- coding: utf-8 -*-
 class TypeAssocDialog < Gtk::Dialog
   include Gtk, GtkHelper, Gtk::Stock
@@ -7,10 +9,12 @@ class TypeAssocDialog < Gtk::Dialog
 
   attr_reader :type_assoc
 
+  FORMAT = [[String, String]]
+
   def initialize parent, type_assoc
     super("タイプ関連付け", parent, MODAL)
 
-    @type_assoc = type_assoc.map(&:dup)
+    @type_assoc = type_assoc.as(FORMAT).map(&:dup)
 
     layout
     wire_up_button_callbacks

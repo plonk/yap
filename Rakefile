@@ -2,12 +2,15 @@ load "config.rb"
 
 task :default => ["yap"]
 
-SRC = %w[main_window.rb mw_model.rb mw_components.rb line_prompt.rb notification.rb
-         channel_info_label.rb channel_name_label.rb relation.rb object_list.rb
-	 channel.rb settings_dialog.rb yellowpage.rb type_assoc_dialog.rb
-         channeldb.rb info_dialog.rb sound.rb config.rb extensions.rb
-         resource.rb threadhack.rb favorite_dialog.rb log_dialog.rb type_association.rb
-         settings.rb yap.rb] 
+SRC = %w[channel.rb channel_info_label.rb channel_list_view.rb
+         channel_name_label.rb channeldb.rb child_process.rb
+         clv_context_menu.rb config.rb extensions.rb favorite_dialog.rb
+         favorites.rb info_dialog.rb launcher.rb line_prompt.rb log_dialog.rb
+         main_window.rb menutest.rb mw_components.rb mw_model.rb
+         notification.rb object_list.rb process_manager.rb rc.rb relation.rb
+         resource.rb settings.rb settings_dialog.rb sound.rb test_suite.rb
+         threadhack.rb type.rb type_assoc_dialog.rb type_association.rb
+         utility.rb yap.rb yellowpage.rb]
 
 file 'yap' => SRC do |task|
   sh "ruby rc.rb -o yap yap.rb"
@@ -27,3 +30,4 @@ task :uninstall do
   sh "rm -vf #{$BIN_DIR}/yap"
   sh "rm -rvf #{$RESOURCE_DIR}"
 end
+
