@@ -57,7 +57,7 @@ class ObjectList < Gtk::ScrolledWindow
       create(TreeViewColumn, headers[i],
              renderer,
              {text: i+1},
-             resizable: true, clickable: true) do |col|
+             resizable: true, clickable: false) do |col|
         col.signal_connect('clicked') do
           @treeview.columns.each do |c|
             if c!=col
