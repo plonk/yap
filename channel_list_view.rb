@@ -278,27 +278,40 @@ class ChannelListView < Gtk::TreeView
     return nil
   end
 
+  def channel_copy iter, ch
+    ch = ch.as Channel
+    iter = iter.as TreeIter
+
+    iter[FLD_CHNAME]   = ch.name
+    iter[FLD_GENRE]    = ch.genre
+    iter[FLD_DETAIL]   = ch.detail
+    iter[FLD_LISTENER] = ch.listener
+    iter[FLD_TIME]     = ch.time
+    iter[FLD_BITRATE]  = ch.bitrate
+    iter[FLD_HASH]     = ch.hash.to_s(16)
+  end
+
   # チャンネルリストとListStoreをマージする
   def refresh
-    model.to_enum.flat_map { |model, path, iter|
+    finished_refs = []
+
+    model.each do |model, path, iter|
       if @mw_model.finished.any? { |ch| ch.hash.to_s(16) == iter[FLD_HASH] }
-        [ TreeRowReference.new(model, path) ]
+        finished_refs << TreeRowReference.new(model, path)
       else
-        []
+        match = @mw_model.master_table.select { |ch| ch.hash.to_s(16) == iter[FLD_HASH] }
+        fail "logic error" unless match.size == 1
+        channel_copy(iter, match.first)
       end
-    }.each do |ref|
+    end
+
+    finished_refs.each do |ref|
       model.remove model.get_iter(ref.path)
     end
 
     @mw_model.just_began.each do |ch|
       iter = model.append
-      iter[FLD_CHNAME]   = ch.name
-      iter[FLD_GENRE]    = ch.genre
-      iter[FLD_DETAIL]   = ch.detail
-      iter[FLD_LISTENER] = ch.listener
-      iter[FLD_TIME]     = ch.time
-      iter[FLD_BITRATE]  = ch.bitrate
-      iter[FLD_HASH]     = ch.hash.to_s(16)
+      channel_copy(iter, ch)
     end
   end
 end
