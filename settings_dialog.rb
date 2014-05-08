@@ -112,7 +112,7 @@ class SettingsDialog < Gtk::Dialog
   end
 
   def cb_file_assoc_button_clicked button
-    dialog = TypeAssocDialog.new(self).show_all
+    dialog = TypeAssocDialog.new(self, ::Settings[:TYPE_ASSOC]).show_all
     dialog.run do |response|
       case response
       when RESPONSE_OK

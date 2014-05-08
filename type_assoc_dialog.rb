@@ -7,14 +7,22 @@ class TypeAssocDialog < Gtk::Dialog
 
   attr_reader :type_assoc
 
-  def initialize parent
+  def initialize parent, type_assoc
     super("タイプ関連付け", parent, MODAL)
 
-    @type_assoc = ::Settings[:TYPE_ASSOC].dup
+    @type_assoc = type_assoc.map(&:dup)
 
     layout
+    wire_up_button_callbacks
+    declare_relations
     load
 
+    signal_connect('destroy') do
+      dissolve_relations
+    end
+  end
+
+  def wire_up_button_callbacks
     @add_button.signal_connect('clicked') do
       @assoc_list.run_add_dialog(self)
     end
@@ -27,14 +35,12 @@ class TypeAssocDialog < Gtk::Dialog
     @down_button.signal_connect('clicked') do
       @assoc_list.go_down
     end
+  end
 
+  def declare_relations
     relation '@delete_button.sensitive mimics @assoc_list.selected'
     relation '@up_button.sensitive mimics @assoc_list.can_go_up?'
     relation '@down_button.sensitive mimics @assoc_list.can_go_down?'
-
-    signal_connect('destroy') do
-      dissolve_relations
-    end
   end
 
   def load
