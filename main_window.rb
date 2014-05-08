@@ -332,9 +332,6 @@ EOS
 
   # -- class MainWindow
 
-  def channel_db_updated
-  end
-
   def reload_toolbutton_callback widget
     STDERR.puts "RELOAD CLICKED"
     @model.reload

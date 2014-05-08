@@ -3,7 +3,7 @@ load "config.rb"
 task :default => ["yap"]
 
 SRC = %w[channel.rb channel_info_label.rb channel_list_view.rb
-         channel_name_label.rb channeldb.rb child_process.rb
+         channel_name_label.rb child_process.rb
          clv_context_menu.rb config.rb extensions.rb favorite_dialog.rb
          favorites.rb info_dialog.rb launcher.rb line_prompt.rb log_dialog.rb
          main_window.rb menutest.rb mw_components.rb mw_model.rb
@@ -23,7 +23,7 @@ end
 task :install => ["yap"] do
   sh "install yap #{$BIN_DIR}"
   sh "mkdir -p #{$RESOURCE_DIR}"
-  sh "cp yap.png loading.ico play.ico question16.ico question64.ico #{$RESOURCE_DIR}"
+  sh "cp ui_definition.xml yap.png loading.ico play.ico question16.ico question64.ico #{$RESOURCE_DIR}"
 end
 
 task :uninstall do

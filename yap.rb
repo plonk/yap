@@ -13,7 +13,6 @@ require_relative "utility"
 require_relative "channel"
 require_relative "threadhack"
 require_relative "yellowpage"
-require_relative "channeldb"
 require_relative "extensions"
 require_relative 'resource'
 
@@ -44,33 +43,9 @@ $MANUAL_UPDATE_COUNT = 5
 $NOTIFICATION_AUTO_CLOSE_TIMEOUT = 15
 $ENABLE_VIEWLOG = false
 
-$RESTART_FLAG = false
-
 settings = Gtk::Settings.default
 settings.gtk_tooltip_timeout = 500 # possibly earlier is desirable
 #settings.gtk_tooltip_timeout = 0
-
-
-dbm_locked = false
-begin
-  $CDB = DBM.new(ENV['HOME'] / ".yap" / "channels")
-rescue
-  dbm_locked = true
-end
-
-if dbm_locked
-  md = Gtk::MessageDialog.new(nil,
-                              Gtk::Dialog::DESTROY_WITH_PARENT,
-                              Gtk::MessageDialog::ERROR,
-                              Gtk::MessageDialog::BUTTONS_OK,
-                              "複数起動することはできません。終了します。")
-  md.title = "エラー - dbm access denied"
-  md.run do |res|
-    md.destroy
-#    Gtk.main_quit # this doesn't work
-    exit 1
-  end
-end
 
 # URL to HTML text
 # $PAGE_CACHE = Hash.new 
@@ -217,13 +192,5 @@ ensure
       f.write $log.string
     end
   end
-  $CDB.close
   $PAGE_CACHE.close
 end
-
-# exec だとなぜか、ウィンドウのｚ軸並びを変更した時にフリーズする。
-# spawn でプロセス番号を変えよう。このプロセスの終了は迅速なので、
-# 多重起動禁止処理に引っかかったりはしないようだ。
-#exec("ruby.exe", "yap.rb") if $RESTART_FLAG
-spawn("ruby", "yap.rb") if $RESTART_FLAG
-#load $0 if $RESTART_FLAG

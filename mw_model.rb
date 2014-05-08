@@ -178,17 +178,6 @@ class MainWindowModel
 
   private 
 
-  # チャンネル DB に追加・更新。
-  def update_channel_db
-    @yellow_pages.each do |yp|
-      yp.each_channel do |ch|
-        $CDB[ch.name] = [yp.timestamp.to_i, ch.contact_url].to_csv
-      end
-    end
-    changed
-    notify_observers(:channel_db_updated)
-  end
-
   def spawn_yp_updater_threads
     threads = []
     @yellow_pages.each do |yp|
@@ -232,9 +221,6 @@ class MainWindowModel
     notify_observers(:channel_list_updated)
 
     update_notification
-
-    # ついでにチャンネルDBを更新する。
-    update_channel_db
   end
 
   # 更新ボタンの有効無効を管理するスレッドを開始する。

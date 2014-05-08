@@ -12,8 +12,41 @@ class MainWindow
     connect_callbacks
   end
 
+  def create_default_action_group
+    action_group = ActionGroup.new('default action group')
+    action_group.add_actions [
+                              ["FileMenuAction", nil, "ファイル(_F)", "", nil, proc { }],
+                              ["ReloadAction",     Stock::REFRESH, "更新(_X)",    "", nil, proc { }],
+                              ["ExitAction",     Stock::QUIT, "終了(_X)",    "", nil, proc { }],
+
+                              ["ViewMenuAction", nil, "表示(_V)",     "", nil, proc { }],
+
+                              ["FavoritesMenuAction", nil, "お気に入り(_A)",     "", nil, proc { }],
+                              ["OrganizeFavoritesAction", nil, "整理(_A)",     "", nil, proc { }],
+
+                              ["ToolMenuAction", nil, "ツール(_T)",     "", nil, proc { }],
+                              ["SettingsAction", Stock::PREFERENCES, "一般設定(_S)",     "", nil, proc { }],
+                              ["TypeAssocAction", nil, "プレーヤー設定(_T)",     "", nil, proc { }],
+                              ["YellowPageAction", nil, "YP 設定(_Y)",     "", nil, proc { }],
+                              ["ProcessManagerAction", nil, "プロセスマネージャ(_P)",     "", nil, proc { }],
+
+                              ["HelpMenuAction", nil, "ヘルプ(_H)",     "", nil, proc { }],
+                              ["AboutAction",    nil, "このアプリケーションについて(_A)",    "", nil, proc { }],
+                             ]
+    action_group
+  end
+
   def widget_layout
     @outermost_vbox = VBox.new(false, 0)
+
+    @ui_manager = UIManager.new
+    @ui_manager.add_ui(Resource.path("ui_definition.xml"))
+
+    @action_group = create_default_action_group
+    @ui_manager.insert_action_group(@action_group, 0)
+
+    @outermost_vbox.pack_start @ui_manager['/ui/menubar'], false
+
     @toolbar = create(Toolbar, toolbar_style: Toolbar::Style::BOTH_HORIZ)
 
     @reload_toolbutton = create(ToolButton, Stock::REFRESH,
@@ -35,24 +68,12 @@ class MainWindow
     end
     @settings_toolbutton = create(ToolButton, Stock::PREFERENCES, important: true)
 
-    @channeldb_toolbutton = create(ToolButton, Stock::YES, 
-                                   label: "チャンネルDB",
-                                   important: true)
-
     @spring = create(SeparatorToolItem, expand: true, draw: false)
-
-    @restart_toolbutton = create(ToolButton, Stock::QUIT, label: "再起動", important: true)
-
-    @about_toolbutton = create(ToolButton, Stock::ABOUT, important: true)
 
     @toolbar.add @reload_toolbutton
     @toolbar.add @favorite_toolbutton
     @toolbar.add @viewlog_toolbutton if $ENABLE_VIEWLOG
     @toolbar.add @settings_toolbutton
-    @toolbar.add @channeldb_toolbutton
-    @toolbar.add @spring
-    @toolbar.add @restart_toolbutton
-    @toolbar.add @about_toolbutton
 
     @outermost_vbox.pack_start(@toolbar, false)
 
@@ -171,23 +192,11 @@ class MainWindow
       d.show_all
     end
 
-    @channeldb_toolbutton.signal_connect("clicked") do 
-      d = ChannelDBDialog.new(self)
-      d.show_all
-    end
-
-    @restart_toolbutton.signal_connect("clicked") do
-      $RESTART_FLAG = true
-      destroy
-    end
-
     @clear_button.signal_connect("clicked") do
       @model.search_term = ""
     end
 
 
     @favorite_toggle_button.signal_connect("toggled", &method(:favorite_toggle_button_toggled_callback))
-
-    @about_toolbutton.signal_connect('clicked', &method(:on_about_toolbutton_clicked))
   end
 end
