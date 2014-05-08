@@ -2,7 +2,6 @@
 require_relative 'relation'
 require_relative 'type'
 
-# -*- coding: utf-8 -*-
 class TypeAssocDialog < Gtk::Dialog
   include Gtk, GtkHelper, Gtk::Stock
   include Relation
