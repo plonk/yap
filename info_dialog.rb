@@ -34,9 +34,12 @@ class InfoDialog < Gtk::Dialog
     else
       if $REVERSE_LOOKUP_TIP
         addr, port = tip.split(':')
-        # XXX should catch Resolv::ResolvError
-        hostname = Resolv.getname(addr)
-        additional_info = "\n(#{hostname}:#{port})"
+        begin
+          hostname = Resolv.getname(addr)
+          additional_info = "\n(#{hostname}:#{port})"
+        rescue
+          additional_info = "\n(reverse lookup failed)"
+        end
       else
         additional_info = ""
       end
