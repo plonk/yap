@@ -60,10 +60,8 @@ class MainWindow
 
     @reload_toolbutton = create(ToolButton, Stock::REFRESH,
                                 label: "すぐに更新",
-                                tooltip_text: $MANUAL_UPDATE_INTERVAL == 0 ?
-                                "次の自動更新を待たずにチャンネルリストを更新します" :
-                                "次の自動更新を待たずにチャンネルリストを更新します" +
-                                "\n（#{$MANUAL_UPDATE_INTERVAL}秒間に#{$MANUAL_UPDATE_COUNT}回まで実行できます）",
+                                tooltip_text: ("次の自動更新を待たずにチャンネルリストを更新します" +
+                                               "\n（#{MainWindowModel::MANUAL_UPDATE_INTERVAL}秒間に#{MainWindowModel::MANUAL_UPDATE_COUNT}回まで実行できます）"),
                                 important: true)
 
     @favorite_toolbutton = create(MenuToolButton, Stock::ABOUT, # only for the star

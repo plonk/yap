@@ -32,8 +32,6 @@ Thread.abort_on_exception = true
 # パラメーター
 #UPDATE_INTERVAL_MINUTE = 1
 # ３分間に３回まで
-$MANUAL_UPDATE_INTERVAL = 5*60
-$MANUAL_UPDATE_COUNT = 5
 $NOTIFICATION_AUTO_CLOSE_TIMEOUT = 15
 $ENABLE_VIEWLOG = false
 

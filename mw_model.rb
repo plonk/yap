@@ -32,6 +32,8 @@ class MainWindowModel
   attr_reader :child_processes
 
   UPDATE_INTERVAL_MINUTE = 10
+  MANUAL_UPDATE_INTERVAL = 5*60
+  MANUAL_UPDATE_COUNT = 5
 
   def initialize
     super
@@ -256,12 +258,12 @@ class MainWindowModel
     @reload_button_state_helper = Thread.start do
       while true
         now = Time.now
-        @reload_history.delete_if { |x| now - x > $MANUAL_UPDATE_INTERVAL } # delete older than 3 minutes
-        if @reload_history.size < $MANUAL_UPDATE_COUNT
+        @reload_history.delete_if { |x| now - x > MANUAL_UPDATE_INTERVAL } # delete older than 3 minutes
+        if @reload_history.size < MANUAL_UPDATE_COUNT
           changed
           notify_observers(:until_reload_toolbutton_available, 0)
         else
-          i = (@reload_history[0] + $MANUAL_UPDATE_INTERVAL - Time.now).to_i
+          i = (@reload_history[0] + MANUAL_UPDATE_INTERVAL - Time.now).to_i
           changed
           notify_observers(:until_reload_toolbutton_available, i)
         end
