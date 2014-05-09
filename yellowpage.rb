@@ -8,6 +8,8 @@ class YellowPage
 
   include Enumerable
 
+  private_class_method :new
+
   IDENTITY_MAP = {}
 
   def self.get *args
