@@ -139,7 +139,7 @@ EOS
     end
   end
 
- def update message, *args
+  def update message, *args
     if self.respond_to? message
       # 別スレッドから呼ばれる可能性があるはず。
       Gtk.queue do 
