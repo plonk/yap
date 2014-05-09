@@ -8,6 +8,16 @@ class YellowPage
 
   include Enumerable
 
+  IDENTITY_MAP = {}
+
+  def self.get *args
+    if IDENTITY_MAP.has_key? args
+      IDENTITY_MAP[args]
+    else
+      IDENTITY_MAP[args] = new *args
+    end
+  end
+
   def initialize(name, url, chat, stat)
     @name = name
     @url = url =~ /\/$/ ? url : url + "/"
@@ -20,6 +30,10 @@ class YellowPage
 
   def favicon_url
     return @url + "favicon.ico"  # Ad hoc
+  end
+
+  def loaded?
+    !!@timestamp
   end
 
   def retrieve

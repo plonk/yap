@@ -52,13 +52,13 @@ class MainWindowModel
   def get_active_yellow_pages
     Settings[:YELLOW_PAGES].to_enum.select { |enabled, | enabled }.
       map do |enabled, name, url, chat_path, stat_path|
-      YellowPage.new(name, url, chat_path, stat_path)
+      YellowPage.get(name, url, chat_path, stat_path)
     end
   end
 
   def settings_changed
     @yellow_pages = get_active_yellow_pages
-    update_channel_list
+    do_update_channel_list(false, false)
     changed
     notify_observers(:settings_changed)
   end
@@ -218,11 +218,23 @@ class MainWindowModel
 
   # チャンネルリストを取得する。
   def update_channel_list
-    puts "Updating channels..."
-    spawn_yp_updater_threads().each &:join
-    puts "Done."
+    do_update_channel_list(true, true)
+  end
 
-    new_table = @yellow_pages.map(&:to_a).inject(:+)
+  def do_update_channel_list(download, notify)
+    if download
+      puts "Updating channels..."
+      spawn_yp_updater_threads().each &:join
+      puts "Done."
+    else
+      @yellow_pages.each do |yp|
+        unless yp.loaded?
+          yp.retrieve
+        end
+      end
+    end
+
+    new_table = @yellow_pages.flat_map(&:to_a)
     @finished = @master_table - new_table
     @just_began = new_table - @master_table
     @master_table = new_table
@@ -230,7 +242,9 @@ class MainWindowModel
     changed
     notify_observers(:channel_list_updated)
 
-    update_notification
+    if notify
+      update_notification
+    end
   end
 
   # 更新ボタンの有効無効を管理するスレッドを開始する。
