@@ -54,8 +54,8 @@ class ChannelListView::ContextMenu < Gtk::Menu
   
   def associate(channel)
     @contact_url.sensitive = channel.contact_url != ""
-    @chat_url   .sensitive = !channel.chname_proper.empty? and channel.chat_url != ""
-    @stat_url   .sensitive = !channel.chname_proper.empty? and channel.stat_url != ""
+    @chat_url   .sensitive = channel.chat_url != ""
+    @stat_url   .sensitive = channel.stat_url != ""
     @play       .sensitive = channel.playable?
 
     @channel = channel

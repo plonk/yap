@@ -101,7 +101,7 @@ class YellowPage
   end
 
   def stat_url_for(ch)
-    if @stat_url_string
+    if @stat_url_string and ch.id != '00000000000000000000000000000000' and !ch.chname_proper.empty?
       return "#{url}#{@stat_url_string}#{ch.chname_proper.url_encode}"
     else
       return ""
@@ -109,7 +109,7 @@ class YellowPage
   end
 
   def chat_url_for(ch)
-    if @chat_url_string
+    if @chat_url_string and ch.id != '00000000000000000000000000000000' and !ch.chname_proper.empty?
       return "#{url}#{@chat_url_string}#{ch.chname_proper.url_encode}"
     else
       return ""
