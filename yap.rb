@@ -29,9 +29,6 @@ if $RUNNING_ON_RUBYW
 end
 Thread.abort_on_exception = true
 
-#Gtk::RC.parse(ENV['HOME'] / ".yap" / "gtkrc")
-Gtk::RC.parse("./gtkrc")
-
 # パラメーター
 #UPDATE_INTERVAL_MINUTE = 1
 UPDATE_INTERVAL_MINUTE = 10
@@ -42,10 +39,6 @@ $MANUAL_UPDATE_INTERVAL = 5*60
 $MANUAL_UPDATE_COUNT = 5
 $NOTIFICATION_AUTO_CLOSE_TIMEOUT = 15
 $ENABLE_VIEWLOG = false
-
-settings = Gtk::Settings.default
-settings.gtk_tooltip_timeout = 500 # possibly earlier is desirable
-#settings.gtk_tooltip_timeout = 0
 
 # URL to HTML text
 # $PAGE_CACHE = Hash.new 
