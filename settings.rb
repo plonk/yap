@@ -24,6 +24,7 @@ class Settings_
      [true, "アスチェ", "http://asuka--sen-nin.ddo.jp/checker/", nil, nil],
      [true, "cavetube", "http://rss.cavelis.net/", nil, nil],
     ],
+    :USER_PEERCAST => "localhost:7144",
   }
 
   VAR_NAMES = VARIABLES.keys
