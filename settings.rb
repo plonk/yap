@@ -10,11 +10,11 @@ class Settings_
   SETTINGS_DIR = ENV['HOME'] / ".yap"
 
   VARIABLES = {
-    :TYPE_ASSOC => [["WMV|FLV", "mplayer $Y"],
+    TYPE_ASSOC: [["WMV|FLV", "mplayer $Y"],
                     ["OPV", "xdg-open $3"]],
-    :TOOLBAR_VISIBLE => true,
-    :CHANNEL_INFO_VISIBLE => true,
-    :YELLOW_PAGES =>
+    TOOLBAR_VISIBLE: true,
+    CHANNEL_INFO_VISIBLE: true,
+    YELLOW_PAGES:
     [
      [true, "SP", "http://bayonet.ddo.jp/sp/", nil, "getgmt.php?cn="],
      [true, "TP", "http://temp.orz.hm/yp/", "chat.php?cn=", "getgmt.php?cn="],
@@ -24,7 +24,8 @@ class Settings_
      [true, "アスチェ", "http://asuka--sen-nin.ddo.jp/checker/", nil, nil],
      [true, "cavetube", "http://rss.cavelis.net/", nil, nil],
     ],
-    :USER_PEERCAST => "localhost:7144",
+    USER_PEERCAST: "localhost:7144",
+    REVERSE_LOOKUP_TIP: true,
   }
 
   VAR_NAMES = VARIABLES.keys

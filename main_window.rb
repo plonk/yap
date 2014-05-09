@@ -374,7 +374,6 @@ EOS
   def update_window_title
     # ウィンドウタイトルを更新する
     str = "YAP - #{Time.now.strftime('%H時%M分')}現在 #{@model.total_channel_count} chが配信中"
-    # str += "interval = #{UPDATE_INTERVAL_MINUTE}"
     self.title = str
   end
 

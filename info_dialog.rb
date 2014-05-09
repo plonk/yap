@@ -34,7 +34,7 @@ class InfoDialog < Gtk::Dialog
     if tip.empty?
       additional_info = ""
     else
-      if $REVERSE_LOOKUP_TIP
+      if ::Settings[:REVERSE_LOOKUP_TIP]
         addr, port = tip.split(':')
         begin
           hostname = Resolv.getname(addr)

@@ -31,6 +31,8 @@ class MainWindowModel
 
   attr_reader :child_processes
 
+  UPDATE_INTERVAL_MINUTE = 10
+
   def initialize
     super
 

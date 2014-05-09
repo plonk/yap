@@ -31,8 +31,6 @@ Thread.abort_on_exception = true
 
 # パラメーター
 #UPDATE_INTERVAL_MINUTE = 1
-UPDATE_INTERVAL_MINUTE = 10
-$REVERSE_LOOKUP_TIP = true
 # ３分間に３回まで
 $MANUAL_UPDATE_INTERVAL = 5*60
 $MANUAL_UPDATE_COUNT = 5
