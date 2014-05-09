@@ -293,26 +293,10 @@ class ChannelListView < Gtk::TreeView
     iter[FLD_HASH]     = ch.hash.to_s(16)
   end
 
-  # チャンネルリストとListStoreをマージする
   def refresh
-    finished_refs = []
-
-    model.each do |model, path, iter|
-      if @mw_model.finished.any? { |ch| ch.hash.to_s(16) == iter[FLD_HASH] }
-        finished_refs << TreeRowReference.new(model, path)
-      else
-        match = @mw_model.master_table.select { |ch| ch.hash.to_s(16) == iter[FLD_HASH] }
-        fail "logic error" unless match.size == 1
-        channel_copy(iter, match.first)
-      end
-    end
-
-    finished_refs.each do |ref|
-      model.remove model.get_iter(ref.path)
-    end
-
-    @mw_model.just_began.each do |ch|
-      iter = model.append
+    @list_store.clear
+    @mw_model.master_table.each do |ch|
+      iter = @list_store.append
       channel_copy(iter, ch)
     end
   end
