@@ -8,7 +8,7 @@ SRC = %w[channel.rb channel_info_label.rb channel_list_view.rb
          favorites.rb info_dialog.rb launcher.rb line_prompt.rb log_dialog.rb
          main_window.rb menutest.rb mw_components.rb mw_model.rb
          notification.rb object_list.rb process_manager.rb rc.rb relation.rb
-         resource.rb settings.rb settings_dialog.rb sound.rb test_suite.rb
+         resource.rb settings.rb settings_dialog.rb
          threadhack.rb type.rb type_assoc_dialog.rb type_association.rb
          utility.rb yap.rb yellowpage.rb]
 
