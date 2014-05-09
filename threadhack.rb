@@ -49,7 +49,7 @@ module Gtk
       begin
         block = @queue.deq
         block.call
-      rescue ThreadSafeQueue::EmptyQueueException => e
+      rescue ThreadSafeQueue::EmptyQueueException
         # wait for next tick
       end
       true # continue

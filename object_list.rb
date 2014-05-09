@@ -82,8 +82,7 @@ class ObjectList < Gtk::ScrolledWindow
   def on_cursor_changed *_
     if iter = @treeview.selection.selected
       object_id = iter[0]
-      obj = @objects.select { |obj| obj.object_id.to_s == object_id }.first
-      @selected = obj
+      @selected = @objects.select { |obj| obj.object_id.to_s == object_id }.first
     else
       @selected = nil
     end
@@ -170,8 +169,6 @@ class ObjectList < Gtk::ScrolledWindow
 
   class AddItemDialog < Gtk::Dialog
     include Gtk::Stock, GtkHelper, Gtk
-
-    attr_reader :result
 
     def initialize parent, headers, constructor
       super('項目を追加する', parent, MODAL)

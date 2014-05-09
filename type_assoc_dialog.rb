@@ -89,8 +89,8 @@ class TypeAssocDialog < Gtk::Dialog
     writers = [ proc { |obj, val| obj[0] = val },
                 proc { |obj, val| obj[1] = val } ]
     constructor = Array.method(:[])
-    assoc_list = create(ObjectList, headers, readers, writers, constructor,
-                        vscrollbar_policy: POLICY_AUTOMATIC)
+    create(ObjectList, headers, readers, writers, constructor,
+           vscrollbar_policy: POLICY_AUTOMATIC)
     
   end
 end
