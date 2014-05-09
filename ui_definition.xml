@@ -1,0 +1,24 @@
+<ui>
+  <menubar>
+    <menu name="FileMenu" action="FileMenuAction">
+      <menuitem name="Reload" action="ReloadAction"/>
+      <menuitem name="Exit" action="ExitAction"/>
+    </menu>
+    <menu name="ViewMenu" action="ViewMenuAction">
+      <menuitem name="ToolbarVisible" action="ToolbarVisibleAction"/>
+      <menuitem name="ChannelInfoVisible" action="ChannelInfoVisibleAction"/>
+    </menu>
+    <menu name="FavoritesMenu" action="FavoritesMenuAction">
+      <menuitem name="OrganizeFavorites" action="OrganizeFavoritesAction"/>
+    </menu>
+    <menu name="ToolMenu" action="ToolMenuAction">
+      <menuitem name="Settings" action="SettingsAction"/>
+      <!-- menuitem name="TypeAssoc" action="TypeAssocAction"/ -->
+      <!-- menuitem name="YellowPage" action="YellowPageAction"/ -->
+      <menuitem name="ProcessManager" action="ProcessManagerAction"/>
+    </menu>
+    <menu name="HelpMenu" action="HelpMenuAction">
+      <menuitem name="About" action="AboutAction" />
+    </menu>
+  </menubar>
+</ui>
