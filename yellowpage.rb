@@ -5,6 +5,8 @@ require "net/http"
 
 class YellowPage
   attr_reader :name, :url
+  attr_reader :timestamp
+  attr_accessor :retrieval_interval
 
   include Enumerable
 
@@ -65,14 +67,6 @@ class YellowPage
 
     return true
   end
- 
-  def retrieval_interval
-    @retrieval_interval
-  end
-
-  def retrieval_interval=(sec)
-    @retrieval_interval = sec
-  end
 
   def is_on_air?(chname)
     each_channel do |ch|
@@ -112,10 +106,6 @@ class YellowPage
     @chlist.size
   end
 
-  def timestamp
-    @timestamp
-  end
-
   def stat_url_for(ch)
     if @stat_url_string and ch.id != '00000000000000000000000000000000' and !ch.chname_proper.empty?
       return "#{url}#{@stat_url_string}#{ch.chname_proper.url_encode}"
@@ -129,35 +119,6 @@ class YellowPage
       return "#{url}#{@chat_url_string}#{ch.chname_proper.url_encode}"
     else
       return ""
-    end
-  end
-end
-
-class DummyYellowPage < YellowPage
-  def initialize
-    @name = "local"
-    @url = "n/a"
-
-#    super(@name, @url, nil, nil)
-  end
-
-  def favicon_url
-#    return nil
-#    return "http://bayonet.ddo.jp/sp/favicon.ico"
-#    return "http://temp.orz.hm/yp/favicon.ico"
-    return "http://www.ne.jp/asahi/yoteichi/place/favicon.ico"
-  end
-
-  def retrieve
-    @chlist.clear
-    # デバッグ用エントリ追加
-    txt = File.new("index.txt", "r:utf-8").read
-    #        txt.force_encoding("utf-8")
-    txt.each_line do |l|
-      l.chomp!
-      ch = Channel.new(l)
-      ch.yp = self
-      @chlist << ch
     end
   end
 end
