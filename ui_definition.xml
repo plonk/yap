@@ -14,7 +14,7 @@
     <menu name="ToolMenu" action="ToolMenuAction">
       <menuitem name="Settings" action="SettingsAction"/>
       <!-- menuitem name="TypeAssoc" action="TypeAssocAction"/ -->
-      <!-- menuitem name="YellowPage" action="YellowPageAction"/ -->
+      <menuitem name="YellowPage" action="YellowPageAction"/>
       <menuitem name="ProcessManager" action="ProcessManagerAction"/>
     </menu>
     <menu name="HelpMenu" action="HelpMenuAction">

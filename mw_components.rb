@@ -3,6 +3,7 @@ require_relative 'main_window'
 require_relative 'channel_list_view'
 require_relative 'utility'
 require_relative 'notification'
+require_relative 'gtk_helper'
 
 class MainWindow
   include GtkHelper
@@ -14,31 +15,33 @@ class MainWindow
 
   def create_default_action_group
     action_group = ActionGroup.new('default action group')
-    action_group.add_actions [
-                              ["FileMenuAction", Stock::FILE, "ファイル(_F)", "", nil, proc { }],
-                              ["ReloadAction",     Stock::REFRESH, "更新(_R)",    "", nil, proc { @model.reload }],
-                              ["ExitAction",     Stock::QUIT, "終了(_X)",    "", nil, proc { quit }],
+    action_group.add_actions \
+    [
+     ["FileMenuAction", Stock::FILE, "ファイル(_F)", "", nil, proc { }],
+     ["ReloadAction", Stock::REFRESH, "更新(_R)", "", nil, proc { @model.reload }],
+     ["ExitAction", Stock::QUIT, "終了(_X)", "", nil, proc { quit }],
 
-                              ["ViewMenuAction", nil, "表示(_V)",     "", nil, proc { }],
+     ["ViewMenuAction", nil, "表示(_V)", "", nil, proc { }],
 
-                              ["FavoritesMenuAction", nil, "お気に入り(_A)",     "", nil, proc { }],
-                              ["OrganizeFavoritesAction", nil, "整理(_A)",     "", nil, proc { run_favorite_dialog }],
+     ["FavoritesMenuAction", nil, "お気に入り(_A)", "", nil, proc { }],
+     ["OrganizeFavoritesAction", nil, "整理(_A)", "", nil, proc { run_favorite_dialog }],
 
-                              ["ToolMenuAction", nil, "ツール(_T)",     "", nil, proc { }],
-                              ["SettingsAction", Stock::PREFERENCES, "一般設定(_S)",     "", nil, proc { open_settings_dialog }],
-                              ["TypeAssocAction", nil, "プレーヤー設定(_T)",     "", nil, proc { }],
-                              ["YellowPageAction", nil, "YP 設定(_Y)",     "", nil, proc { }],
-                              ["ProcessManagerAction", nil, "プロセスマネージャ(_P)",     "", nil, proc { open_process_manager }],
+     ["ToolMenuAction", nil, "ツール(_T)", "", nil, proc { }],
+     ["SettingsAction", Stock::PREFERENCES, "一般設定(_S)", "", nil, proc { open_settings_dialog }],
+     ["TypeAssocAction", nil, "プレーヤー設定(_T)", "", nil, proc { }],
+     ["YellowPageAction", nil, "YP 設定(_Y)", "", nil, proc { open_yellow_page_manager }],
+     ["ProcessManagerAction", nil, "プロセスマネージャ(_P)", "", nil, proc { open_process_manager }],
 
-                              ["HelpMenuAction", Stock::HELP, "ヘルプ(_H)",     "", nil, proc { }],
-                              ["AboutAction",    Stock::ABOUT, "このアプリケーションについて(_A)",    "", nil, proc { run_about_dialog }],
-                             ]
+     ["HelpMenuAction", Stock::HELP, "ヘルプ(_H)", "", nil, proc { }],
+     ["AboutAction", Stock::ABOUT, "このアプリケーションについて(_A)", "", nil, proc { run_about_dialog }],
+    ]
 
     # [name, stock_id, label, accelarator, tooltip, proc, is_active]
-    action_group.add_toggle_actions [
-                                     ["ToolbarVisibleAction", nil, "ツールバー(_T)", "", nil, proc { toggle_toolbar_visibility }, ::Settings[:TOOLBAR_VISIBLE] ],
-                                     ["ChannelInfoVisibleAction", nil, "チャンネル情報(_C)", "", nil, proc { toggle_channel_info_visibility }, ::Settings[:CHANNEL_INFO_VISIBLE] ],
-                                    ]
+    action_group.add_toggle_actions \
+    [
+     ["ToolbarVisibleAction", nil, "ツールバー(_T)", "", nil, proc { toggle_toolbar_visibility }, ::Settings[:TOOLBAR_VISIBLE] ],
+     ["ChannelInfoVisibleAction", nil, "チャンネル情報(_C)", "", nil, proc { toggle_channel_info_visibility }, ::Settings[:CHANNEL_INFO_VISIBLE] ],
+    ]
     action_group
   end
 

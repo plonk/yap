@@ -4,6 +4,7 @@ require_relative "mw_model"
 require_relative 'channel_info_label'
 require_relative 'channel_name_label'
 require_relative 'process_manager'
+require_relative 'yellow_page_manager'
 
 class MainWindow < Gtk::Window
 end
@@ -217,6 +218,10 @@ EOS
   def open_settings_dialog
     d = SettingsDialog.new(self)
     d.show_all
+  end
+
+  def open_yellow_page_manager
+    YellowPageManager.new(self).show_all
   end
 
   def setup_accel_keys

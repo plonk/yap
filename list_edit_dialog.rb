@@ -68,8 +68,6 @@ class ListEditDialog < Gtk::Dialog
   include Gtk
   include GtkHelper
 
-  attr_reader :result
-
   def create_renderer(type, editable, col_id)
     case type
     when :toggle
@@ -185,6 +183,12 @@ class ListEditDialog < Gtk::Dialog
     end
   end
 
+  def result
+    @liststore.to_enum.map do |liststore, path, iter|
+      @numfields.times.map { |i| iter[i] }
+    end
+  end
+
   def initialize parent_window, options
     super('List Edit Dialog', parent_window)
 
@@ -209,13 +213,6 @@ class ListEditDialog < Gtk::Dialog
         true
       else
         false
-      end
-    end
-
-    @ok_button.signal_connect 'clicked' do |button|
-      @result = []
-      @liststore.each do |liststore, path, iter|
-        @result << @numfields.times.map { |i| iter[i] }
       end
     end
 
