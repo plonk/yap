@@ -9,7 +9,24 @@ class Settings_
 
   SETTINGS_DIR = ENV['HOME'] / ".yap"
 
-  VARIABLES = %w[USER_PLAYER USER_PEERCAST TYPE_ASSOC TOOLBAR_VISIBLE CHANNEL_INFO_VISIBLE].map(&:to_sym)
+  VARIABLES = {
+    :TYPE_ASSOC => [["WMV|FLV", "mplayer $Y"],
+                    ["OPV", "xdg-open $3"]],
+    :TOOLBAR_VISIBLE => true,
+    :CHANNEL_INFO_VISIBLE => true,
+    :YELLOW_PAGES =>
+    [
+     [true, "SP", "http://bayonet.ddo.jp/sp/", nil, "getgmt.php?cn="],
+     [true, "TP", "http://temp.orz.hm/yp/", "chat.php?cn=", "getgmt.php?cn="],
+     [true, "event", "http://eventyp.xrea.jp/", nil, nil],
+     [true, "DP", "http://dp.prgrssv.net/", nil, nil],
+     [true, "multi-yp", "http://peercast.takami98.net/multi-yp/", nil, nil],
+     [true, "アスチェ", "http://asuka--sen-nin.ddo.jp/checker/", nil, nil],
+     [true, "cavetube", "http://rss.cavelis.net/", nil, nil],
+    ],
+  }
+
+  VAR_NAMES = VARIABLES.keys
 
   def initialize
     super
@@ -19,21 +36,16 @@ class Settings_
       Dir.mkdir(SETTINGS_DIR)
     end
 
-    @variables = {
-      :TYPE_ASSOC => [["WMV|FLV", "mplayer $Y"],
-                      ["OPV", "xdg-open $3"]],
-      :TOOLBAR_VISIBLE => true,
-      :CHANNEL_INFO_VISIBLE => true,
-    }
+    @variables = VARIABLES
   end
 
   def [] sym
-    raise "unknown variable name #{sym}" unless VARIABLES.include?(sym)
+    raise "unknown variable name #{sym}" unless VAR_NAMES.include?(sym)
     @variables[sym]
   end
 
   def []= sym, value
-    raise "unknown variable name #{sym}" unless VARIABLES.include?(sym)
+    raise "unknown variable name #{sym}" unless VAR_NAMES.include?(sym)
     @variables[sym] = value
     changed
     notify_observers

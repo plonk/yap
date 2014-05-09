@@ -47,13 +47,11 @@ class MainWindowModel
     @yellow_pages = []
     @child_processes = []
 
-    add_yp YellowPage.new("SP",       "http://bayonet.ddo.jp/sp/", nil)
-    add_yp YellowPage.new("TP",       "http://temp.orz.hm/yp/")
-    add_yp YellowPage.new("event",    "http://eventyp.xrea.jp/", nil, nil)
-    add_yp YellowPage.new("DP",       "http://dp.prgrssv.net/")
-    add_yp YellowPage.new("multi-yp", "http://peercast.takami98.net/multi-yp/", nil, nil)
-    add_yp YellowPage.new("アスチェ", "http://asuka--sen-nin.ddo.jp/checker/", nil, nil)
-    add_yp YellowPage.new("cavetube", "http://rss.cavelis.net/", nil, nil)
+    Settings[:YELLOW_PAGES].each do |enabled, name, url, chat_path, stat_path|
+      if enabled
+        add_yp YellowPage.new(name, url, chat_path, stat_path)
+      end
+    end
   end
 
   def settings_changed

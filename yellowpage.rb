@@ -8,7 +8,7 @@ class YellowPage
 
   include Enumerable
 
-  def initialize(name, url, chat = "chat.php?cn=", stat = "getgmt.php?cn=")
+  def initialize(name, url, chat, stat)
     @name = name
     @url = url =~ /\/$/ ? url : url + "/"
 
