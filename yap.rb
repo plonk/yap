@@ -140,9 +140,9 @@ def get_page_title(url)
 end
 
 $PIXBUF_CACHE = Hash.new
-QUESTION_16 = Gdk::Pixbuf.new Resource.path("question16.ico")
-QUESTION_64 = Gdk::Pixbuf.new Resource.path("question64.ico")
-LOADING_16 = Gdk::Pixbuf.new Resource.path("loading.ico")
+QUESTION_16 = Gdk::Pixbuf.new Resource["question16.ico"]
+QUESTION_64 = Gdk::Pixbuf.new Resource["question64.ico"]
+LOADING_16 = Gdk::Pixbuf.new Resource["loading.ico"]
 
 def get_pixbuf_from_url(url)
   if $PIXBUF_CACHE[url]

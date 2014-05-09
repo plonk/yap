@@ -12,6 +12,8 @@ class Resource_
     end
     path
   end
+
+  alias :[] :path
 end
 
 Resource = Resource_.new($RESOURCE_DIR)

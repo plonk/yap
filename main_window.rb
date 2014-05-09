@@ -31,7 +31,7 @@ class MainWindow
 
   def create_status_icon
     @status_icon = create(StatusIcon,
-                          pixbuf: Gdk::Pixbuf.new(Resource.path('yap.png')),
+                          pixbuf: Gdk::Pixbuf.new(Resource['yap.png']),
                           tooltip: "YAP")
 
     # クリックされたらメインウィンドウの表示・非表示を切り替える。

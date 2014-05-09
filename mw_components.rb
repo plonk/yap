@@ -49,7 +49,7 @@ class MainWindow
     @outermost_vbox = VBox.new(false, 0)
 
     @ui_manager = UIManager.new
-    @ui_manager.add_ui(Resource.path("ui_definition.xml"))
+    @ui_manager.add_ui(Resource["ui_definition.xml"])
 
     @action_group = create_default_action_group
     @ui_manager.insert_action_group(@action_group, 0)
@@ -105,7 +105,7 @@ class MainWindow
                           sensitive: false,
                           height_request: 75,
                           width_request: 120)
-    @play_button.add Image.new Resource.path("play.ico")
+    @play_button.add Image.new Resource["play.ico"]
     @play_button.signal_connect("clicked") do 
       if ch = @channel_list_view.get_selected_channel # ちゃんとYPも見たほうが良い
         @model.play(ch)
@@ -179,7 +179,7 @@ class MainWindow
     @outermost_vbox.pack_start(@notification, false)
 
     set_default_size(640, 640)
-    self.icon = Resource.path 'yap.png'
+    self.icon = Resource['yap.png']
     self.border_width = 0 # 10
     add @outermost_vbox
   end
