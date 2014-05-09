@@ -44,17 +44,21 @@ class MainWindowModel
     @notification = ""
     @master_table = []
     @update_first_time = true
-    @yellow_pages = []
     @child_processes = []
 
-    Settings[:YELLOW_PAGES].each do |enabled, name, url, chat_path, stat_path|
-      if enabled
-        add_yp YellowPage.new(name, url, chat_path, stat_path)
-      end
+    @yellow_pages = get_active_yellow_pages
+  end
+
+  def get_active_yellow_pages
+    Settings[:YELLOW_PAGES].to_enum.select { |enabled, | enabled }.
+      map do |enabled, name, url, chat_path, stat_path|
+      YellowPage.new(name, url, chat_path, stat_path)
     end
   end
 
   def settings_changed
+    @yellow_pages = get_active_yellow_pages
+    update_channel_list
     changed
     notify_observers(:settings_changed)
   end
@@ -97,10 +101,6 @@ class MainWindowModel
       ch = yp.get_channel(name)
       ch ? [ch] : []
     end
-  end
-
-  def add_yp(yp)
-    @yellow_pages << yp
   end
 
   def show_channel_info ch
