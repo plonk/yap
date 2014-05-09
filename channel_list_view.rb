@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+require_relative 'gtk_helper'
+
 class ChannelListView < Gtk::TreeView
 end
 

@@ -4,6 +4,7 @@ require_relative 'settings'
 require_relative 'utility'
 require_relative 'object_list'
 require_relative 'type_assoc_dialog'
+require_relative 'gtk_helper'
 
 class SettingsDialog < Gtk::Dialog
   include Gtk, GtkHelper

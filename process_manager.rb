@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'gtk2'
+require_relative 'gtk_helper'
 
 class ProcessManager < Gtk::Dialog
   include Gtk, GtkHelper

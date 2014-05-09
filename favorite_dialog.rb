@@ -2,6 +2,7 @@
 require 'gtk2'
 require_relative 'utility'
 require_relative 'line_prompt'
+require_relative 'gtk_helper'
 
 class FavoriteDialog < Gtk::Dialog
   include Gtk, GtkHelper

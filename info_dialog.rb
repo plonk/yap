@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+require_relative 'gtk_helper'
+
 class InfoDialog < Gtk::Dialog
   include Gtk, GtkHelper
 

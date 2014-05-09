@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'gtk2'
 require_relative 'utility'
+require_relative 'gtk_helper'
 
 class LinePrompt < Gtk::Dialog
   include Gtk, GtkHelper
