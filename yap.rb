@@ -29,9 +29,6 @@ if $RUNNING_ON_RUBYW
 end
 Thread.abort_on_exception = true
 
-# パラメーター
-#UPDATE_INTERVAL_MINUTE = 1
-# ３分間に３回まで
 $NOTIFICATION_AUTO_CLOSE_TIMEOUT = 15
 $ENABLE_VIEWLOG = false
 

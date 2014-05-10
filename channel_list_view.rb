@@ -196,14 +196,15 @@ class ChannelListView < Gtk::TreeView
 
     signal_connect("row-activated") do |treeview, path, column|
       iter = model.get_iter(path)
-      ch = @mw_model.get_channel(iter[FLD_CHNAME])
+      ch = @mw_model.find_channel_by_hash(iter[FLD_HASH].to_i(16))
+      fail unless ch
       if ch.playable?
         @mw_model.play(ch)
       end
     end
 
     # 行が選択された時に実行される
-    signal_connect("cursor-changed") do |treeview|
+    selection.signal_connect("changed") do
       @mw_model.select_channel(get_selected_channel)
     end
   end
@@ -260,11 +261,10 @@ class ChannelListView < Gtk::TreeView
 
   # hash で判断するように変える。
   def get_selected_channel
-    path, column = cursor
+    iter = selection.selected
 
-    if path
-      iter = self.model.get_iter(path)
-      @mw_model.get_channel(iter[FLD_CHNAME])
+    if iter
+      @mw_model.find_channel_by_hash(iter[FLD_HASH].to_i(16))
     else
       nil
     end

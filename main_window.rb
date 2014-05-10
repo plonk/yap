@@ -319,12 +319,13 @@ EOS
             current_channel = @model.selected_channel
             if current_channel == ch
               @favicon_image.pixbuf = pixbuf
+
             end
           end
         end
       end
     else
-      @favicon_iamge.pixbuf = nil
+      @favicon_image.pixbuf = nil
     end
   end
   
