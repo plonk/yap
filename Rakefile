@@ -6,7 +6,7 @@ SRC = %w[channel.rb channel_info_label.rb channel_list_view.rb
          channel_name_label.rb child_process.rb gtk_helper.rb
          clv_context_menu.rb config.rb extensions.rb favorite_dialog.rb
          favorites.rb info_dialog.rb launcher.rb line_prompt.rb log_dialog.rb
-         main_window.rb menutest.rb mw_components.rb mw_model.rb
+         main_window.rb mw_components.rb mw_model.rb
          notification.rb object_list.rb process_manager.rb rc.rb relation.rb
          resource.rb settings.rb settings_dialog.rb web_resource.rb
          threadhack.rb type.rb type_assoc_dialog.rb type_association.rb
