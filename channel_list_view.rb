@@ -48,7 +48,7 @@ class ChannelListView < Gtk::TreeView
       renderer.background_set = false
       renderer.weight = WEIGHT_NORMAL
     end
-    renderer.set_property("markup", get_highlighted_markup(iter[0], @mw_model.search_term))
+    renderer.set_property("markup", get_highlighted_markup(iter[0], @search_term))
   end
 
   def genre_cell_data_func col, renderer, model, iter
@@ -58,7 +58,7 @@ class ChannelListView < Gtk::TreeView
       renderer.text = "n/a"
       renderer.foreground = "gray"
     else
-      renderer.markup = get_highlighted_markup(genre, @mw_model.search_term)
+      renderer.markup = get_highlighted_markup(genre, @search_term)
     end
   end
 
@@ -120,7 +120,7 @@ class ChannelListView < Gtk::TreeView
   end
 
   def detail_cell_data_func col, renderer, model, iter
-    renderer.markup = get_highlighted_markup(iter[2], @mw_model.search_term)
+    renderer.markup = get_highlighted_markup(iter[2], @search_term)
   end
 
   # ソートするカラムを column_id に切り替える手続きオブジェクトを返す。
@@ -137,6 +137,14 @@ class ChannelListView < Gtk::TreeView
     end
   end
 
+  def favorites_changed
+    refresh
+  end
+
+  def channel_list_updated
+    refresh
+  end
+
   def settings_changed
     @cr_name.font =
       @cr_genre.font =
@@ -146,11 +154,15 @@ class ChannelListView < Gtk::TreeView
       @cr_time.font = ::Settings[:LIST_FONT]
   end
 
-  def initialize(mw_model)
+  def initialize(mw_model, func)
+    @func = func
     @mw_model = mw_model
     @mw_model.add_observer(self, :update)
+
+    @search_term = ""
     @list_store = ListStore.new(*FIELD_TYPES)
     super(@list_store)
+
 
     # セルレンダラーの設定
     @cr_name	= create CellRendererText, font: ::Settings[:LIST_FONT], ellipsize: Layout::ELLIPSIZE_END
@@ -224,6 +236,8 @@ class ChannelListView < Gtk::TreeView
     selection.signal_connect("changed") do
       @mw_model.select_channel(get_selected_channel)
     end
+
+    refresh
   end
 
   def on_button_press_event w, event
@@ -251,6 +265,7 @@ class ChannelListView < Gtk::TreeView
   end
 
   def search(term)
+    @search_term = term
     search_result = TreeModelFilter.new(model)
     esc_term = Regexp.escape(regularize(term))
     search_result.set_visible_func do |model, iter|
@@ -297,6 +312,8 @@ class ChannelListView < Gtk::TreeView
     return nil
   end
 
+  # セルデータ関数とインターリーブで動くようなので、
+  # モデルを切り離してから呼び出そう。
   def channel_copy iter, ch
     ch = ch.as Channel
     iter = iter.as TreeIter
@@ -312,10 +329,17 @@ class ChannelListView < Gtk::TreeView
   end
 
   def refresh
+    backup = self.model
+    self.model = nil
+
     @list_store.clear
     @mw_model.master_table.each do |ch|
-      iter = @list_store.append
-      channel_copy(iter, ch)
+      if @func.call(ch)
+        iter = @list_store.append
+        channel_copy(iter, ch)
+      end
     end
+
+    self.model = backup
   end
 end

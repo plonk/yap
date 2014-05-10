@@ -21,9 +21,6 @@ class MainWindowModel
   # 終了チャンネル。
   attr_reader :finished
 
-  # 検索中の言葉。
-  attr_reader :search_term
-
   attr_reader :selected_channel
   
   # YP リスト
@@ -44,7 +41,6 @@ class MainWindowModel
 
     Settings.add_observer(self, :settings_changed)
 
-    @search_term = ""
     @notification = ""
     @master_table = []
     @update_first_time = true
@@ -155,12 +151,6 @@ class MainWindowModel
   def favorites_changed
     changed
     notify_observers :favorites_changed
-  end
-
-  def search_term= term
-    @search_term = term
-    changed
-    notify_observers :search_term_changed, term
   end
 
   def finalize
@@ -280,4 +270,3 @@ class MainWindowModel
     end
   end
 end
-

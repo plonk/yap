@@ -128,7 +128,6 @@ EOS
   def show_all
     super
     # フォーカスバグを回避するために Entry の show を遅らせる。
-    @search_field.show
     @toolbar.visible = ::Settings[:TOOLBAR_VISIBLE]
     @mainarea_vbox.visible = ::Settings[:CHANNEL_INFO_VISIBLE]
   end
@@ -152,24 +151,8 @@ EOS
     end
   end
 
-  def search_term_changed term
-    if term == ""
-      @channel_list_view.reset_model
-      @search_field.text = ""
-      @search_label.text = ""
-    else
-      @channel_list_view.reset_model
-      @search_label.markup = "<span size=\"10000\" background=\"yellow\" font_weight=\"bold\">検索中</span>" # 10pt bold
-      @channel_list_view.search(term)
-    end
-  end
-
-  def search_field_activate_callback widget
-    @model.search_term = @search_field.text
-  end
-
   def favorites_changed
-    update_favorite_toolbutton
+    update_favorite_toggle_button
   end
 
   def run_favorite_dialog
@@ -266,13 +249,11 @@ EOS
   
   def favorite_toggle_button_toggled_callback widget
     if @favorite_toggle_button.active?
-      if ch = @channel_list_view.get_selected_channel
-        @favorite_toggle_button.child.set_markup(COLORED_STAR_MARKUP)
+      if ch = @model.selected_channel
         @model.favorites << ch.name unless @model.favorites.include? ch.name
       end
     else
-      if ch = @channel_list_view.get_selected_channel
-        @favorite_toggle_button.child.set_markup(GRAY_STAR_MARKUP)
+      if ch = @model.selected_channel
         @model.favorites.delete ch.name
       end
     end
@@ -296,7 +277,13 @@ EOS
   def update_favorite_toggle_button
     if ch = @model.selected_channel
       @favorite_toggle_button.sensitive = true
-      @favorite_toggle_button.active = @model.favorites.include? ch.name
+      if @model.favorites.include? ch.name
+        @favorite_toggle_button.active = true
+        @favorite_toggle_button.child.set_markup(COLORED_STAR_MARKUP)
+      else
+        @favorite_toggle_button.active = false
+        @favorite_toggle_button.child.set_markup(GRAY_STAR_MARKUP)
+      end
     else
       @favorite_toggle_button.sensitive = false
     end
@@ -365,15 +352,7 @@ EOS
   # -- class MainWindow --
 
   def channel_list_updated
-    update_favorite_toolbutton
-    @channel_list_view.refresh
     update_window_title
-  end
-
-  def update_favorite_toolbutton
-    numfavs = (@model.yellow_pages.flat_map(&:channel_names) & @model.favorites.to_a).size
-    @favorite_toolbutton.label = "お気に入り (#{numfavs})"
-    @favorite_toolbutton.menu = create_favorite_menu
   end
 
   # -- class MainWindow

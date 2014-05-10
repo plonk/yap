@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 require_relative 'main_window'
-require_relative 'channel_list_view'
+require_relative 'channel_list_page'
 require_relative 'utility'
 require_relative 'notification'
 require_relative 'gtk_helper'
@@ -64,10 +64,6 @@ class MainWindow
                                                "\n（#{MainWindowModel::MANUAL_UPDATE_INTERVAL}秒間に#{MainWindowModel::MANUAL_UPDATE_COUNT}回まで実行できます）"),
                                 important: true)
 
-    @favorite_toolbutton = create(MenuToolButton, Stock::ABOUT, # only for the star
-                                  label: "お気に入り",
-                                  important: true,
-                                  tooltip_text: "配信中のお気に入りch")
     if $ENABLE_VIEWLOG
       @viewlog_toolbutton = create(ToolButton, Stock::JUSTIFY_LEFT,
                                    label: "ログ",
@@ -78,7 +74,6 @@ class MainWindow
     @spring = create(SeparatorToolItem, expand: true, draw: false)
 
     @toolbar.add @reload_toolbutton
-    @toolbar.add @favorite_toolbutton
     @toolbar.add @viewlog_toolbutton if $ENABLE_VIEWLOG
     @toolbar.add @settings_toolbutton
 
@@ -88,13 +83,14 @@ class MainWindow
 
     @outermost_vbox.pack_start(@mainarea_vbox, false)
 
-    @channel_list_view = ChannelListView.new(@model)
+    @channel_list_page = ChannelListPage.new(@model)
 
-    @channel_list_view_scrolled_window = create(ScrolledWindow, 
-                                       shadow_type: SHADOW_ETCHED_IN,
-                                       hscrollbar_policy: POLICY_AUTOMATIC,
-                                       vscrollbar_policy: POLICY_ALWAYS)
-    @channel_list_view_scrolled_window.add @channel_list_view
+    @notebook = Notebook.new
+    @notebook.append_page(@channel_list_page, Label.new('すべて'))
+
+    @notebook.append_page(ChannelListPage.new(@model,
+                                              proc { |ch| @model.favorites.include? ch.name }),
+                          Label.new('お気に入り'))
 
     hbox = HBox.new false, 15 # (homogeneous: false, spacing: 15) なぜか動かない
 
@@ -105,7 +101,7 @@ class MainWindow
                           width_request: 120)
     @play_button.add Image.new Resource["play.ico"]
     @play_button.signal_connect("clicked") do 
-      if ch = @channel_list_view.get_selected_channel # ちゃんとYPも見たほうが良い
+      if ch = @model.selected_channel
         @model.play(ch)
       end
     end
@@ -159,19 +155,9 @@ class MainWindow
 
     @mainarea_vbox.pack_start(@detail_vbox, false)
 
-    @search_label = Label.new("")
-    @link_hbox.pack_start(@search_label, false)
-    @search_field = Entry.new
-    @search_field.set_no_show_all(true) # なんだかわからないけど、フォーカスがおかしくなるので、メインウィンドウを show してから、show する
-    @search_term = ""
-    @link_hbox.pack_start(@search_field, false)
-    @clear_button = create(Button, " ☓ ", tooltip_text: "入力欄をクリアして検索をやめる")
-    @search_field.signal_connect("activate", &method(:search_field_activate_callback))
-    @link_hbox.pack_start(@clear_button, false)
-
     @mainarea_vbox.pack_start(@link_hbox, false)
 
-    @outermost_vbox.pack_start(@channel_list_view_scrolled_window, true)
+    @outermost_vbox.pack_start(@notebook, true)
 
     @notification = Notification.new
     @outermost_vbox.pack_start(@notification, false)
@@ -195,11 +181,6 @@ class MainWindow
     @settings_toolbutton.signal_connect("clicked") do
       open_settings_dialog
     end
-
-    @clear_button.signal_connect("clicked") do
-      @model.search_term = ""
-    end
-
 
     @favorite_toggle_button.signal_connect("toggled", &method(:favorite_toggle_button_toggled_callback))
   end
