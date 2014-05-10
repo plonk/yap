@@ -4,7 +4,6 @@
 require 'gtk2'
 require "resolv"
 require "net/http"
-require "csv"
 require "dbm"
 
 require_relative 'settings'
