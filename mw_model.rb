@@ -190,7 +190,10 @@ class MainWindowModel
     end
   end
 
-  private 
+  # チャンネルリストを取得する。
+  def update_channel_list
+    do_update_channel_list(true, true)
+  end
 
   def spawn_yp_updater_threads
     threads = []
@@ -218,11 +221,6 @@ class MainWindowModel
                               .join("、") + " が配信を開始しています。"
                           end
     end
-  end
-
-  # チャンネルリストを取得する。
-  def update_channel_list
-    do_update_channel_list(true, true)
   end
 
   def do_update_channel_list(download, notify)

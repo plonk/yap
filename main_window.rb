@@ -16,10 +16,10 @@ class MainWindow
 
   URL2PIXBUF = Hash.new # contact URL to favicon pixbuf
 
-  def initialize
+  def initialize(model)
     super(Window::TOPLEVEL)
 
-    @model = MainWindowModel.new
+    @model = model
 
     initialize_components
     create_status_icon

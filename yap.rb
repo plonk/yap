@@ -45,8 +45,12 @@ require_relative "settings_dialog"
 require_relative 'settings'
 
 require_relative "main_window"
+require_relative 'bandwidth_checker_manager'
 
-window = MainWindow.new
+model = MainWindowModel.new
+window = MainWindow.new model
+BandwidthCheckerManager.new model
+
 unless defined? Ocra
   window.show_all 
 end
