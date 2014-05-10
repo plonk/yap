@@ -33,11 +33,13 @@ class SettingsDialog < Gtk::Dialog
     @peercast_entry = create(Entry, no_show_all: true, text: ::Settings[:USER_PEERCAST])
     @file_assoc_button = create(Button, '設定', on_clicked: method(:cb_file_assoc_button_clicked))
     @font_button = create(FontButton, ::Settings[:LIST_FONT])
+    @bandwidth_check_button = create(CheckButton, active: ::Settings[:ENABLE_AUTO_BANDWIDTH_CHECK])
 
     definition = [
                   [head("peercast のホスト名とポート"), @peercast_entry],
                   [head("プレーヤー"), @file_assoc_button],
                   [head("フォント"), @font_button],
+                  [head("自動帯域チェック"), @bandwidth_check_button],
                  ]
 
     definition.each_with_index do |row, y|
@@ -59,6 +61,7 @@ class SettingsDialog < Gtk::Dialog
       when Dialog::RESPONSE_OK
         ::Settings[:USER_PEERCAST] = @peercast_entry.text
         ::Settings[:LIST_FONT] = @font_button.font_name
+        ::Settings[:ENABLE_AUTO_BANDWIDTH_CHECK] = @bandwidth_check_button.active?
         ::Settings.save
       end
       destroy

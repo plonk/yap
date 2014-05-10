@@ -28,6 +28,7 @@ class Settings_
     REVERSE_LOOKUP_TIP: true,
     NOTIFICATION_AUTO_CLOSE_SECONDS: 15,
     LIST_FONT: 'Sans 12',
+    ENABLE_AUTO_BANDWIDTH_CHECK: true,
   }
 
   VAR_NAMES = VARIABLES.keys

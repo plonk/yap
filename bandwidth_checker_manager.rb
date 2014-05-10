@@ -92,6 +92,7 @@ class BandwidthCheckerManager
   end
 
   def channel_list_updated
+    return unless ::Settings[:ENABLE_AUTO_BANDWIDTH_CHECK]
     return if @running
 
     @running = true
