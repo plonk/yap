@@ -9,7 +9,7 @@ class BandwidthCheckerManager
     def self.valid_unchecked? ch
       ch.name =~ /アップロード帯域$/ and
         ch.contact_url =~ /uptest\/$/ and
-        ch.detail =~ /^No Data/
+        ch.detail =~ /^No data/
     end
 
     attr_reader :finished_time, :channel
