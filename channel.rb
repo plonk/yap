@@ -18,7 +18,7 @@ class Channel
   NAME = 0
   ID = 1 # etc.
 
-  def initialize(line)
+  def initialize(line, yp)
     row = line.split(/<>/, 19).map{|x| x.unescape_html }
     @fields = row
     @genre = row[4]
@@ -28,6 +28,7 @@ class Channel
     @contact_url = row[3]
     @type = row[9]
     @detail = row[5]
+    @yp = yp
 
     # チャンネル名とストリームIDから同定する
     @hash = MD5.hexdigest(row[NAME] + '<>' + @id).to_i(16)

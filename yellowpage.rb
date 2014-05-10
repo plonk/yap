@@ -56,10 +56,9 @@ class YellowPage
 
     @chlist.clear
     txt.force_encoding("utf-8")
-    txt.each_line do |l|
-      l.chomp!
-      ch = Channel.new(l)
-      ch.yp = self
+    txt.each_line do |line|
+      line.chomp!
+      ch = Channel.new(line, self)
       @chlist << ch
     end
 
