@@ -5,6 +5,7 @@ require_relative 'channel_info_label'
 require_relative 'channel_name_label'
 require_relative 'process_manager'
 require_relative 'yellow_page_manager'
+require_relative 'information_area'
 
 class MainWindow < Gtk::Window
 end
@@ -13,8 +14,6 @@ require_relative "mw_components"
 
 class MainWindow
   include Gtk
-
-  URL2PIXBUF = Hash.new # contact URL to favicon pixbuf
 
   def initialize(model)
     super(Window::TOPLEVEL)
@@ -67,7 +66,7 @@ class MainWindow
 
   def settings_changed
     @toolbar.visible = ::Settings[:TOOLBAR_VISIBLE]
-    @mainarea_vbox.visible = ::Settings[:CHANNEL_INFO_VISIBLE]
+    @information_area.visible = ::Settings[:CHANNEL_INFO_VISIBLE]
   end
 
   def toggle_toolbar_visibility
@@ -121,15 +120,10 @@ EOS
     end
   end
 
-  def favorite_toggled
-    @favorite_toggle_button.activate
-  end
-
   def show_all
     super
-    # フォーカスバグを回避するために Entry の show を遅らせる。
     @toolbar.visible = ::Settings[:TOOLBAR_VISIBLE]
-    @mainarea_vbox.visible = ::Settings[:CHANNEL_INFO_VISIBLE]
+    @information_area.visible = ::Settings[:CHANNEL_INFO_VISIBLE]
   end
 
   def show_channel_info ch
@@ -152,7 +146,6 @@ EOS
   end
 
   def favorites_changed
-    update_favorite_toggle_button
   end
 
   def run_favorite_dialog
@@ -165,40 +158,6 @@ EOS
     end
     dialog.destroy
   end
-
-  def create_favorite_menu
-    Menu.new.tap do |menu|
-      MenuItem.new("お気に入りの整理...").tap do |edit|
-        edit.signal_connect("activate") do
-          run_favorite_dialog
-        end
-        menu.append edit
-      end
-
-      menu.append MenuItem.new # separator
-
-      # 配信中のお気に入り配信をメニューに追加する。
-      @model.favorites.sort.each do |name|
-        if @model.is_on_air?(name)
-          MenuItem.new(name).tap do |item|
-            item.signal_connect("activate") do
-              chs = @model.get_channels(name)
-              if chs.size > 1
-                STDERR.puts "Warning: more than one #{name}\n"
-              end
-              # これ nil を set_cursor したらどうなるんだろう。
-              path = @channel_list_view.get_path_of_channel( chs[0] )
-              @channel_list_view.grab_focus
-              @channel_list_view.set_cursor(path, nil, false) # no column selection, no editing
-            end
-            menu.append item
-          end
-        end
-      end
-      menu.show_all
-    end
-  end
-
 
   def open_settings_dialog
     d = SettingsDialog.new(self)
@@ -242,111 +201,6 @@ EOS
   def until_reload_toolbutton_available sec
     @reload_toolbutton.sensitive = (sec == 0)
     @reload_toolbutton.label = (sec == 0) ? "すぐに更新" : "すぐに更新（あと#{sec}秒）"
-  end
-
-  COLORED_STAR_MARKUP = " <span foreground=\"#FEA315\" size=\"xx-large\">★</span> "
-  GRAY_STAR_MARKUP = " <span foreground=\"gray\" size=\"xx-large\">★</span> "
-  
-  def favorite_toggle_button_toggled_callback widget
-    if @favorite_toggle_button.active?
-      if ch = @model.selected_channel
-        @model.favorites << ch.name unless @model.favorites.include? ch.name
-      end
-    else
-      if ch = @model.selected_channel
-        @model.favorites.delete ch.name
-      end
-    end
-  end
-
-  def update_link_button
-    if ch = @model.selected_channel
-      if ch.contact_url.empty?
-        @link_button.child.text = "今からpeercastでゲーム実況配信"
-        @link_button.uri = "http://yy25.60.kg/peercastjikkyou/"
-      else
-        @link_button.child.text = ch.contact_url
-        @link_button.uri = ch.contact_url
-      end
-    else
-      @link_button.child.text = ''
-      @link_button.uri = ''
-    end
-  end
-
-  def update_favorite_toggle_button
-    if ch = @model.selected_channel
-      @favorite_toggle_button.sensitive = true
-      if @model.favorites.include? ch.name
-        @favorite_toggle_button.active = true
-        @favorite_toggle_button.child.set_markup(COLORED_STAR_MARKUP)
-      else
-        @favorite_toggle_button.active = false
-        @favorite_toggle_button.child.set_markup(GRAY_STAR_MARKUP)
-      end
-    else
-      @favorite_toggle_button.sensitive = false
-    end
-  end
-
-  def update_play_button
-    @play_button.sensitive = (ch = @model.selected_channel and ch.playable?)
-  end
-
-  def update_favicon_image
-    if ch = @model.selected_channel
-      pixbuf = URL2PIXBUF[ch.contact_url]
-      if pixbuf
-        @favicon_image.pixbuf = pixbuf
-      else
-        @favicon_image.pixbuf = LOADING_16
-        Thread.start do
-          pixbuf = get_favicon_pixbuf_for(ch)
-          pixbuf = pixbuf.scale(16, 16, Gdk::Pixbuf::INTERP_NEAREST)
-          URL2PIXBUF[ch.contact_url] = pixbuf
-          Gtk.queue do 
-            current_channel = @model.selected_channel
-            if current_channel == ch
-              @favicon_image.pixbuf = pixbuf
-
-            end
-          end
-        end
-      end
-    else
-      @favicon_image.pixbuf = nil
-    end
-  end
-
-  def get_favicon_pixbuf_for(ch, fallback = QUESTION_16)
-    if ch.favicon_url
-      puts "favicon is specified for #{ch}"
-      WebResource.get_pixbuf(ch.favicon_url, fallback)
-    else
-      fallback
-    end
-  end
-
-  def update_genre_label
-    if ch = @model.selected_channel
-      @genre_label.text = ch.genre
-    else
-      @genre_label.text = ''
-    end
-  end
-
-  def selected_channel_changed
-    ch = @model.selected_channel
-
-    @chname_label.show_channel(ch)
-    @info_label.show_channel(ch)
-
-    update_play_button
-    update_link_button
-    update_favorite_toggle_button
-
-    update_favicon_image
-    update_genre_label
   end
 
   # -- class MainWindow --

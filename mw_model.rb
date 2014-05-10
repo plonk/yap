@@ -117,8 +117,11 @@ class MainWindowModel
   end
 
   def toggle_favorite
-    changed
-    notify_observers(:favorite_toggled)
+    if favorites.include? selected_channel.name
+      favorites.delete(selected_channel.name)
+    else
+      favorites << selected_channel.name
+    end
   end
 
   def play(channel)

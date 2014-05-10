@@ -46,7 +46,8 @@ class MainWindow
   end
 
   def widget_layout
-    @outermost_vbox = VBox.new(false, 0)
+    set_default_size(640, 640)
+    set(icon: Resource['yap.png'], border_width: 0)
 
     @ui_manager = UIManager.new
     @ui_manager.add_ui(Resource["ui_definition.xml"])
@@ -54,118 +55,50 @@ class MainWindow
     @action_group = create_default_action_group
     @ui_manager.insert_action_group(@action_group, 0)
 
-    @outermost_vbox.pack_start @ui_manager['/ui/menubar'], false
+    create(VBox, false, 0) do |outermost_vbox|
+      outermost_vbox.pack_start @ui_manager['/ui/menubar'], false
 
-    @toolbar = create(Toolbar, toolbar_style: Toolbar::Style::BOTH_HORIZ)
+      @toolbar = create(Toolbar, toolbar_style: Toolbar::Style::BOTH_HORIZ) do |toolbar|
+        @reload_toolbutton = create(ToolButton, Stock::REFRESH,
+                                    label: "すぐに更新",
+                                    tooltip_text: ("次の自動更新を待たずにチャンネルリストを更新します" +
+                                                   "\n（#{MainWindowModel::MANUAL_UPDATE_INTERVAL}秒間に#{MainWindowModel::MANUAL_UPDATE_COUNT}回まで実行できます）"),
+                                    important: true)
 
-    @reload_toolbutton = create(ToolButton, Stock::REFRESH,
-                                label: "すぐに更新",
-                                tooltip_text: ("次の自動更新を待たずにチャンネルリストを更新します" +
-                                               "\n（#{MainWindowModel::MANUAL_UPDATE_INTERVAL}秒間に#{MainWindowModel::MANUAL_UPDATE_COUNT}回まで実行できます）"),
-                                important: true)
+        if $ENABLE_VIEWLOG
+          @viewlog_toolbutton = create(ToolButton, Stock::JUSTIFY_LEFT,
+                                       label: "ログ",
+                                       important: true)
+        end
+        @settings_toolbutton = create(ToolButton, Stock::PREFERENCES, important: true)
 
-    if $ENABLE_VIEWLOG
-      @viewlog_toolbutton = create(ToolButton, Stock::JUSTIFY_LEFT,
-                                   label: "ログ",
-                                   important: true)
-    end
-    @settings_toolbutton = create(ToolButton, Stock::PREFERENCES, important: true)
+        @spring = create(SeparatorToolItem, expand: true, draw: false)
 
-    @spring = create(SeparatorToolItem, expand: true, draw: false)
+        toolbar.add @reload_toolbutton
+        toolbar.add @viewlog_toolbutton if $ENABLE_VIEWLOG
+        toolbar.add @settings_toolbutton
 
-    @toolbar.add @reload_toolbutton
-    @toolbar.add @viewlog_toolbutton if $ENABLE_VIEWLOG
-    @toolbar.add @settings_toolbutton
-
-    @outermost_vbox.pack_start(@toolbar, false)
-
-    @mainarea_vbox = create(VBox, homogeneous: false, spacing: 5, border_width: 10)
-
-    @outermost_vbox.pack_start(@mainarea_vbox, false)
-
-    @channel_list_page = ChannelListPage.new(@model)
-
-    @notebook = Notebook.new
-    @notebook.append_page(@channel_list_page, Label.new('すべて'))
-
-    @notebook.append_page(ChannelListPage.new(@model,
-                                              proc { |ch| @model.favorites.include? ch.name }),
-                          Label.new('お気に入り'))
-
-    hbox = HBox.new false, 15 # (homogeneous: false, spacing: 15) なぜか動かない
-
-    @play_button = create(Button, 
-                          tooltip_text: "チャンネルを再生する",
-                          sensitive: false,
-                          height_request: 75,
-                          width_request: 120)
-    @play_button.add Image.new Resource["play.ico"]
-    @play_button.signal_connect("clicked") do 
-      if ch = @model.selected_channel
-        @model.play(ch)
+        outermost_vbox.pack_start(toolbar, false)
       end
+
+      @information_area = InformationArea.new(@model)
+      outermost_vbox.pack_start(@information_area, false)
+
+      @notebook = create(Notebook) do |notebook|
+        @channel_list_page = ChannelListPage.new(@model)
+        notebook.append_page(@channel_list_page, Label.new('すべて'))
+        notebook.append_page(ChannelListPage.new(@model,
+                                                 proc { |ch| @model.favorites.include? ch.name }),
+                             Label.new('お気に入り'))
+
+        outermost_vbox.pack_start(notebook, true)
+      end
+
+      @notification = Notification.new
+      outermost_vbox.pack_start(@notification, false)
+
+      add outermost_vbox
     end
-    hbox.pack_start(@play_button, false, false)
-
-    @chname_label = ChannelNameLabel.new
-
-    @little_vbox = VBox.new
-    @little_vbox.pack_start(@chname_label, false)
-
-    @info_label = ChannelInfoLabel.new
-    @little_vbox.pack_start(@info_label)
-    hbox.pack_start @little_vbox
-
-    @favorite_toggle_button = create(ToggleButton, "",
-                                     tooltip_text: "お気に入り",
-                                     sensitive: false,
-                                     draw_indicator: false)
-    @favorite_toggle_button.child.set_markup(" <span foreground=\"gray\" size=\"xx-large\">★</span> ")
-    align = Alignment.new(1, 0, 0, 0) # place in the top-right corner
-    align.add @favorite_toggle_button
-    hbox.pack_start(align, false, false)
-
-    @mainarea_vbox.pack_start(hbox, false)
-
-    @link_hbox = HBox.new(false, 5)
-    @link_button = create(LinkButton, "", "",
-                          xalign: 0)
-    @link_button.child.ellipsize = Pango::Layout::ELLIPSIZE_END
-    @link_button.signal_connect("clicked") do
-      system("start", @link_button.uri)
-      true
-    end
-
-    @detail_vbox = VBox.new
-
-    @genre_label = create(Label, '',
-                          wrap: true,
-                          xalign: 0,
-                          ellipsize: Pango::Layout::ELLIPSIZE_END)
-    genre_hbox = HBox.new(false, 5)
-    genre_hbox.pack_start(Label.new("　　ジャンル："), false)
-    genre_hbox.pack_start(@genre_label, true);
-    @detail_vbox.pack_start(genre_hbox, false)
-
-    bbs_label = Label.new("　　　掲示板：")
-    @favicon_image = Image.new
-    @link_hbox.pack_start(bbs_label, false)
-    @link_hbox.pack_start(@favicon_image, false)
-    @link_hbox.pack_start(@link_button, true)
-
-    @mainarea_vbox.pack_start(@detail_vbox, false)
-
-    @mainarea_vbox.pack_start(@link_hbox, false)
-
-    @outermost_vbox.pack_start(@notebook, true)
-
-    @notification = Notification.new
-    @outermost_vbox.pack_start(@notification, false)
-
-    set_default_size(640, 640)
-    self.icon = Resource['yap.png']
-    self.border_width = 0 # 10
-    add @outermost_vbox
   end
 
   def connect_callbacks
@@ -181,7 +114,5 @@ class MainWindow
     @settings_toolbutton.signal_connect("clicked") do
       open_settings_dialog
     end
-
-    @favorite_toggle_button.signal_connect("toggled", &method(:favorite_toggle_button_toggled_callback))
   end
 end
