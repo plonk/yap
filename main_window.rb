@@ -14,6 +14,8 @@ require_relative "mw_components"
 class MainWindow
   include Gtk
 
+  URL2PIXBUF = Hash.new # contact URL to favicon pixbuf
+
   def initialize
     super(Window::TOPLEVEL)
 
@@ -328,8 +330,6 @@ EOS
       @favicon_image.pixbuf = nil
     end
   end
-  
-  URL2PIXBUF = Hash.new # contact URL to favicon pixbuf
 
   def get_favicon_pixbuf_for(ch, fallback = QUESTION_16)
     if ch.favicon_url
