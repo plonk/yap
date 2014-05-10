@@ -4,7 +4,7 @@ require_relative 'launcher'
 require_relative 'type_association'
 
 class Channel
-  attr_reader :genre, :id, :tip, :comment, :contact_url, :type
+  attr_reader :genre, :id, :tip, :comment, :contact_url, :type, :detail
   attr_reader :fields
   attr_accessor :yp
 
@@ -74,14 +74,6 @@ class Channel
       -1
 #      raise "time format error"
     end
-  end
-
-  def detail
-#    if @detail =~ / - <([A-z ]+)>$/ or @detail =~ /^([A-z ]+)$/
-#      $`
-#    else
-      @detail # ポート状態がないことがあるのか？
-#    end
   end
 
   # Over, Free, Open, 2M Over etc.
