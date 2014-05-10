@@ -31,3 +31,6 @@ task :uninstall do
   sh "rm -rvf #{$RESOURCE_DIR}"
 end
 
+task :stats do
+  sh "wc -l *.rb | sort -nr"
+end

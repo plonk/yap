@@ -46,3 +46,11 @@ module GtkHelper
     return label
   end    
 end
+
+class Gtk::Widget
+  def set(hash)
+    hash.each_pair do |name, value|
+      self.send(name.to_s + "=", value)
+    end
+  end
+end

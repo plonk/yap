@@ -21,70 +21,31 @@ class SettingsDialog < Gtk::Dialog
     end
   end
 
-  def check_peercast
-    str = @peercast_entry.text
-    return true if str.empty?
-
-    if not str =~ /^.+:.+$/
-      show_message("ホスト名:ポート番号の形式で指定してください", "peercast 入力形式エラー")
-      return false
-    end
-
-    host, port = str.split(/:/, 2)
-    unless port =~ /^\d+$/ and port.to_i.between?(1, 65535)
-      show_message("ポート番号が有効な数字ではありません", "ポート番号エラー")
-      return false
-    end
-
-    # 開いてみる？ タイムアウトが長い。
-    open_failed = false
-    begin
-      s = TCPSocket.new(host, port.to_i)
-      s.close
-    rescue
-      open_failed = true
-    end
-    if open_failed
-      show_message("#{host}:#{port}にアクセスできません。\n設定しますが、再生できないと思われます。",
-                         "#{host}:#{port}が開けません",
-                         MessageDialog::WARNING)
-    end
-
-    return true
-  end
-
   def initialize(parent)
     # ピアキャストのポート番号、動画プレーヤーのパス？
     super("設定", parent, Dialog::MODAL)
-    table = Table.new(3, 2)
-    table.row_spacings = 5
-    table.column_spacings = 10
+ 
+    set border_width: 5, resizable: false
+    vbox.set(spacing: 10)
 
-    self.border_width = 5
-    self.resizable = false
+    table = create(Table, 2, 2, row_spacings: 5, column_spacings: 10)
 
-    a1 = head("peercast のホスト名とポート\n（通常 localhost:7144）")
-    @host_entry = a2 = Entry.new
-    a2.no_show_all = true
-    a2.text = ::Settings[:USER_PEERCAST] || ""
-    @peercast_entry = a2 
-    a3 = Button.new("チェック")
-    a3.signal_connect ("clicked") do 
-      if a2.text != "" and check_peercast
-        show_message("#{@peercast_entry.text} に問題は見つかりませんでした。",
-                           "問題なし",
-                           MessageDialog::INFO)
+    @peercast_entry = create(Entry, no_show_all: true, text: ::Settings[:USER_PEERCAST])
+    @file_assoc_button = create(Button, '設定', on_clicked: method(:cb_file_assoc_button_clicked))
+
+    definition = [[head("peercast のホスト名とポート"), @peercast_entry],
+                  [head("プレーヤー"), @file_assoc_button]]
+
+    definition.each_with_index do |row, y|
+      row.each_with_index do |widget, x|
+        table.attach_defaults(widget,
+                              x, x+1,
+                              y, y+1)
       end
     end
-    b1 = head("プレーヤー")
-    @file_assoc_button = b2 = create(Button, '設定', on_clicked: method(:cb_file_assoc_button_clicked))
 
-    table.attach_defaults(a1, 0, 1, 0, 1)
-    table.attach_defaults(a2, 1, 2, 0, 1)
-    table.attach_defaults(a3, 2, 3, 0, 1)
-
-    table.attach_defaults(b1, 0, 1, 1, 2)
-    table.attach_defaults(b2, 1, 3, 1, 2)
+    vbox.pack_start(table)
+    vbox.pack_end(HSeparator.new)
 
     add_button(Stock::OK, Dialog::RESPONSE_OK)
     add_button(Stock::CANCEL, Dialog::RESPONSE_CANCEL)
@@ -92,24 +53,11 @@ class SettingsDialog < Gtk::Dialog
     signal_connect("response") do |d, res|
       case res
       when Dialog::RESPONSE_OK
-        if not check_peercast
-          # do not save settings
-        else
-          if (s = @peercast_entry.text).empty?
-            ::Settings[:USER_PEERCAST] = nil
-          else
-            ::Settings[:USER_PEERCAST] = s
-          end
-          ::Settings.save
-        end
-      else # CANCEL
-        # ::Settings.load
+        ::Settings[:USER_PEERCAST] = @peercast_entry.text
+        ::Settings.save
       end
       destroy
     end
-
-    vbox.pack_start(table)
-    vbox.pack_end(HSeparator.new)
   end
 
   def cb_file_assoc_button_clicked button
@@ -125,6 +73,6 @@ class SettingsDialog < Gtk::Dialog
 
   def show_all
     super
-    @host_entry.show
+    @peercast_entry.show
   end
 end
