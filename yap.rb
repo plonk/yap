@@ -3,7 +3,6 @@
 # イエローページビュアーあるいは yap (Yet Another PCYP)
 require 'gtk2'
 require "resolv"
-require "nkf"
 require "net/http"
 require "csv"
 require "dbm"
