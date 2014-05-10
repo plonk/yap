@@ -16,9 +16,10 @@ class ChannelListView < Gtk::TreeView
   FLD_TIME     = 4
   FLD_BITRATE  = 5
   FLD_HASH     = 6
+  FLD_YPNAME   = 7
 
-  # FIELDS:      chname,  genre, detail, listener,   time, bitrate,   hash
-  FIELD_TYPES = [String, String, String, Integer, Integer, Integer, String]
+  # FIELDS:      chname,  genre, detail, listener,   time, bitrate,   hash, ypname
+  FIELD_TYPES = [String, String, String, Integer, Integer, Integer, String, String]
 
   def open_url(url)
     Environment.open(url)
@@ -146,6 +147,7 @@ class ChannelListView < Gtk::TreeView
     cr_time	= create CellRendererText, xalign: 1
 
     @yp_column = TreeViewColumn.new("YP", cr_yp)
+    @yp_column.signal_connect("clicked", &sort_changer(FLD_YPNAME, SORT_ASCENDING))
     @yp_column.set_cell_data_func(cr_yp, &method(:yp_cell_data_func))
     append_column @yp_column
 
@@ -291,6 +293,7 @@ class ChannelListView < Gtk::TreeView
     iter[FLD_TIME]     = ch.time
     iter[FLD_BITRATE]  = ch.bitrate
     iter[FLD_HASH]     = ch.hash.to_s(16)
+    iter[FLD_YPNAME]   = ch.yp.name
   end
 
   def refresh
