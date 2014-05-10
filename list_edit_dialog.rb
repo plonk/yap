@@ -21,15 +21,13 @@ class ListEditDialog < Gtk::Dialog
     def initialize parent_window, headers, types
       super('アイテムを追加', parent_window)
 
-      # self.width_request = 320
       @views = []
 
       vbox.spacing = 5
-      headers.each_with_index do |header, col_id|
-        vbox.add create(HBox) { |hbox|
-          create(Label, header) do |legend|
-            legend.width_request = 50
-            hbox.pack_start legend, false
+      create(Table, 2, headers.size, row_spacings: 5, column_spacings: 10) do |table|
+        headers.each_with_index do |header, col_id|
+          create(Label, header, xalign: 1) do |legend|
+            table.attach_defaults(legend, 0, 1, col_id, col_id+1)
           end
 
           case types[col_id]
@@ -37,23 +35,24 @@ class ListEditDialog < Gtk::Dialog
             create(Entry) do |entry|
               entry.width_request = 150
               @views << entry
-              hbox.add entry
+              table.attach_defaults(entry, 1, 2, col_id, col_id+1)
             end
           when :toggle
             create(CheckButton) do |toggle|
               @views << toggle
-              hbox.add toggle
+              table.attach_defaults(toggle, 1, 2, col_id, col_id+1)
             end
           when :radio
             create(CheckButton) do |toggle|
               toggle.active = false
               toggle.sensitive = false
               @views << toggle
-              hbox.add toggle
+              table.attach_defaults(toggle, 1, 2, col_id, col_id+1)
             end
           else fail
           end
-        }
+        end
+        vbox.pack_start(table, false)
       end
 
       @ok_button = add_button Stock::OK, RESPONSE_OK
@@ -141,12 +140,10 @@ class ListEditDialog < Gtk::Dialog
     end
 
     @ok_button = add_button(Stock::OK, RESPONSE_OK)
+    add_button(Stock::CANCEL, RESPONSE_CANCEL)
   end
 
   def create_context_menu
-    self.width_request = 320
-    self.height_request = 200
-
     create(Menu) do |menu|
       create(MenuItem, "追加") do |add_item|
         add_item.signal_connect('activate') do |item|
@@ -190,7 +187,7 @@ class ListEditDialog < Gtk::Dialog
   end
 
   def initialize parent_window, options
-    super('List Edit Dialog', parent_window)
+    super(options[:title] || 'List Edit Dialog', parent_window)
 
     optary = [:types, :editable, :table, :headers].map(&options.method(:[]))
     @types, editable, table, @headers = optary
@@ -228,5 +225,8 @@ class ListEditDialog < Gtk::Dialog
         iter[i] = row[i]
       end
     end
+
+    width, height = @treeview.size_request
+    set_size_request width + 30, height + 60
   end
 end

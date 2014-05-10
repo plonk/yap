@@ -11,12 +11,11 @@ class YellowPageManager < ListEditDialog
     table = intern(::Settings[:YELLOW_PAGES])
 
     super(parent,
+          title: 'YP 設定',
           table: table,
           headers: ['有効', '名前', 'URL', 'チャット有', '統計有'],
           types: [:toggle, :text, :text, :toggle, :toggle],
           editable: [true, true, true, true, true])
-
-    set_size_request 480, 320
 
     signal_connect 'response', &method(:on_response)
   end
