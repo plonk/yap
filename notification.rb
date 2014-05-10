@@ -34,7 +34,7 @@ class Notification < Gtk::InfoBar
     show
     # 一定時間後に自動的に閉じる。
     Thread.new do
-      sleep $NOTIFICATION_AUTO_CLOSE_TIMEOUT
+      sleep ::Settings[:NOTIFICATION_AUTO_CLOSE_SECONDS]
       Gtk.queue { hide if @info_bar_label.text == message }
     end
   end

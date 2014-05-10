@@ -26,6 +26,7 @@ class Settings_
     ],
     USER_PEERCAST: "localhost:7144",
     REVERSE_LOOKUP_TIP: true,
+    NOTIFICATION_AUTO_CLOSE_SECONDS: 15,
   }
 
   VAR_NAMES = VARIABLES.keys
