@@ -306,7 +306,7 @@ EOS
 
   def update_favicon_image
     if ch = @model.selected_channel
-      pixbuf = $URL2PIXBUF[ch.contact_url]
+      pixbuf = URL2PIXBUF[ch.contact_url]
       if pixbuf
         @favicon_image.pixbuf = pixbuf
       else
@@ -314,7 +314,7 @@ EOS
         Thread.start do
           pixbuf = get_favicon_pixbuf_for(ch)
           pixbuf = pixbuf.scale(16, 16, Gdk::Pixbuf::INTERP_NEAREST)
-          $URL2PIXBUF[ch.contact_url] = pixbuf
+          URL2PIXBUF[ch.contact_url] = pixbuf
           Gtk.queue do 
             current_channel = @model.selected_channel
             if current_channel == ch
@@ -329,7 +329,7 @@ EOS
     end
   end
   
-  $URL2PIXBUF = Hash.new # contact URL to favicon pixbuf
+  URL2PIXBUF = Hash.new # contact URL to favicon pixbuf
 
   def get_favicon_pixbuf_for(ch, fallback = QUESTION_16)
     if ch.favicon_url
