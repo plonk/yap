@@ -25,17 +25,17 @@ class ChannelListView < Gtk::TreeView
     Environment.open(url)
   end
 
+  TARGET_NAME_CELL_WIDTH = 16.0
+
   def name_cell_data_func col, renderer, model, iter
-    width = measure_width(iter[0])
-    if width > 16
-      factor = (16.0 / width)
-      if factor < 5
-        factor = 0.8
-      end
-      renderer.font = "Meiryo UI %.1f" % (10 * factor)
-    else
-      renderer.font = "Meiryo 10"
+    base_font = Pango::FontDescription.new(::Settings[:LIST_FONT])
+
+    half_widths = measure_width(iter[0])
+    if half_widths > TARGET_NAME_CELL_WIDTH
+      factor = TARGET_NAME_CELL_WIDTH / half_widths
+      base_font.size = [10*factor,8].max * 1000
     end
+    renderer.font = base_font
     if @mw_model.favorites.include? iter[0]
       renderer.background = "#FFBBBB" # pink if favorite
       renderer.weight = WEIGHT_BOLD
@@ -61,7 +61,6 @@ class ChannelListView < Gtk::TreeView
       renderer.markup = get_highlighted_markup(genre, @mw_model.search_term)
     end
   end
-
 
   def listener_cell_data_func col, renderer, model, iter
     renderer.weight = WEIGHT_NORMAL
@@ -132,59 +131,75 @@ class ChannelListView < Gtk::TreeView
     end
   end
 
+  def update message, *args
+    if self.respond_to? message
+      self.send(message, *args)
+    end
+  end
+
+  def settings_changed
+    @cr_name.font =
+      @cr_genre.font =
+      @cr_detail.font =
+      @cr_listener.font =
+      @cr_bitrate.font =
+      @cr_time.font = ::Settings[:LIST_FONT]
+  end
+
   def initialize(mw_model)
     @mw_model = mw_model
+    @mw_model.add_observer(self, :update)
     @list_store = ListStore.new(*FIELD_TYPES)
     super(@list_store)
 
     # セルレンダラーの設定
-    cr_name	= create CellRendererText, font: "10",          ellipsize: Layout::ELLIPSIZE_END
-    cr_genre	= create CellRendererText, font: "Meiryo UI",   ellipsize: Layout::ELLIPSIZE_END
-    cr_detail	= create CellRendererText, font: "Meiryo UI 9", ellipsize: Layout::ELLIPSIZE_END
-    cr_listener	= create CellRendererText, xalign: 1
-    cr_bitrate	= create CellRendererText, xalign: 1
-    cr_yp	= create CellRendererPixbuf
-    cr_time	= create CellRendererText, xalign: 1
+    @cr_name	= create CellRendererText, font: ::Settings[:LIST_FONT], ellipsize: Layout::ELLIPSIZE_END
+    @cr_genre	= create CellRendererText, font: ::Settings[:LIST_FONT], ellipsize: Layout::ELLIPSIZE_END
+    @cr_detail	= create CellRendererText, font: ::Settings[:LIST_FONT], ellipsize: Layout::ELLIPSIZE_END
+    @cr_listener= create CellRendererText, font: ::Settings[:LIST_FONT], xalign: 1
+    @cr_bitrate	= create CellRendererText, font: ::Settings[:LIST_FONT], xalign: 1
+    @cr_yp	= create CellRendererPixbuf
+    @cr_time	= create CellRendererText, font: ::Settings[:LIST_FONT], xalign: 1
 
-    @yp_column = TreeViewColumn.new("YP", cr_yp)
+    @yp_column = TreeViewColumn.new("YP", @cr_yp)
     @yp_column.signal_connect("clicked", &sort_changer(FLD_YPNAME, SORT_ASCENDING))
-    @yp_column.set_cell_data_func(cr_yp, &method(:yp_cell_data_func))
+    @yp_column.set_cell_data_func(@cr_yp, &method(:yp_cell_data_func))
     append_column @yp_column
 
-    @name_column = TreeViewColumn.new("名前", cr_name, text: 0)
+    @name_column = TreeViewColumn.new("名前", @cr_name, text: 0)
     @name_column.resizable = true
     @name_column.min_width = 150
     @name_column.signal_connect("clicked", &sort_changer(0, SORT_ASCENDING))
-    @name_column.set_cell_data_func(cr_name, &method(:name_cell_data_func))
+    @name_column.set_cell_data_func(@cr_name, &method(:name_cell_data_func))
     append_column @name_column
 
-    @genre_column = TreeViewColumn.new("ジャンル", cr_genre, text: 1)
+    @genre_column = TreeViewColumn.new("ジャンル", @cr_genre, text: 1)
     @genre_column.resizable = true
     @genre_column.min_width = 70
     @genre_column.signal_connect("clicked", &sort_changer(1, SORT_ASCENDING))
-    @genre_column.set_cell_data_func(cr_genre, &method(:genre_cell_data_func))
+    @genre_column.set_cell_data_func(@cr_genre, &method(:genre_cell_data_func))
     append_column @genre_column
 
-    @detail_column = TreeViewColumn.new("配信内容", cr_detail, text: 2)
+    @detail_column = TreeViewColumn.new("配信内容", @cr_detail, text: 2)
     @detail_column.resizable = true
     @detail_column.min_width = 240
     @detail_column.signal_connect("clicked", &sort_changer(2, SORT_ASCENDING))
-    @detail_column.set_cell_data_func(cr_detail, &method(:detail_cell_data_func))
+    @detail_column.set_cell_data_func(@cr_detail, &method(:detail_cell_data_func))
     append_column @detail_column
 
-    @listener_column = TreeViewColumn.new("人数", cr_listener, text: 3)
+    @listener_column = TreeViewColumn.new("人数", @cr_listener, text: 3)
     @listener_column.signal_connect("clicked", &sort_changer(3, SORT_DESCENDING))
-    @listener_column.set_cell_data_func(cr_listener, &method(:listener_cell_data_func))
+    @listener_column.set_cell_data_func(@cr_listener, &method(:listener_cell_data_func))
     append_column @listener_column
 
-    @time_column = TreeViewColumn.new("時間", cr_time, :text=>4)
+    @time_column = TreeViewColumn.new("時間", @cr_time, :text=>4)
     @time_column.signal_connect("clicked", &sort_changer(4, SORT_DESCENDING))
-    @time_column.set_cell_data_func(cr_time, &method(:time_cell_data_func))
+    @time_column.set_cell_data_func(@cr_time, &method(:time_cell_data_func))
     append_column @time_column
 
-    @bitrate_column = TreeViewColumn.new("Bps", cr_bitrate, text: 5)
+    @bitrate_column = TreeViewColumn.new("Bps", @cr_bitrate, text: 5)
     @bitrate_column.signal_connect("clicked", &sort_changer(5, SORT_DESCENDING))
-    @bitrate_column.set_cell_data_func(cr_bitrate, &method(:bitrate_cell_data_func))
+    @bitrate_column.set_cell_data_func(@cr_bitrate, &method(:bitrate_cell_data_func))
     append_column @bitrate_column
 
     self.headers_clickable = true

@@ -32,9 +32,13 @@ class SettingsDialog < Gtk::Dialog
 
     @peercast_entry = create(Entry, no_show_all: true, text: ::Settings[:USER_PEERCAST])
     @file_assoc_button = create(Button, '設定', on_clicked: method(:cb_file_assoc_button_clicked))
+    @font_button = create(FontButton, ::Settings[:LIST_FONT])
 
-    definition = [[head("peercast のホスト名とポート"), @peercast_entry],
-                  [head("プレーヤー"), @file_assoc_button]]
+    definition = [
+                  [head("peercast のホスト名とポート"), @peercast_entry],
+                  [head("プレーヤー"), @file_assoc_button],
+                  [head("フォント"), @font_button],
+                 ]
 
     definition.each_with_index do |row, y|
       row.each_with_index do |widget, x|
@@ -54,6 +58,7 @@ class SettingsDialog < Gtk::Dialog
       case res
       when Dialog::RESPONSE_OK
         ::Settings[:USER_PEERCAST] = @peercast_entry.text
+        ::Settings[:LIST_FONT] = @font_button.font_name
         ::Settings.save
       end
       destroy
