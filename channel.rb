@@ -148,7 +148,7 @@ class Channel
   def get_specified_favicon_url(url)
     puts "get_specified_favicon_url"
     p [:get_specified_favicon_url, url]
-    buf = get_page(url)
+    buf = WebResource.get_page(url)
     if buf =~ /<link rel="?(shortcut )?icon"? href="([^"]+)"/i
       puts "found!"
       (URI.parse(url) + $2).to_s

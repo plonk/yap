@@ -111,7 +111,7 @@ class ChannelListView < Gtk::TreeView
   def yp_cell_data_func col, renderer, model, iter
     ch = @mw_model.find_channel_by_hash(iter[FLD_HASH].to_i(16))
     if ch
-      renderer.pixbuf = get_pixbuf_from_url(ch.yp.favicon_url)
+      renderer.pixbuf = WebResource.get_pixbuf(ch.yp.favicon_url)
         .scale(16, 16, Gdk::Pixbuf::INTERP_BILINEAR)
     else
       # リストの表示とイエローページのロードが非同期だから到達するだろう。

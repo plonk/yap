@@ -329,6 +329,17 @@ EOS
     end
   end
   
+  $URL2PIXBUF = Hash.new # contact URL to favicon pixbuf
+
+  def get_favicon_pixbuf_for(ch, fallback = QUESTION_16)
+    if ch.favicon_url
+      puts "favicon is specified for #{ch}"
+      WebResource.get_pixbuf(ch.favicon_url, fallback)
+    else
+      fallback
+    end
+  end
+
   def update_genre_label
     if ch = @model.selected_channel
       @genre_label.text = ch.genre

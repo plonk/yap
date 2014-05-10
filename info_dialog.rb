@@ -60,7 +60,7 @@ class InfoDialog < Gtk::Dialog
   end
 
   def get_favicon_image_for(url)
-    buf = get_page(url)
+    buf = WebResource.get_page(url)
     image = Gtk::Image.new
     if buf =~ /<link rel="?(shortcut )?icon"? href="([^"]+)"/i
       puts "favicon is specified"
@@ -68,7 +68,7 @@ class InfoDialog < Gtk::Dialog
       p favicon_url
       uri = URI.join(url, favicon_url)
       Gdk::PixbufLoader.open do |loader|
-        loader.write get_favicon(uri.to_s)
+        loader.write WebResource.get_favicon(uri.to_s)
         loader.close
         image.pixbuf = loader.pixbuf
       end
