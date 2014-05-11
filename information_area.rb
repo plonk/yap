@@ -63,7 +63,7 @@ class InformationArea < Gtk::VBox
       create(HBox, false, 5) do |genre_hbox|
         @genre_label = create(Label, '',
                               wrap: true,
-                              xalign: 0,
+                              xalign: 0.5,
                               width_request: 120 + 15,
                               ellipsize: Pango::Layout::ELLIPSIZE_END)
 
