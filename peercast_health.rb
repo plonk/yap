@@ -17,15 +17,12 @@ class PeercastHealth
   end
 
   def check
-    socket = Socket.new(Socket::AF_INET, Socket::SOCK_STREAM, 0)
-    sockaddr = Socket.sockaddr_in(@port, @host)
-
     response = nil
     timeout @timeout_seconds do 
-      socket.connect sockaddr
-      socket.write "\x70\x63\x70\x0a\x04\x00\x00\x00\x01\x00\x00\x00\x68\x65\x6c\x6f\x00\x00\x00\x80"
-      response = socket.recv(4)
-      socket.close
+      Addrinfo.tcp(@host, @port).connect do |socket|
+        socket.write "\x70\x63\x70\x0a\x04\x00\x00\x00\x01\x00\x00\x00\x68\x65\x6c\x6f\x00\x00\x00\x80"
+        response = socket.recv(4)
+      end
     end
     response == "oleh"
   rescue Errno::ECONNREFUSED
