@@ -4,6 +4,7 @@ require_relative 'favorites'
 require_relative 'launcher'
 require_relative 'type_association'
 require_relative 'child_process'
+require_relative 'peercast_health'
 
 # アプリケーションモデルとかプレゼンターとかそんなの。
 class MainWindowModel
@@ -169,11 +170,13 @@ class MainWindowModel
   def start_helper_threads
     start_reload_button_manager_thread
     start_updater_thread
+    start_peercast_watcher_thread
   end
 
   def stop_helper_threads
     @reload_button_state_helper.kill
     @updater_thread.kill
+    @peercast_watcher_thread.kill
   end
 
   def reload
@@ -269,6 +272,21 @@ class MainWindowModel
       loop do
         update_channel_list
         sleep UPDATE_INTERVAL_MINUTE * 60
+      end
+    end
+  end
+
+  def start_peercast_watcher_thread
+    @peercast_watcher_thread = Thread.start do
+      loop do
+        host, port = ::Settings[:USER_PEERCAST].split(/:/)
+        watcher = PeercastHealth.new(host, port.to_i, 0.5)
+        result = watcher.check
+        if result
+        else
+          self.notification = "#{watcher.to_s} に接続できません。(#{watcher.error_reason})"
+        end
+        sleep 5 * 60
       end
     end
   end
