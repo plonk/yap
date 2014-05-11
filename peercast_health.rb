@@ -34,6 +34,9 @@ class PeercastHealth
   rescue Timeout::Error
     @error_reason = "connection timed out"
     false
+  rescue Errno::EINVAL
+    @error_reason = "invalid argument"
+    false
   end
 end
 
