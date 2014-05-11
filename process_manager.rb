@@ -58,7 +58,7 @@ class ProcessManager < Gtk::Dialog
   end
 
   def object_list_update
-    @kill_button.sensitive = @object_list.selected and !@object_list.selected.finished?
+    @kill_button.sensitive = @object_list.selected && !@object_list.selected.finished?
     @clear_button.sensitive = !@object_list.get.select(&:finished?).empty?
   end
 
