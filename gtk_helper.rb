@@ -50,10 +50,11 @@ module GtkHelper
   end    
 end
 
-class Gtk::Widget
+class Gtk::Object
   def set(hash)
     hash.each_pair do |name, value|
       self.send(name.to_s + "=", value)
     end
+    self
   end
 end
