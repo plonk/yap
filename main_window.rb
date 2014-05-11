@@ -248,8 +248,6 @@ EOS
       Gtk.queue do 
         self.__send__(message, *args)
       end
-    else
-      STDERR.puts "update: unknown message #{message}(args: #{args.inspect}) received"
     end
   end
 
