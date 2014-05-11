@@ -20,7 +20,7 @@ class InformationArea < Gtk::VBox
   def do_layout
     set(homogeneous: false, spacing: 5, border_width: 10)
 
-    create(HBox,  false, 15) do |hbox|
+    create(HBox, false, 15) do |hbox|
       @play_button = create(Button, 
                             tooltip_text: "チャンネルを再生する",
                             sensitive: false,
@@ -61,31 +61,24 @@ class InformationArea < Gtk::VBox
 
     create(VBox) do |detail_vbox|
       create(HBox, false, 5) do |genre_hbox|
-        genre_hbox.pack_start(Label.new("　　ジャンル："), false)
-
         @genre_label = create(Label, '',
                               wrap: true,
                               xalign: 0,
+                              width_request: 120 + 15,
                               ellipsize: Pango::Layout::ELLIPSIZE_END)
-        genre_hbox.pack_start(@genre_label, true);
+
+        @favicon_image = Image.new
+        @link_button = create(LinkButton, "", "",
+                              xalign: 0)
+        @link_button.child.set(ellipsize: Pango::Layout::ELLIPSIZE_END)
+
+        genre_hbox.pack_start(@genre_label, false);
+        genre_hbox.pack_start(@favicon_image, false)
+        genre_hbox.pack_start(@link_button, true)
 
         detail_vbox.pack_start(genre_hbox, false)
       end
       pack_start(detail_vbox, false)
-    end
-
-    create(HBox, false, 5) do |link_hbox|
-      bbs_label = Label.new("　　　掲示板：")
-      @favicon_image = Image.new
-      @link_button = create(LinkButton, "", "",
-                            xalign: 0)
-      @link_button.child.set(ellipsize: Pango::Layout::ELLIPSIZE_END)
-
-      link_hbox.pack_start(bbs_label, false)
-      link_hbox.pack_start(@favicon_image, false)
-      link_hbox.pack_start(@link_button, true)
-
-      pack_start(link_hbox, false)
     end
   end
 
@@ -162,9 +155,11 @@ class InformationArea < Gtk::VBox
 
   def update_genre_label
     if ch = @model.selected_channel
-      @genre_label.text = ch.genre
+      @genre_label.set(text: ch.genre,
+                       tooltip_text: ch.genre)
     else
-      @genre_label.text = ''
+      @genre_label.set(text: '',
+                       tooltip_text: '')
     end
   end
 

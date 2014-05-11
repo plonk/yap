@@ -3,11 +3,13 @@ require 'gtk2'
 
 class ChannelNameLabel < Gtk::Label
   include Gtk
+  include GtkHelper
 
   def initialize
     super
-    self.wrap      = false
-    self.xalign    = 0
+    set(ellipsize: Pango::Layout::ELLIPSIZE_END,
+        wrap: false,
+        xalign: 0)
   end
 
   class << self
