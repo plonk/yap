@@ -31,10 +31,13 @@ module GtkHelper
     widget
   end
 
-  def head(str)
+  def head(str, tooltip = nil)
     label = Gtk::Label.new(str+":")
     label.xalign = 1
-    label.yalign = 0
+    label.yalign = 0.5
+    if tooltip
+      label.tooltip_text = tooltip
+    end
     return label
   end
 

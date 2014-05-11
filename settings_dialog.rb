@@ -34,12 +34,21 @@ class SettingsDialog < Gtk::Dialog
     @file_assoc_button = create(Button, '設定', on_clicked: method(:cb_file_assoc_button_clicked))
     @font_button = create(FontButton, ::Settings[:LIST_FONT])
     @bandwidth_check_button = create(CheckButton, active: ::Settings[:ENABLE_AUTO_BANDWIDTH_CHECK])
+    @grid_combo_box = create(ComboBox) do |combobox|
+      ["なし", "横", "縦", "両方"].each_with_index do |word, idx|
+        combobox.append_text word
+      end
+      combobox.active = ::Settings[:GRID_LINES]
+    end
+    @rules_check_button = create(CheckButton, active: ::Settings[:RULES_HINT])
 
     definition = [
-                  [head("peercast のホスト名とポート"), @peercast_entry],
+                  [head("接続先 Peercast ノード"), @peercast_entry],
                   [head("プレーヤー"), @file_assoc_button],
-                  [head("フォント"), @font_button],
                   [head("自動帯域チェック"), @bandwidth_check_button],
+                  [head("リストのフォント"), @font_button],
+                  [head("罫線"), @grid_combo_box],
+                  [head("交互に暗色", "一行ごとに背景を暗くする(テーマ依存)"), @rules_check_button],
                  ]
 
     definition.each_with_index do |row, y|
@@ -62,6 +71,8 @@ class SettingsDialog < Gtk::Dialog
         ::Settings[:USER_PEERCAST] = @peercast_entry.text
         ::Settings[:LIST_FONT] = @font_button.font_name
         ::Settings[:ENABLE_AUTO_BANDWIDTH_CHECK] = @bandwidth_check_button.active?
+        ::Settings[:GRID_LINES] = @grid_combo_box.active
+        ::Settings[:RULES_HINT] = @rules_check_button.active?
         ::Settings.save
       end
       destroy

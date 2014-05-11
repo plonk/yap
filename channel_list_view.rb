@@ -136,7 +136,9 @@ class ChannelListView < Gtk::TreeView
 
   def update message, *args
     if self.respond_to? message
-      self.send(message, *args)
+      Gtk.queue do 
+        self.__send__(message, *args)
+      end
     end
   end
 
@@ -155,7 +157,11 @@ class ChannelListView < Gtk::TreeView
       @cr_listener.font =
       @cr_bitrate.font =
       @cr_time.font = ::Settings[:LIST_FONT]
+
+    set_view_preferences
   end
+
+  GRID_LINE_CONSTANTS = [GRID_LINES_NONE, GRID_LINES_HORIZONTAL, GRID_LINES_VERTICAL, GRID_LINES_BOTH]
 
   def initialize(mw_model, func)
     @func = func
@@ -218,8 +224,10 @@ class ChannelListView < Gtk::TreeView
     @bitrate_column.set_cell_data_func(@cr_bitrate, &method(:bitrate_cell_data_func))
     append_column @bitrate_column
 
-    self.headers_clickable = true
-    self.enable_grid_lines = GRID_LINES_HORIZONTAL
+    set(headers_clickable: true)
+
+    set_view_preferences()
+
     @list_store.set_sort_column_id 0, SORT_ASCENDING
 
     @context_menu = ContextMenu.new(@mw_model)
@@ -242,6 +250,11 @@ class ChannelListView < Gtk::TreeView
     end
 
     refresh
+  end
+
+  def set_view_preferences
+    set(rules_hint: ::Settings[:RULES_HINT],
+        enable_grid_lines: GRID_LINE_CONSTANTS[::Settings[:GRID_LINES]])
   end
 
   def on_button_press_event w, event

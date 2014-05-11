@@ -21,7 +21,7 @@ class Settings_
      [true, "event", "http://eventyp.xrea.jp/", nil, nil],
      [true, "DP", "http://dp.prgrssv.net/", nil, nil],
      [true, "multi-yp", "http://peercast.takami98.net/multi-yp/", nil, nil],
-     [true, "アスチェ", "http://asuka--sen-nin.ddo.jp/checker/", nil, nil],
+     [true, "アスカチェッカー", "http://asuka--sen-nin.ddo.jp/checker/", nil, nil],
      [true, "cavetube", "http://rss.cavelis.net/", nil, nil],
     ],
     USER_PEERCAST: "localhost:7144",
@@ -29,6 +29,8 @@ class Settings_
     NOTIFICATION_AUTO_CLOSE_SECONDS: 15,
     LIST_FONT: 'Sans 12',
     ENABLE_AUTO_BANDWIDTH_CHECK: true,
+    GRID_LINES: 1,
+    RULES_HINT: true,
   }
 
   VAR_NAMES = VARIABLES.keys
