@@ -8,6 +8,9 @@ require_relative 'clv_context_menu'
 
 class ChannelListView < Gtk::TreeView
   include Pango, Gtk, GtkHelper
+  include Observable
+
+  attr_reader :count
 
   FLD_CHNAME   = 0
   FLD_GENRE    = 1
@@ -158,6 +161,7 @@ class ChannelListView < Gtk::TreeView
     @func = func
     @mw_model = mw_model
     @mw_model.add_observer(self, :update)
+    @count = -1
 
     @search_term = ""
     @list_store = ListStore.new(*FIELD_TYPES)
@@ -329,17 +333,22 @@ class ChannelListView < Gtk::TreeView
   end
 
   def refresh
+    count = 0
     backup = self.model
     self.model = nil
 
     @list_store.clear
     @mw_model.master_table.each do |ch|
       if @func.call(ch)
+        count += 1
         iter = @list_store.append
         channel_copy(iter, ch)
       end
     end
 
     self.model = backup
+    @count = count
+    changed
+    notify_observers
   end
 end

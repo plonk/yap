@@ -1,18 +1,40 @@
 # -*- coding: utf-8 -*-
 require_relative 'channel_list_view'
+require_relative 'tab_label'
 
 class ChannelListPage < Gtk::VBox
   include Gtk
   include GtkHelper
+  include Observable
 
-  def initialize(model, func = proc { true })
+  attr_reader :title, :label
+
+  def initialize(model, title, func = proc { true })
     super()
 
     @model = model
     @func = func
     set(homogeneous: false)
+    @base_title = title
 
     do_layout
+
+    @channel_list_view.add_observer(self)
+
+    @label = TabLabel.new(self)
+
+    signal_connect('destroy') do
+      @channel_list_view.delete_observer(self)
+    end
+  end
+
+  def title
+    "#{@base_title}(#{@channel_list_view.count})"
+  end
+
+  def update
+    changed
+    notify_observers
   end
 
   def do_layout

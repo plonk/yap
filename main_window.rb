@@ -107,11 +107,13 @@ class MainWindow < Gtk::Window
       outermost_vbox.pack_start(@information_area, false)
 
       @notebook = create(Notebook) do |notebook|
-        @channel_list_page = ChannelListPage.new(@model)
-        notebook.append_page(@channel_list_page, Label.new('すべて'))
-        notebook.append_page(ChannelListPage.new(@model,
-                                                 proc { |ch| @model.favorites.include? ch.name }),
-                             Label.new('お気に入り'))
+        @channel_list_page = ChannelListPage.new(@model, 'すべて')
+        notebook.append_page(@channel_list_page, @channel_list_page.label)
+        fav_page = ChannelListPage.new(@model, 'お気に入り',
+                                       proc { |ch|
+                                         @model.favorites.include? ch.name
+                                       })
+        notebook.append_page(fav_page, fav_page.label)
 
         outermost_vbox.pack_start(notebook, true)
       end
