@@ -20,7 +20,11 @@ class ChannelListPage < Gtk::VBox
       @search_label = Label.new("")
       @search_field = Entry.new
       @search_field.signal_connect("activate", &method(:search_field_activate_callback))
-      @clear_button = create(Button, " ☓ ", tooltip_text: "入力欄をクリアして検索をやめる",
+      clear_icon = IconFactory
+        .lookup_default("gtk-clear")
+        .render_icon(self.style, Widget::TEXT_DIR_RTL, STATE_NORMAL, IconSize::MENU)
+      @clear_button = create(Button, image: Image.new(clear_icon),
+                             tooltip_text: "入力欄をクリアして検索をやめる",
                              on_clicked: method(:clear_button_clicked_callback))
 
       hbox.pack_end(@clear_button, false)
