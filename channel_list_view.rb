@@ -189,22 +189,19 @@ class ChannelListView < Gtk::TreeView
     append_column @yp_column
 
     @name_column = TreeViewColumn.new("名前", @cr_name, text: 0)
-    @name_column.resizable = true
-    @name_column.min_width = 150
+      .set(resizable: true, min_width: 120, expand: true)
     @name_column.signal_connect("clicked", &sort_changer(0, SORT_ASCENDING))
     @name_column.set_cell_data_func(@cr_name, &method(:name_cell_data_func))
     append_column @name_column
 
     @genre_column = TreeViewColumn.new("ジャンル", @cr_genre, text: 1)
-    @genre_column.resizable = true
-    @genre_column.min_width = 70
+      .set(resizable: true, min_width: 50, expand: true)
     @genre_column.signal_connect("clicked", &sort_changer(1, SORT_ASCENDING))
     @genre_column.set_cell_data_func(@cr_genre, &method(:genre_cell_data_func))
     append_column @genre_column
 
     @detail_column = TreeViewColumn.new("配信内容", @cr_detail, text: 2)
-    @detail_column.resizable = true
-    @detail_column.min_width = 240
+      .set(resizable: true, min_width: 240, expand: true)
     @detail_column.signal_connect("clicked", &sort_changer(2, SORT_ASCENDING))
     @detail_column.set_cell_data_func(@cr_detail, &method(:detail_cell_data_func))
     append_column @detail_column
