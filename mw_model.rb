@@ -136,6 +136,8 @@ class MainWindowModel
       changed
       notify_observers(:child_process_changed)
     end
+  rescue StandardError => e
+    self.notification = "エラー: #{e.message}"
   end
 
   def clear_finished_child_processes
