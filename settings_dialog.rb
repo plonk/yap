@@ -62,14 +62,14 @@ class SettingsDialog < Gtk::Dialog
     vbox.pack_start(table)
     vbox.pack_end(HSeparator.new)
 
-    add_button(Stock::CANCEL, Dialog::RESPONSE_CANCEL)
-    add_button(Stock::OK, Dialog::RESPONSE_OK)
+    add_button(Stock::CANCEL, RESPONSE_CANCEL)
+    add_button(Stock::OK, RESPONSE_OK)
 
     set_alternative_button_order [RESPONSE_OK, RESPONSE_CANCEL]
 
     signal_connect("response") do |d, res|
       case res
-      when Dialog::RESPONSE_OK
+      when RESPONSE_OK
         ::Settings[:USER_PEERCAST] = @peercast_entry.text
         ::Settings[:LIST_FONT] = @font_button.font_name
         ::Settings[:ENABLE_AUTO_BANDWIDTH_CHECK] = @bandwidth_check_button.active?

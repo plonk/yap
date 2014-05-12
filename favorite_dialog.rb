@@ -15,8 +15,8 @@ class FavoriteDialog < Gtk::Dialog
 
     set_default_size(512, 384)
 
-    add_button(Stock::CANCEL, Dialog::RESPONSE_CANCEL)
-    add_button(Stock::OK, Dialog::RESPONSE_OK)
+    add_button(Stock::CANCEL, RESPONSE_CANCEL)
+    add_button(Stock::OK, RESPONSE_OK)
 
     set_alternative_button_order [RESPONSE_OK, RESPONSE_CANCEL]
 
@@ -45,7 +45,7 @@ class FavoriteDialog < Gtk::Dialog
                           dialog = LinePrompt.new("お気に入りのチャンネルを追加", self)
                           dialog.show_all
                           dialog.run do |response|
-                            if response == Dialog::RESPONSE_OK
+                            if response == RESPONSE_OK
                               @list.push(dialog.text)
                               append_item(dialog.text)
                             end

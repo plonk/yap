@@ -5,7 +5,7 @@ class InfoDialog < Gtk::Dialog
   include Gtk, GtkHelper
 
   def initialize(parent, ch)
-    super "#{ch.name}のチャンネル情報", parent, Dialog::MODAL, [ Stock::OK, Dialog::RESPONSE_NONE ]
+    super "#{ch.name}のチャンネル情報", parent, MODAL, [ Stock::OK, RESPONSE_NONE ]
 
     rows = [
              [ get_framed_favicon_image(ch), cell(ch.name) ],

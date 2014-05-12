@@ -7,11 +7,11 @@ class LinePrompt < Gtk::Dialog
   include Gtk, GtkHelper
   attr_accessor :validator
 
-  def initialize(title = "ラインプロンプト", parent = nil, mode = Dialog::MODAL)
+  def initialize(title = "ラインプロンプト", parent = nil, mode = MODAL)
     super(title, parent, mode)
 
-    add_button(Stock::CANCEL, Dialog::RESPONSE_CANCEL)
-    @ok_button = add_button(Stock::OK, Dialog::RESPONSE_OK)
+    add_button(Stock::CANCEL, RESPONSE_CANCEL)
+    @ok_button = add_button(Stock::OK, RESPONSE_OK)
 
     set_alternative_button_order [RESPONSE_OK, RESPONSE_CANCEL]
 
@@ -39,7 +39,7 @@ class LinePrompt < Gtk::Dialog
 
   def on_entry_activate entry
     if validator.call(entry.text)
-      response(Dialog::RESPONSE_OK)
+      response(RESPONSE_OK)
     end
   end
 
