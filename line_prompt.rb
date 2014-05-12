@@ -10,8 +10,11 @@ class LinePrompt < Gtk::Dialog
   def initialize(title = "ラインプロンプト", parent = nil, mode = Dialog::MODAL)
     super(title, parent, mode)
 
-    @ok_button = add_button(Stock::OK, Dialog::RESPONSE_OK)
     add_button(Stock::CANCEL, Dialog::RESPONSE_CANCEL)
+    @ok_button = add_button(Stock::OK, Dialog::RESPONSE_OK)
+
+    set_alternative_button_order [RESPONSE_OK, RESPONSE_CANCEL]
+
 
     vbox.spacing = 10
     @entry = create(Entry,

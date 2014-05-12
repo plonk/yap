@@ -189,8 +189,10 @@ class ObjectList < Gtk::ScrolledWindow
 
       self.vbox.pack_start(HSeparator.new, false)
 
-      add_button(OK, RESPONSE_OK)
       add_button(CANCEL, RESPONSE_CANCEL)
+      add_button(OK, RESPONSE_OK)
+
+      set_alternative_button_order [RESPONSE_OK, RESPONSE_CANCEL]
     end
 
     def result

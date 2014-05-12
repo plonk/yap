@@ -3,8 +3,8 @@ class LogDialog < Gtk::Dialog
   include Gtk
 
   def initialize(parent)
-    super("ログ", parent, Dialog::MODAL)
-    add_button(Stock::OK, Dialog::RESPONSE_OK)
+    super("ログ", parent, MODAL)
+    add_button(Stock::OK, RESPONSE_OK)
     buf = TextBuffer.new
     buf.text = $log.string
     textview = TextView.new(buf)

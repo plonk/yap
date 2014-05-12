@@ -14,8 +14,11 @@ class FavoriteDialog < Gtk::Dialog
     @list = list
 
     set_default_size(512, 384)
-    add_button(Stock::OK, Dialog::RESPONSE_OK)
+
     add_button(Stock::CANCEL, Dialog::RESPONSE_CANCEL)
+    add_button(Stock::OK, Dialog::RESPONSE_OK)
+
+    set_alternative_button_order [RESPONSE_OK, RESPONSE_CANCEL]
 
     self.vbox.spacing = 10
 

@@ -62,8 +62,10 @@ class SettingsDialog < Gtk::Dialog
     vbox.pack_start(table)
     vbox.pack_end(HSeparator.new)
 
-    add_button(Stock::OK, Dialog::RESPONSE_OK)
     add_button(Stock::CANCEL, Dialog::RESPONSE_CANCEL)
+    add_button(Stock::OK, Dialog::RESPONSE_OK)
+
+    set_alternative_button_order [RESPONSE_OK, RESPONSE_CANCEL]
 
     signal_connect("response") do |d, res|
       case res

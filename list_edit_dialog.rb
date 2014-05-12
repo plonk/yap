@@ -55,8 +55,10 @@ class ListEditDialog < Gtk::Dialog
         vbox.pack_start(table, false)
       end
 
-      @ok_button = add_button Stock::OK, RESPONSE_OK
       add_button Stock::CANCEL, RESPONSE_CANCEL
+      @ok_button = add_button Stock::OK, RESPONSE_OK
+
+      set_alternative_button_order [RESPONSE_OK, RESPONSE_CANCEL]
 
       @ok_button.signal_connect 'clicked' do |button|
         @result = @views.map(&method(:value))
@@ -139,8 +141,10 @@ class ListEditDialog < Gtk::Dialog
       self.vbox.add vbox
     end
 
-    @ok_button = add_button(Stock::OK, RESPONSE_OK)
     add_button(Stock::CANCEL, RESPONSE_CANCEL)
+    @ok_button = add_button(Stock::OK, RESPONSE_OK)
+
+    set_alternative_button_order [RESPONSE_OK, RESPONSE_CANCEL]
   end
 
   def create_context_menu
