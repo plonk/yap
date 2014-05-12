@@ -112,6 +112,7 @@ class MainWindowModel
   end
 
   def select_channel ch
+    STDERR.puts "#{ch} selected in mw_model"
     @selected_channel = ch
     changed
     notify_observers(:selected_channel_changed)

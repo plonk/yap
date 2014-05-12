@@ -168,10 +168,12 @@ class ChannelListView < Gtk::TreeView
     @mw_model = mw_model
     @mw_model.add_observer(self, :update)
     @count = -1
+    @suppress_selection_change = false
 
     @search_term = ""
     @list_store = ListStore.new(*FIELD_TYPES)
     super(@list_store)
+    selection.mode = SELECTION_BROWSE
 
 
     # セルレンダラーの設定
@@ -243,10 +245,16 @@ class ChannelListView < Gtk::TreeView
 
     # 行が選択された時に実行される
     selection.signal_connect("changed") do
-      @mw_model.select_channel(get_selected_channel)
+      @mw_model.select_channel(get_selected_channel) unless @suppress_selection_change
     end
 
     refresh
+  end
+
+  def silently
+    @suppress_selection_change = true
+    yield
+    @suppress_selection_change = false
   end
 
   def set_view_preferences
@@ -283,11 +291,6 @@ class ChannelListView < Gtk::TreeView
     search_result = TreeModelFilter.new(model)
     esc_term = Regexp.escape(regularize(term))
     search_result.set_visible_func do |model, iter|
-      if [iter[FLD_CHNAME],
-          iter[FLD_GENRE],
-          iter[FLD_DETAIL]].include? nil
-        next false
-      end
       if [FLD_CHNAME,
           FLD_GENRE,
           FLD_DETAIL]
@@ -316,10 +319,9 @@ class ChannelListView < Gtk::TreeView
     end
   end
 
-  # 一致を調べるべきフィールドが違うかもしれない。
   def get_path_of_channel(ch)
     @list_store.each do |m, path, iter|
-      if iter[FLD_CHNAME] == ch.name
+      if iter[FLD_CH_ID] == ch.channel_id
         return path
       end
     end
@@ -342,23 +344,47 @@ class ChannelListView < Gtk::TreeView
     iter[FLD_YPNAME]   = ch.yp.name
   end
 
-  def refresh
-    count = 0
-    backup = self.model
-    self.model = nil
-
-    @list_store.clear
-    @mw_model.master_table.each do |ch|
-      if @func.call(ch)
-        count += 1
-        iter = @list_store.append
-        channel_copy(iter, ch)
+  def select_appropriate_row
+    ch = @mw_model.selected_channel
+    if ch
+      to_be_selected = get_path_of_channel  ch
+    end
+    if to_be_selected==nil
+      iter = self.selection.selected
+      if iter
+        silently do
+          self.selection.unselect_path iter.path 
+        end
+      end
+    else
+      silently do
+        self.selection.select_path to_be_selected
       end
     end
+  end
 
-    self.model = backup
+  def refresh
+
+    count = 0
+    silently do 
+      @list_store.clear
+      @mw_model.master_table.each do |ch|
+        if @func.call(ch)
+          count += 1
+          iter = @list_store.append
+          channel_copy(iter, ch)
+        end
+      end
+    end
     @count = count
+
+    select_appropriate_row
+
     changed
     notify_observers
+  end
+
+  def selected_channel_changed
+    select_appropriate_row
   end
 end
