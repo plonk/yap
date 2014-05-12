@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 require_relative "channel.rb"
 require "net/http"
+require 'uri'
 
 class YellowPage
   attr_reader :name, :url
@@ -41,15 +42,9 @@ class YellowPage
   end
 
   def retrieve
-    host = nil
-    path = nil
-    if self.url =~ /^http:\/\/([^\/]+)(\/.*)$/
-      host = $1
-      path = $2 + "index.txt"
-    end
-    #    p host, path
+    uri = URI(url)
     begin
-      txt = Net::HTTP.get(host, path)
+      txt = Net::HTTP.get(uri.host, uri.path + 'index.txt')
     rescue
       return false
     end
