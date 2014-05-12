@@ -79,10 +79,10 @@ class MainWindowModel
     end
   end
 
-  def find_channel_by_hash(hash)
+  def find_channel_by_channel_id(chid)
     @yellow_pages.each do |yp|
       yp.each_channel do |ch|
-        return ch if ch.hash == hash
+        return ch if ch.channel_id == chid
       end
     end
     nil

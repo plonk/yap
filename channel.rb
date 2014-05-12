@@ -8,7 +8,7 @@ class Channel
   attr_reader :fields
   attr_accessor :yp
   attr_reader :hash
-  attr_reader :identifier
+  attr_reader :channel_id
 
   include Digest
 
@@ -32,14 +32,14 @@ class Channel
     @detail = row[5]
     @yp = yp
 
-    @identifier = yp.name + row[NAME] + @id
+    @channel_id = yp.name + row[NAME] + @id
 
     # チャンネル名とストリームIDから同定する
-    @hash = MD5.hexdigest(@identifier).to_i(16).truncate_to_fixnum
+    @hash = MD5.hexdigest(@channel_id).to_i(16).truncate_to_fixnum
   end
 
   def ==(other)
-    self.identifier == other.identifier
+    self.channel_id == other.channel_id
   end
 
   # Array#- の為に eql? と hash をオーバーライドする。

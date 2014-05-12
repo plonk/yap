@@ -18,10 +18,10 @@ class ChannelListView < Gtk::TreeView
   FLD_LISTENER = 3
   FLD_TIME     = 4
   FLD_BITRATE  = 5
-  FLD_HASH     = 6
+  FLD_CH_ID    = 6
   FLD_YPNAME   = 7
 
-  # FIELDS:      chname,  genre, detail, listener,   time, bitrate,   hash, ypname
+  # FIELDS:      chname,  genre, detail, listener,   time, bitrate,  ch_id, ypname
   FIELD_TYPES = [String, String, String, Integer, Integer, Integer, String, String]
 
   def open_url(url)
@@ -112,7 +112,7 @@ class ChannelListView < Gtk::TreeView
   end
 
   def yp_cell_data_func col, renderer, model, iter
-    ch = @mw_model.find_channel_by_hash(iter[FLD_HASH].to_i(16))
+    ch = @mw_model.find_channel_by_channel_id(iter[FLD_CH_ID])
     if ch
       renderer.pixbuf = WebResource.get_pixbuf(ch.yp.favicon_url)
         .scale(16, 16, Gdk::Pixbuf::INTERP_BILINEAR)
@@ -234,7 +234,7 @@ class ChannelListView < Gtk::TreeView
 
     signal_connect("row-activated") do |treeview, path, column|
       iter = model.get_iter(path)
-      ch = @mw_model.find_channel_by_hash(iter[FLD_HASH].to_i(16))
+      ch = @mw_model.find_channel_by_channel_id(iter[FLD_CH_ID])
       fail unless ch
       if ch.playable?
         @mw_model.play(ch)
@@ -305,12 +305,12 @@ class ChannelListView < Gtk::TreeView
     self.model = @list_store
   end
 
-  # hash で判断するように変える。
+  # ch_id で判断するように変える。
   def get_selected_channel
     iter = selection.selected
 
     if iter
-      @mw_model.find_channel_by_hash(iter[FLD_HASH].to_i(16))
+      @mw_model.find_channel_by_channel_id(iter[FLD_CH_ID])
     else
       nil
     end
@@ -338,7 +338,7 @@ class ChannelListView < Gtk::TreeView
     iter[FLD_LISTENER] = ch.listener
     iter[FLD_TIME]     = ch.time
     iter[FLD_BITRATE]  = ch.bitrate
-    iter[FLD_HASH]     = ch.hash.to_s(16)
+    iter[FLD_CH_ID]    = ch.channel_id
     iter[FLD_YPNAME]   = ch.yp.name
   end
 
