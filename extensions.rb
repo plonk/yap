@@ -35,3 +35,15 @@ class String
     CGI::unescape(self)
   end
 end
+
+class Integer
+  MIN_POSITIVE_BIGNUM = 1 << 1.size*8-2
+
+  def truncate_to_fixnum
+    if not self.is_a? Fixnum
+      self % MIN_POSITIVE_BIGNUM
+    else
+      self
+    end
+  end
+end

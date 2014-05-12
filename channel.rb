@@ -7,6 +7,8 @@ class Channel
   attr_reader :genre, :id, :tip, :comment, :contact_url, :type, :detail
   attr_reader :fields
   attr_accessor :yp
+  attr_reader :hash
+  attr_reader :identifier
 
   include Digest
 
@@ -30,21 +32,21 @@ class Channel
     @detail = row[5]
     @yp = yp
 
+    @identifier = yp.name + row[NAME] + @id
+
     # チャンネル名とストリームIDから同定する
-    @hash = MD5.hexdigest(row[NAME] + '<>' + @id).to_i(16)
+    @hash = MD5.hexdigest(@identifier).to_i(16).truncate_to_fixnum
   end
 
   def ==(other)
-    hash == other.hash
+    self.identifier == other.identifier
   end
 
   # Array#- の為に eql? と hash をオーバーライドする。
   # 両方ともオーバーライドする必要があるらしい。
-  def eql?(other)
-    hash == other.hash
+  def eql? other
+    self == other
   end
-
-  attr_reader :hash
 
   def chname_proper
     @fields[14].url_decode.force_encoding("utf-8")
