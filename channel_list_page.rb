@@ -62,6 +62,7 @@ class ChannelListPage < Gtk::VBox
            hscrollbar_policy: POLICY_AUTOMATIC,
            vscrollbar_policy: POLICY_ALWAYS) do |sw|
       sw.add @channel_list_view
+      @channel_list_view.scrolled_window = sw
       pack_start(sw, true)
     end
   end

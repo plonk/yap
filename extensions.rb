@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'cgi'
 
 class Object
@@ -45,5 +46,19 @@ class Integer
     else
       self
     end
+  end
+end
+
+class Array
+  # 関数(あるいは to_proc できるオブジェクト)の配列から、適用されるとそ
+  # れぞれのオブジェクトを引数に適用する関数を返す。
+  #
+  # [ :succ, ->(x){x*10} ].juxt.call(1)
+  # => [2, 10]
+  def juxt
+    fs = self.map(&:to_proc)
+    lambda { |*args|
+      fs.map { |f| f.call(*args) }
+    }
   end
 end

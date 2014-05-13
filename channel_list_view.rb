@@ -11,6 +11,7 @@ class ChannelListView < Gtk::TreeView
   include Observable
 
   attr_reader :count
+  attr_accessor :scrolled_window
 
   FLD_CHNAME   = 0
   FLD_GENRE    = 1
@@ -364,22 +365,28 @@ class ChannelListView < Gtk::TreeView
   end
 
   def refresh
+    if @scrolled_window
+      value = @scrolled_window.vadjustment.value
+    end
 
-    count = 0
     silently do 
       @list_store.clear
-      @mw_model.master_table.each do |ch|
-        if @func.call(ch)
-          count += 1
-          iter = @list_store.append
-          channel_copy(iter, ch)
-        end
+      match = @mw_model.master_table.select(&@func.method(:call))
+      @count = match.size 
+      match.each do |ch|
+        iter = @list_store.append
+        channel_copy(iter, ch)
       end
     end
-    @count = count
 
     select_appropriate_row
 
+    if @scrolled_window
+      Thread.new do
+        sleep 0.5
+        Gtk.queue do @scrolled_window.vadjustment.value = [@scrolled_window.vadjustment.upper, value].min end
+      end
+    end
     changed
     notify_observers
   end
