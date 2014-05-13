@@ -38,7 +38,7 @@ class ChannelListPage < Gtk::VBox
   end
 
   def do_layout
-    create(HBox, false) do |hbox|
+    create(HBox, false, 1) do |hbox|
       @search_label = Label.new("")
       @search_field = Entry.new
       @search_field.signal_connect("activate", &method(:search_field_activate_callback))
