@@ -11,17 +11,27 @@ class Favorites
     @list = []
   end
 
-  def replace(ary)
-    @list.replace(ary)
-    changed
-    notify_observers
+  def set_equal? a, b
+    (a & b).size == a.size
   end
 
-  def <<(item)
+  def replace(ary)
+    if set_equal? ary, @list
+      @list.replace(ary)
+    else 
+      @list.replace(ary)
+      changed
+      notify_observers
+    end
+  end
+
+  def << item
     raise unless item.is_a? String
-    @list << item
-    changed
-    notify_observers
+    unless @list.include? item
+      @list << item
+      changed
+      notify_observers
+    end
   end
 
   def each(&block)
@@ -47,6 +57,8 @@ class Favorites
     File.open(FAVORITES_FILE, "r:utf-8") do |fm|
       self.replace(fm.each_line.map(&:chomp))
     end
+    changed
+    notify_observers
   end
 
   def save
@@ -56,8 +68,10 @@ class Favorites
   end
 
   def delete(name)
-    @list.delete(name)
-    changed
-    notify_observers
+    if @list.include? name
+      @list.delete(name)
+      changed
+      notify_observers
+    end
   end
 end
