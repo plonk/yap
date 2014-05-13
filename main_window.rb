@@ -212,22 +212,21 @@ class MainWindow < Gtk::Window
   end
 
   def run_about_dialog
-    comments = <<EOS
-GTK+ #{Gtk::VERSION.join('.')}
-Ruby/GTK: #{Gtk::BINDING_VERSION.join('.')} (built for #{Gtk::BUILD_VERSION.join('.')})
-Ruby: #{RUBY_VERSION} [#{RUBY_PLATFORM}]
-EOS
-    comments = comments.chomp
-    dialog = create(AboutDialog,
-                    modal: true,
-                    program_name: "YAP",
-                    version: "0.0.3",
-                    comments: comments,
-                    authors: ['予定地'],
-                    website: 'https://github.com/plonk/yap')
-    dialog.run do |response|
-      dialog.destroy
-    end
+    comments = ["GTK+ #{Gtk::VERSION.join('.')}",
+                "Ruby/GTK #{Gtk::BINDING_VERSION.join('.')} (built for #{Gtk::BUILD_VERSION.join('.')})",
+                "Ruby #{RUBY_VERSION} [#{RUBY_PLATFORM}]",
+                "Nokogiri #{Nokogiri::VERSION}",
+                "Mechanize #{Mechanize::VERSION}"].join("\n")
+    create(AboutDialog,
+           program_name: "YAP",
+           version: "0.0.3",
+           comments: comments,
+           authors: ['予定地'],
+           website: 'https://github.com/plonk/yap') do |dialog|
+      dialog.signal_connect('response') do
+        dialog.destroy
+      end
+    end.show_all
   end
 
   def show_all
