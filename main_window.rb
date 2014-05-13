@@ -10,6 +10,7 @@ require_relative 'channel_list_page'
 require_relative 'utility'
 require_relative 'notification'
 require_relative 'gtk_helper'
+require_relative 'about_dialog'
 
 class MainWindow < Gtk::Window
   include Gtk
@@ -162,8 +163,6 @@ class MainWindow < Gtk::Window
 
     # メインウィンドウが最小化されたら非表示にする。
     self.signal_connect('window-state-event') do |win, e|
-      # p [:changed_mask, e.changed_mask]
-      # p [:new_state, e.new_window_state]
       if e.changed_mask.iconified?
         if e.new_window_state.iconified? and !e.new_window_state.withdrawn?
           self.hide
@@ -207,26 +206,8 @@ class MainWindow < Gtk::Window
     end
   end
 
-  def on_about_toolbutton_clicked toolbutton
-    run_about_dialog
-  end
-
   def run_about_dialog
-    comments = ["GTK+ #{Gtk::VERSION.join('.')}",
-                "Ruby/GTK #{Gtk::BINDING_VERSION.join('.')} (built for #{Gtk::BUILD_VERSION.join('.')})",
-                "Ruby #{RUBY_VERSION} [#{RUBY_PLATFORM}]",
-                "Nokogiri #{Nokogiri::VERSION}",
-                "Mechanize #{Mechanize::VERSION}"].join("\n")
-    create(AboutDialog,
-           program_name: "YAP",
-           version: "0.0.3",
-           comments: comments,
-           authors: ['予定地'],
-           website: 'https://github.com/plonk/yap') do |dialog|
-      dialog.signal_connect('response') do
-        dialog.destroy
-      end
-    end.show_all
+    YapAboutDialog.new.show_all
   end
 
   def show_all
