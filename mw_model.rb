@@ -285,8 +285,7 @@ class MainWindowModel
         host, port = ::Settings[:USER_PEERCAST].split(/:/)
         watcher = PeercastHealth.new(host, port.to_i, 0.5)
         result = watcher.check
-        if result
-        else
+        if not result
           self.notification = "#{watcher.to_s} に接続できません。(#{watcher.error_reason})"
         end
         sleep 5 * 60

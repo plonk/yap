@@ -24,7 +24,7 @@ class Settings_
      [true, "アスカチェッカー", "http://asuka--sen-nin.ddo.jp/checker/", nil, nil],
      [true, "cavetube", "http://rss.cavelis.net/", nil, nil],
     ],
-    USER_PEERCAST: "localhost:7144",
+    USER_PEERCAST: "127.0.0.1:7144",
     REVERSE_LOOKUP_TIP: true,
     NOTIFICATION_AUTO_CLOSE_SECONDS: 15,
     LIST_FONT: 'Sans 12',
