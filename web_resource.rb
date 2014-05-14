@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+require 'uri'
 
 class WebResourceClass
   include Singleton
@@ -55,6 +56,18 @@ class WebResourceClass
       rescue
         return PIXBUF_CACHE[url] = fallback
       end
+    end
+  end
+
+  # HTML ページから link 要素で指定されたアイコンの URL を得る。
+  # 見つからなければ nil
+  def specified_favicon_url(url)
+    puts 'get_specified_favicon_url'
+    buf = get_page(url)
+    if buf =~ /<link rel="?(shortcut )?icon"? href="([^"]+)"/i
+      (URI.parse(url) + Regexp.last_match[2]).to_s
+    else
+      nil
     end
   end
 end

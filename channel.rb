@@ -118,39 +118,21 @@ class Channel
   end
 
   # 今のところしたらばだけ。
-  # FIX: Cyclomatic complexity for favicon_url is too high.
   def favicon_url
-    if contact_url =~ %r{^http://jbbs\.shitaraba\.net/bbs/read\.cgi/([a-z]+/\d+)} # l50などと続く可能性あり
-      # the link is to a specific thread or a post
-      t = get_specified_favicon_url("http://jbbs.shitaraba.net/#{Regexp.last_match[1]}/")
-      return t if t
-    elsif contact_url =~ %r{^http://jbbs\.shitaraba\.net/[a-z]+/\d+/} # スレやレスでなく掲示板のトップなら
-      t = get_specified_favicon_url(contact_url)
-      return t if t
+    # したらばで特定のスレやレスへのリンクである。
+    if contact_url =~ %r{^http://jbbs\.shitaraba\.net/bbs/read\.cgi/([a-z]+/\d+)}
+      top_url = "http://jbbs.shitaraba.net/#{Regexp.last_match[1]}/"
+    else
+      top_url = contact_url
     end
 
-    if contact_url =~ %r{^http://jbbs\.shitaraba\.net/}
-      'http://jbbs.shitaraba.net/favicon.ico'
+    favicon_url = WebResource.specified_favicon_url(top_url)
+    if favicon_url
+      favicon_url 
     else
-      begin
-        'http://' + URI.parse(contact_url).host / 'favicon.ico'
-      rescue
-        nil
-      end
+      'http://' + URI.parse(contact_url).host / 'favicon.ico'
     end
-  end
-
-  # 見つからなければ nil
-  def get_specified_favicon_url(url)
-    puts 'get_specified_favicon_url'
-    p [:get_specified_favicon_url, url]
-    buf = WebResource.get_page(url)
-    if buf =~ /<link rel="?(shortcut )?icon"? href="([^"]+)"/i
-      puts 'found!'
-      (URI.parse(url) + Regexp.last_match[2]).to_s
-    else
-      puts 'not found'
-      nil
-    end
+  rescue
+    nil
   end
 end
