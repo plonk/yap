@@ -25,61 +25,80 @@ class SettingsDialog < Gtk::Dialog
     # ピアキャストのポート番号、動画プレーヤーのパス？
     super('設定', parent, Dialog::MODAL)
 
-    set border_width: 5, resizable: false
-    vbox.set(spacing: 10)
+    do_layout
 
-    table = create(Table, 2, 2, row_spacings: 5, column_spacings: 10)
+    signal_connect('response', &method(:on_response))
+  end
 
-    @peercast_entry = create(Entry, no_show_all: true, text: ::Settings[:USER_PEERCAST])
-    @file_assoc_button = create(Button, '設定', on_clicked: method(:cb_file_assoc_button_clicked))
-    @font_button = create(FontButton, ::Settings[:LIST_FONT])
-    @bandwidth_check_button = create(CheckButton, active: ::Settings[:ENABLE_AUTO_BANDWIDTH_CHECK])
-    @grid_combo_box = create(ComboBox) do |combobox|
+  def on_response(_d, res)
+    case res
+    when RESPONSE_OK
+      ::Settings[:USER_PEERCAST] = @peercast_entry.text
+      ::Settings[:LIST_FONT] = @font_button.font_name
+      ::Settings[:ENABLE_AUTO_BANDWIDTH_CHECK] = @bandwidth_button.active?
+      ::Settings[:GRID_LINES] = @grid_combo_box.active
+      ::Settings[:RULES_HINT] = @rules_check_button.active?
+      ::Settings.save
+    end
+    destroy
+  end
+
+  def create_combo_box
+    create(ComboBox) do |combobox|
       ['なし', '横', '縦', '両方'].each do |word|
         combobox.append_text word
       end
       combobox.active = ::Settings[:GRID_LINES]
     end
-    @rules_check_button = create(CheckButton, active: ::Settings[:RULES_HINT])
+  end
 
-    definition =
-      [
-       [head('接続先 Peercast ノード'), @peercast_entry],
-       [head('プレーヤー'), @file_assoc_button],
-       [head('自動帯域チェック'), @bandwidth_check_button],
-       [head('リストのフォント'), @font_button],
-       [head('罫線'), @grid_combo_box],
-       [head('交互に暗色', '一行ごとに背景を暗くする(テーマ依存)'), @rules_check_button]
-      ]
+  def create_cell_widgets
+    @peercast_entry     = create(Entry, text: ::Settings[:USER_PEERCAST])
+    @file_assoc_button  =
+      create(Button, '設定', on_clicked: method(:cb_file_assoc_button_clicked))
+    @font_button        = create(FontButton, ::Settings[:LIST_FONT])
+    @bandwidth_button   =
+      create(CheckButton, active: ::Settings[:ENABLE_AUTO_BANDWIDTH_CHECK])
+    @grid_combo_box     = create_combo_box
+    @rules_check_button = create(CheckButton, active: ::Settings[:RULES_HINT])
+  end
+
+  def widget_table
+    create_cell_widgets
+
+    [[head('接続先 Peercast ノード'), @peercast_entry],
+     [head('プレーヤー'), @file_assoc_button],
+     [head('自動帯域チェック'), @bandwidth_button],
+     [head('リストのフォント'), @font_button],
+     [head('罫線'), @grid_combo_box],
+     [head('交互に暗色', '一行ごとに背景を暗くする(テーマ依存)'), @rules_check_button]]
+  end
+
+  def create_table
+    definition = widget_table
+    table = create(Table, 2, definition.size,
+                   row_spacings: 5,
+                   column_spacings: 10)
 
     definition.each_with_index do |row, y|
       row.each_with_index do |widget, x|
-        table.attach_defaults(widget,
-                              x, x + 1,
-                              y, y + 1)
+        table.attach_defaults(widget, x, x + 1, y, y + 1)
       end
     end
+    table
+  end
 
-    vbox.pack_start(table)
+  def do_layout
+    set border_width: 5, resizable: false
+    vbox.set(spacing: 10)
+
+    vbox.pack_start(create_table)
     vbox.pack_end(HSeparator.new)
 
     add_button(Stock::CANCEL, RESPONSE_CANCEL)
     add_button(Stock::OK, RESPONSE_OK)
 
     set_alternative_button_order [RESPONSE_OK, RESPONSE_CANCEL]
-
-    signal_connect('response') do |_d, res|
-      case res
-      when RESPONSE_OK
-        ::Settings[:USER_PEERCAST] = @peercast_entry.text
-        ::Settings[:LIST_FONT] = @font_button.font_name
-        ::Settings[:ENABLE_AUTO_BANDWIDTH_CHECK] = @bandwidth_check_button.active?
-        ::Settings[:GRID_LINES] = @grid_combo_box.active
-        ::Settings[:RULES_HINT] = @rules_check_button.active?
-        ::Settings.save
-      end
-      destroy
-    end
   end
 
   def cb_file_assoc_button_clicked(_button)
@@ -95,6 +114,5 @@ class SettingsDialog < Gtk::Dialog
 
   def show_all
     super
-    @peercast_entry.show
   end
 end

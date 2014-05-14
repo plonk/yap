@@ -6,13 +6,6 @@ class YapAboutDialog < Gtk::AboutDialog
   def initialize
     super()
 
-    comments = ["GTK+ #{Gtk::VERSION.join('.')}",
-                "Ruby/GTK #{Gtk::BINDING_VERSION.join('.')}" \
-                "(built for #{Gtk::BUILD_VERSION.join('.')})",
-                "Ruby #{RUBY_VERSION} [#{RUBY_PLATFORM}]",
-                "Nokogiri #{Nokogiri::VERSION}",
-                "Mechanize #{Mechanize::VERSION}"].join("\n")
-
     set(program_name: 'YAP',
         version: '0.0.3',
         comments: comments,
@@ -22,5 +15,14 @@ class YapAboutDialog < Gtk::AboutDialog
     signal_connect('response') do
       destroy
     end
+  end
+
+  def comments
+    ["GTK+ #{Gtk::VERSION.join('.')}",
+     "Ruby/GTK #{Gtk::BINDING_VERSION.join('.')}" \
+     "(built for #{Gtk::BUILD_VERSION.join('.')})",
+     "Ruby #{RUBY_VERSION} [#{RUBY_PLATFORM}]",
+     "Nokogiri #{Nokogiri::VERSION}",
+     "Mechanize #{Mechanize::VERSION}"].join("\n")
   end
 end

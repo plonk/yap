@@ -15,6 +15,7 @@ class BandwidthCheckerManager
     attr_reader :finished_time, :channel
 
     def initialize(channel)
+      fail unless valid_unchecked?(ch)
       @channel = channel
       @monitor = Monitor.new
       self.state = 'initialized'
@@ -34,20 +35,23 @@ class BandwidthCheckerManager
       end
     end
 
+    def extract_kbps(html)
+      Nokogiri::HTML(html).css('span').each do |elem|
+        return elem.content
+      end
+      '???'
+    end
+
     def run
       normal_post_url = channel.contact_url + 'uptest_n.php'
 
-      mech = Mechanize.new
       self.state = 'getting form'
-      mech.get(normal_post_url) do |page|
+      Mechanize.new.get(normal_post_url) do |page|
         self.state = 'submitting form'
         check_result = page.form_with(name: 'uptest').submit
 
-        doc = Nokogiri::HTML(check_result.body)
-        doc.css('span').each do |elem|
-          @finished_time = Time.now
-          self.state = "finished (#{elem.content})"
-        end
+        @finished_time = Time.now
+        self.state = "finished (#{extract_kbps(check_result.body)})"
       end
     rescue
       self.state = 'finished (error)'
@@ -94,22 +98,23 @@ class BandwidthCheckerManager
     return if @running
 
     @running = true
-    unchecked = @model.master_table.select do |ch|
-      Checker.valid_unchecked? ch
-    end
+    unchecked =
+      @model.master_table.select { |ch| Checker.valid_unchecked?(ch) }
 
     update_lists
 
     to_be_checked = unchecked - (@checking + @finished_recently).map(&:channel)
 
-    to_be_checked.each do |ch|
-      checker = Checker.new(ch)
-      checker.add_observer(self, :checker_changed)
-      @checking << checker
-      CheckerWindow.new(checker).show_all
-      checker.run
-    end
+    to_be_checked.each { |ch| check(ch) }
     @running = false
+  end
+
+  def check(ch)
+    checker = Checker.new(ch)
+    checker.add_observer(self, :checker_changed)
+    @checking << checker
+    CheckerWindow.new(checker).show_all
+    checker.run
   end
 
   class CheckerWindow < Gtk::Dialog
