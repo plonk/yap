@@ -62,13 +62,6 @@ class YellowPage
     true
   end
 
-  def is_on_air?(chname)
-    each_channel do |ch|
-      return true if ch.name == chname
-    end
-    false
-  end
-
   def get_channel(chname)
     each_channel do |ch|
       return ch if ch.name == chname

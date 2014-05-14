@@ -12,11 +12,11 @@ class SettingsDialog < Gtk::Dialog
   def show_message(message, title, kind = MessageDialog::ERROR)
     md = MessageDialog.new(self,
                            Dialog::DESTROY_WITH_PARENT,
-                           MessageDialog::ERROR,
+                           kind,
                            MessageDialog::BUTTONS_OK,
                            message)
     md.title = title
-    md.run do |response|
+    md.run do |_response|
       md.destroy
     end
   end
@@ -35,21 +35,22 @@ class SettingsDialog < Gtk::Dialog
     @font_button = create(FontButton, ::Settings[:LIST_FONT])
     @bandwidth_check_button = create(CheckButton, active: ::Settings[:ENABLE_AUTO_BANDWIDTH_CHECK])
     @grid_combo_box = create(ComboBox) do |combobox|
-      ['なし', '横', '縦', '両方'].each_with_index do |word, idx|
+      ['なし', '横', '縦', '両方'].each do |word|
         combobox.append_text word
       end
       combobox.active = ::Settings[:GRID_LINES]
     end
     @rules_check_button = create(CheckButton, active: ::Settings[:RULES_HINT])
 
-    definition = [
-      [head('接続先 Peercast ノード'), @peercast_entry],
-      [head('プレーヤー'), @file_assoc_button],
-      [head('自動帯域チェック'), @bandwidth_check_button],
-      [head('リストのフォント'), @font_button],
-      [head('罫線'), @grid_combo_box],
-      [head('交互に暗色', '一行ごとに背景を暗くする(テーマ依存)'), @rules_check_button],
-                 ]
+    definition =
+      [
+       [head('接続先 Peercast ノード'), @peercast_entry],
+       [head('プレーヤー'), @file_assoc_button],
+       [head('自動帯域チェック'), @bandwidth_check_button],
+       [head('リストのフォント'), @font_button],
+       [head('罫線'), @grid_combo_box],
+       [head('交互に暗色', '一行ごとに背景を暗くする(テーマ依存)'), @rules_check_button]
+      ]
 
     definition.each_with_index do |row, y|
       row.each_with_index do |widget, x|
@@ -67,7 +68,7 @@ class SettingsDialog < Gtk::Dialog
 
     set_alternative_button_order [RESPONSE_OK, RESPONSE_CANCEL]
 
-    signal_connect('response') do |d, res|
+    signal_connect('response') do |_d, res|
       case res
       when RESPONSE_OK
         ::Settings[:USER_PEERCAST] = @peercast_entry.text
@@ -81,7 +82,7 @@ class SettingsDialog < Gtk::Dialog
     end
   end
 
-  def cb_file_assoc_button_clicked(button)
+  def cb_file_assoc_button_clicked(_button)
     dialog = TypeAssocDialog.new(self, ::Settings[:TYPE_ASSOC]).show_all
     dialog.run do |response|
       case response

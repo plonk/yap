@@ -25,10 +25,10 @@ class LinePrompt < Gtk::Dialog
 
     signal_connect('show', &method(:on_show))
 
-    self.validator = proc { |text| true }
+    self.validator = proc { true }
   end
 
-  def on_show(dialog)
+  def on_show(_dialog)
     @ok_button.sensitive = validator.call('')
   end
 
@@ -37,9 +37,7 @@ class LinePrompt < Gtk::Dialog
   end
 
   def on_entry_activate(entry)
-    if validator.call(entry.text)
-      response(RESPONSE_OK)
-    end
+    response(RESPONSE_OK) if validator.call(entry.text)
   end
 
   def text

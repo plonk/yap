@@ -28,9 +28,8 @@ class InformationArea < Gtk::VBox
                             width_request: 120)
       @play_button.add Image.new Resource['play.ico']
       @play_button.signal_connect('clicked') do
-        if ch = @model.selected_channel
-          @model.play(ch)
-        end
+        ch = @model.selected_channel
+        @model.play(ch) if ch
       end
       hbox.pack_start(@play_button, false, false)
 
@@ -98,7 +97,8 @@ class InformationArea < Gtk::VBox
   GRAY_STAR_MARKUP = " <span foreground=\"gray\" size=\"xx-large\">★</span> "
 
   def update_favorite_toggle_button
-    if ch = @model.selected_channel
+    ch = @model.selected_channel
+    if ch
       @favorite_toggle_button.sensitive = true
       if @model.favorites.include? ch.name
         @favorite_toggle_button.active = true
@@ -115,11 +115,13 @@ class InformationArea < Gtk::VBox
   end
 
   def update_play_button
-    @play_button.sensitive = (ch = @model.selected_channel and ch.playable?)
+    @play_button.sensitive =
+      @model.selected_channel && @model.selected_channel.playable?
   end
 
   def update_favicon_image
-    if ch = @model.selected_channel
+    ch = @model.selected_channel
+    if ch
       pixbuf = URL2PIXBUF[ch.contact_url]
       if pixbuf
         @favicon_image.pixbuf = pixbuf
@@ -153,7 +155,8 @@ class InformationArea < Gtk::VBox
   end
 
   def update_genre_label
-    if ch = @model.selected_channel
+    ch = @model.selected_channel
+    if ch
       @genre_label.set(text: ch.genre,
                        tooltip_text: ch.genre)
     else
@@ -176,20 +179,23 @@ class InformationArea < Gtk::VBox
     update_genre_label
   end
 
-  def on_favorite_toggle_button_toggled(widget)
+  def on_favorite_toggle_button_toggled(_widget)
     if @favorite_toggle_button.active?
-      if ch = @model.selected_channel
+      ch = @model.selected_channel
+      if ch
         @model.favorites << ch.name unless @model.favorites.include? ch.name
       end
     else
-      if ch = @model.selected_channel
+      ch = @model.selected_channel
+      if ch
         @model.favorites.delete ch.name
       end
     end
   end
 
   def update_link_button
-    if ch = @model.selected_channel
+    ch = @model.selected_channel
+    if ch
       if ch.contact_url.empty?
         @link_button.child.text = '今からpeercastでゲーム実況配信'
         @link_button.uri = 'http://yy25.60.kg/peercastjikkyou/'

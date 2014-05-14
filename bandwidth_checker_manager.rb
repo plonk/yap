@@ -7,8 +7,8 @@ class BandwidthCheckerManager
     include Observable
 
     def self.valid_unchecked?(ch)
-      ch.name =~ /アップロード帯域$/ and
-        ch.contact_url =~ /uptest\/$/ and
+      ch.name =~ /アップロード帯域$/ &&
+        ch.contact_url =~ /uptest\/$/ &&
         ch.detail =~ /^No data/
     end
 
@@ -63,9 +63,7 @@ class BandwidthCheckerManager
   end
 
   def update(message, *args)
-    if respond_to? message
-      __send__(message, *args)
-    end
+    __send__(message, *args) if respond_to? message
   end
 
   def reject_finished(checkers)
@@ -73,11 +71,11 @@ class BandwidthCheckerManager
   end
 
   def update_lists
-    finished  = @checking.group_by { |checker| (checker.state =~ /finished/).to_bool }
+    finished  = @checking.group_by { |c| (c.state =~ /finished/).to_bool }
     @finished_recently += finished[true] || []
     @checking = finished[false] || []
 
-    old = @finished_recently.group_by { |checker| (Time.now - checker.finished_time) > 60 }
+    old = @finished_recently.group_by { |c| (Time.now - c.finished_time) > 60 }
     (old[true] || []).each do |checker|
       checker.delete_observer(self)
     end

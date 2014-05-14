@@ -4,7 +4,7 @@ require 'cgi'
 class Object
   # instance tap
   def itap(&blk)
-    instance_eval &blk
+    instance_eval(&blk)
     self
   end
 
@@ -61,8 +61,8 @@ class Array
   # => [2, 10]
   def juxt
     fs = map(&:to_proc)
-    lambda { |*args|
+    lambda do |*args|
       fs.map { |f| f.call(*args) }
-    }
+    end
   end
 end

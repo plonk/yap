@@ -9,7 +9,7 @@ def main(file, options)
   @loaded = []
 
   input = File.new(file, 'r')
-  if options[:outputfile] then
+  if options[:outputfile]
     out = File.new(options[:outputfile], 'w', 0777)
   else
     out = STDOUT
@@ -45,7 +45,7 @@ def init
   options = {}
 
   OptionParser.new.instance_eval do
-    banner = "Usage: #{$PROGRAM_NAME} [options] SOURCE_FILE"
+    self.banner = "Usage: #{$PROGRAM_NAME} [options] SOURCE_FILE"
     on('-s', 'strip') do
       options[:strip] = true
     end

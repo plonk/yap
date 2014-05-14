@@ -22,8 +22,14 @@ class ChannelListView < Gtk::TreeView
   FLD_CH_ID    = 6
   FLD_YPNAME   = 7
 
-  # FIELDS:      chname,  genre, detail, listener,   time, bitrate,  ch_id, ypname
-  FIELD_TYPES = [String, String, String, Integer, Integer, Integer, String, String]
+  FIELD_TYPES = [String,	# chname
+                 String,	# genre
+                 String,	# detail
+                 Integer,	# listener
+                 Integer,	# time
+                 Integer,	# bitrate
+                 String,	# ch_id
+                 String]	# ypname
 
   def open_url(url)
     Environment.open(url)
@@ -31,7 +37,7 @@ class ChannelListView < Gtk::TreeView
 
   TARGET_NAME_CELL_WIDTH = 16.0
 
-  def name_cell_data_func(col, renderer, model, iter)
+  def name_cell_data_func(_col, renderer, _model, iter)
     base_font = Pango::FontDescription.new(::Settings[:LIST_FONT])
 
     half_widths = measure_width(iter[0])
@@ -55,7 +61,7 @@ class ChannelListView < Gtk::TreeView
     renderer.set_property('markup', get_highlighted_markup(iter[0], @search_term))
   end
 
-  def genre_cell_data_func(col, renderer, model, iter)
+  def genre_cell_data_func(_col, renderer, _model, iter)
     renderer.foreground_set = false
     genre = iter[1]
     if genre == ''
@@ -66,7 +72,7 @@ class ChannelListView < Gtk::TreeView
     end
   end
 
-  def listener_cell_data_func(col, renderer, model, iter)
+  def listener_cell_data_func(_col, renderer, _model, iter)
     renderer.weight = WEIGHT_NORMAL
     renderer.foreground_set = false
     i = iter[3]
@@ -78,26 +84,21 @@ class ChannelListView < Gtk::TreeView
     end
   end
 
-  def time_cell_data_func(col, renderer, model, iter)
+  def time_cell_data_func(_col, renderer, _model, iter)
     renderer.foreground_set = false
     i = iter[4]
     if i < 24 * 60
       hour = i / 60
       min = i % 60
-      renderer.text = sprintf('%2d:%02d', hour, min)
+      renderer.text = format('%2d:%02d', hour, min)
       renderer.foreground = 'gray' if hour == 0 && min == 0
     else
-      if false
-        day = i.to_f / (24 * 60)
-        renderer.text = sprintf('%.1f日', day)
-      else
-        day = i / (24 * 60)
-        renderer.text = sprintf('%d日+', day)
-      end
+      day = i / (24 * 60)
+      renderer.text = format('%d日+', day)
     end
   end
 
-  def bitrate_cell_data_func(col, renderer, model, iter)
+  def bitrate_cell_data_func(_col, renderer, _model, iter)
     renderer.weight = WEIGHT_NORMAL
     renderer.foreground_set = false
     bps = iter[5]
@@ -108,11 +109,11 @@ class ChannelListView < Gtk::TreeView
       renderer.text = "#{bps}K"
     else
       m = bps.to_f / 1000
-      renderer.text = sprintf('%.2fM', m)
+      renderer.text = format('%.2fM', m)
     end
   end
 
-  def yp_cell_data_func(col, renderer, model, iter)
+  def yp_cell_data_func(_col, renderer, _model, iter)
     ch = @mw_model.find_channel_by_channel_id(iter[FLD_CH_ID])
     if ch
       renderer.pixbuf = WebResource.get_pixbuf(ch.yp.favicon_url)
@@ -123,14 +124,14 @@ class ChannelListView < Gtk::TreeView
     end
   end
 
-  def detail_cell_data_func(col, renderer, model, iter)
+  def detail_cell_data_func(_col, renderer, _model, iter)
     renderer.markup = get_highlighted_markup(iter[2], @search_term)
   end
 
   # ソートするカラムを column_id に切り替える手続きオブジェクトを返す。
   def sort_changer(column_id, order)
     fail ArgumentError, 'unknown sort order' unless [SORT_ASCENDING, SORT_DESCENDING].include? order
-    lambda do |tree_view_column|
+    lambda do |_tree_view_column|
       @list_store.set_sort_column_id column_id, order
     end
   end
@@ -234,18 +235,16 @@ class ChannelListView < Gtk::TreeView
     self.events = Gdk::Event::BUTTON_PRESS_MASK
     signal_connect('button_press_event', &method(:on_button_press_event))
 
-    signal_connect('row-activated') do |treeview, path, column|
+    signal_connect('row-activated') do |_treeview, path, _column|
       iter = model.get_iter(path)
       ch = @mw_model.find_channel_by_channel_id(iter[FLD_CH_ID])
       fail unless ch
-      if ch.playable?
-        @mw_model.play(ch)
-      end
+      @mw_model.play(ch) if ch.playable?
     end
 
     # 行が選択された時に実行される
     selection.signal_connect('changed') do
-      @mw_model.select_channel(get_selected_channel) unless @suppress_selection_change
+      @mw_model.select_channel(selected_channel) unless @suppress_selection_change
     end
 
     refresh
@@ -262,13 +261,14 @@ class ChannelListView < Gtk::TreeView
         enable_grid_lines: GRID_LINE_CONSTANTS[::Settings[:GRID_LINES]])
   end
 
-  def on_button_press_event(w, event)
+  def on_button_press_event(_w, event)
     # なんで Button press 以外のイベントが来るんだろう？
     unless event.event_type == Gdk::Event::BUTTON_PRESS
       STDERR.puts event.inspect
     end
     if event.button == 3
-      if ch = get_selected_channel
+      ch = selected_channel
+      if ch
         @context_menu.associate(ch)
         @context_menu.show_all
         @context_menu.popup(nil, nil, event.button, event.time)
@@ -277,9 +277,8 @@ class ChannelListView < Gtk::TreeView
     elsif event.button == 2
       # 中クリックの位置によらず、既に選択されている行のコンタクト
       # URLが開かれるのは問題。
-      if ch = get_selected_channel
-        open_url(ch.contact_url)
-      end
+      ch = selected_channel
+      open_url(ch.contact_url) if ch
       true
     else
       false
@@ -290,7 +289,7 @@ class ChannelListView < Gtk::TreeView
     @search_term = term
     search_result = TreeModelFilter.new(model)
     esc_term = Regexp.escape(regularize(term))
-    search_result.set_visible_func do |model, iter|
+    search_result.set_visible_func do |_model, iter|
       if [FLD_CHNAME,
           FLD_GENRE,
           FLD_DETAIL]
@@ -309,7 +308,7 @@ class ChannelListView < Gtk::TreeView
   end
 
   # ch_id で判断するように変える。
-  def get_selected_channel
+  def selected_channel
     iter = selection.selected
 
     if iter
@@ -320,10 +319,8 @@ class ChannelListView < Gtk::TreeView
   end
 
   def get_path_of_channel(ch)
-    @list_store.each do |m, path, iter|
-      if iter[FLD_CH_ID] == ch.channel_id
-        return path
-      end
+    @list_store.each do |_m, path, iter|
+      return path if iter[FLD_CH_ID] == ch.channel_id
     end
     nil
   end
@@ -346,9 +343,7 @@ class ChannelListView < Gtk::TreeView
 
   def select_appropriate_row
     ch = @mw_model.selected_channel
-    if ch
-      to_be_selected = get_path_of_channel ch
-    end
+    to_be_selected = get_path_of_channel ch if ch
     if to_be_selected.nil?
       iter = selection.selected
       if iter
@@ -364,9 +359,7 @@ class ChannelListView < Gtk::TreeView
   end
 
   def refresh
-    if @scrolled_window
-      value = @scrolled_window.vadjustment.value
-    end
+    value = @scrolled_window.vadjustment.value if @scrolled_window
 
     silently do
       @list_store.clear
@@ -383,7 +376,10 @@ class ChannelListView < Gtk::TreeView
     if @scrolled_window
       Thread.new do
         sleep 0.5
-        Gtk.queue do @scrolled_window.vadjustment.value = [@scrolled_window.vadjustment.upper, value].min end
+        Gtk.queue do
+          @scrolled_window.vadjustment.value =
+            [@scrolled_window.vadjustment.upper, value].min
+        end
       end
     end
     changed

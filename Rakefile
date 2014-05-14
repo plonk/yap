@@ -23,7 +23,8 @@ end
 task install: ['yap'] do
   sh "install yap #{$BIN_DIR}"
   sh "mkdir -p #{$RESOURCE_DIR}"
-  sh "cp ui_definition.xml yap.png loading.ico play.ico question16.ico question64.ico #{$RESOURCE_DIR}"
+  sh("cp ui_definition.xml yap.png loading.ico play.ico question16.ico question64.ico" \
+     "#{$RESOURCE_DIR}")
 end
 
 task :uninstall do

@@ -12,7 +12,7 @@ module Relation
 
   def compute(code, &block)
     lhs, pred, rhs = code.split(/\s+/)
-    fail unless pred == 'from' and block
+    fail unless pred == 'from' && block
     listener, writer = parse_specifier_writer(lhs)
     subject, reader = parse_specifier_reader(rhs)
     subject.add_observer self, :relation_update
@@ -26,6 +26,7 @@ module Relation
   end
 
   private
+
   def do_add_relation(listener, writer, subject, reader, transform)
     @_relations ||= []
     listener.__send__(writer, transform.call(subject.__send__(reader))) # first sync
@@ -47,7 +48,7 @@ module Relation
   end
 
   def dissolve_relations
-    @_relations.each do |dest, writer, subject, reader, transform|
+    @_relations.each do |_dest, _writer, subject, _reader, _transform|
       subject.delete_observer(self)
     end
     @_relations.clear

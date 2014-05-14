@@ -47,18 +47,19 @@ class MainWindowModel
     @update_first_time = true
     @child_processes = []
 
-    @yellow_pages = get_active_yellow_pages
+    @yellow_pages = active_yellow_pages
   end
 
-  def get_active_yellow_pages
-    Settings[:YELLOW_PAGES].to_enum.select { |enabled, | enabled }.
-      map do |enabled, name, url, chat_path, stat_path|
+  def active_yellow_pages
+    Settings[:YELLOW_PAGES].to_enum
+      .select { |enabled, | enabled }
+      .map do |_enabled, name, url, chat_path, stat_path|
       YellowPage.get(name, url, chat_path, stat_path)
     end
   end
 
   def settings_changed
-    @yellow_pages = get_active_yellow_pages
+    @yellow_pages = active_yellow_pages
     do_update_channel_list(false, false)
     changed
     notify_observers(:settings_changed)
@@ -71,12 +72,6 @@ class MainWindowModel
 
   def total_channel_count
     master_table.size
-  end
-
-  def is_on_air?(name)
-    @yellow_pages.any? do |yp|
-      yp.any? { |ch| ch.name == name }
-    end
   end
 
   def find_channel_by_channel_id(chid)
@@ -198,9 +193,8 @@ class MainWindowModel
     threads = []
     @yellow_pages.each do |yp|
       threads << Thread.new do
-        unless yp.retrieve
-          puts "Failed in retrieving from #{yp.name}"
-        end
+        success = yp.retrieve
+        puts "Failed in retrieving from #{yp.name}" unless success
       end
     end
     threads
@@ -211,27 +205,26 @@ class MainWindowModel
     if @update_first_time
       @update_first_time = false
     else
-      self.notification = if @just_began.empty?
-                            '新着チャンネルはありません。'
-                          else
-                            @just_began.map(&:name)
-                              .sort
-                              .map { |name| favorites.include?(name) ? name + '★' : name }
-                              .join('、') + ' が配信を開始しています。'
-                          end
+      self.notification =
+        if @just_began.empty?
+          '新着チャンネルはありません。'
+        else
+          @just_began.map(&:name)
+            .sort
+            .map { |name| favorites.include?(name) ? name + '★' : name }
+            .join('、') + ' が配信を開始しています。'
+        end
     end
   end
 
   def do_update_channel_list(download, notify)
     if download
       puts 'Updating channels...'
-      spawn_yp_updater_threads.each &:join
+      spawn_yp_updater_threads.each(&:join)
       puts 'Done.'
     else
       @yellow_pages.each do |yp|
-        unless yp.loaded?
-          yp.retrieve
-        end
+        yp.retrieve unless yp.loaded?
       end
     end
 
@@ -243,9 +236,7 @@ class MainWindowModel
     changed
     notify_observers(:channel_list_updated)
 
-    if notify
-      update_notification
-    end
+    update_notification if notify
   end
 
   # 更新ボタンの有効無効を管理するスレッドを開始する。
@@ -253,9 +244,9 @@ class MainWindowModel
     @reload_history = []
 
     @reload_button_state_helper = Thread.start do
-      while true
+      loop do
         now = Time.now
-        @reload_history.delete_if { |x| now - x > MANUAL_UPDATE_INTERVAL } # delete older than 3 minutes
+        @reload_history.delete_if { |x| now - x > MANUAL_UPDATE_INTERVAL }
         if @reload_history.size < MANUAL_UPDATE_COUNT
           changed
           notify_observers(:until_reload_toolbutton_available, 0)

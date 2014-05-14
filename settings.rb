@@ -4,7 +4,7 @@ require 'observer'
 require 'yaml'
 require_relative 'extensions'
 
-class Settings_
+class SettingsClass
   include Singleton, Observable
 
   SETTINGS_DIR = ENV['HOME'] / '.yap'
@@ -22,7 +22,7 @@ class Settings_
       [true, 'DP', 'http://dp.prgrssv.net/', nil, nil],
       [true, 'multi-yp', 'http://peercast.takami98.net/multi-yp/', nil, nil],
       [true, 'アスカチェッカー', 'http://asuka--sen-nin.ddo.jp/checker/', nil, nil],
-      [true, 'cavetube', 'http://rss.cavelis.net/', nil, nil],
+      [true, 'cavetube', 'http://rss.cavelis.net/', nil, nil]
     ],
     USER_PEERCAST: '127.0.0.1:7144',
     REVERSE_LOOKUP_TIP: true,
@@ -30,7 +30,7 @@ class Settings_
     LIST_FONT: 'Sans 12',
     ENABLE_AUTO_BANDWIDTH_CHECK: true,
     GRID_LINES: 1,
-    RULES_HINT: true,
+    RULES_HINT: true
   }
 
   VAR_NAMES = VARIABLES.keys
@@ -59,15 +59,15 @@ class Settings_
     value
   end
 
+  SETTINGS_YAML_FILE = SETTINGS_DIR / 'settings.yml'
+
   def load
-    begin
-      data = YAML.load_file(SETTINGS_DIR / 'settings.yml')
-      @variables = @variables.merge Hash[*data.flat_map { |str, val| [str.to_sym, val] }]
-    rescue Errno::ENOENT
-      # do nothing
-    end
+    data = YAML.load_file(SETTINGS_YAML_FILE)
+    @variables = @variables.merge Hash[*data.flat_map { |str, val| [str.to_sym, val] }]
     changed
     notify_observers
+  rescue Errno::ENOENT
+    STDERR.puts "Warning: #{SETTINGS_YAML_FILE} not found"
   end
 
   def save
@@ -78,5 +78,5 @@ class Settings_
   end
 end
 
-Settings = Settings_.instance
+Settings = SettingsClass.instance
 Settings.load
