@@ -32,7 +32,7 @@ class WebResourceClass
 
   # url で示される .ico 形式のアイコンを取得する
   # 失敗したら nil を返す
-  def get_favicon(url)
+  def favicon_data(url)
     data = get_page(url)
 
     if data && data[0..3] == "\x00\x00\x01\x00"
@@ -48,7 +48,7 @@ class WebResourceClass
     else
       begin
         Gdk::PixbufLoader.open do |loader|
-          buf = WebResource.get_favicon(url)
+          buf = WebResource.favicon_data(url)
           loader.write(buf)
           loader.close
           return PIXBUF_CACHE[url] = loader.pixbuf
