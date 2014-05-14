@@ -83,8 +83,7 @@ class ChannelListPage < Gtk::VBox
       @channel_list_view.reset_model
       # 10pt bold
       @search_label.markup =
-        "<span size=\"10000\" background=\"yellow\" font_weight=\"bold\">" \
-      '検索中</span>'
+        '<span size="10000" background="yellow" font_weight="bold">検索中</span>'
       @channel_list_view.search(@search_field.text)
     end
   end

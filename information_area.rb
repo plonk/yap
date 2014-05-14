@@ -48,7 +48,7 @@ class InformationArea < Gtk::VBox
                                          sensitive: false,
                                          draw_indicator: false,
                                          on_toggled: method(:on_favorite_toggle_button_toggled))
-        @favorite_toggle_button.child.set_markup(" <span foreground=\"gray\" size=\"xx-large\">★</span> ")
+        @favorite_toggle_button.child.set_markup(' <span foreground="gray" size="xx-large">★</span> ')
 
         align.add @favorite_toggle_button
         hbox.pack_start(align, false, false)
@@ -93,8 +93,8 @@ class InformationArea < Gtk::VBox
     update_favorite_toggle_button
   end
 
-  COLORED_STAR_MARKUP = " <span foreground=\"#FEA315\" size=\"xx-large\">★</span> "
-  GRAY_STAR_MARKUP = " <span foreground=\"gray\" size=\"xx-large\">★</span> "
+  COLORED_STAR_MARKUP = ' <span foreground="#FEA315" size="xx-large">★</span> '
+  GRAY_STAR_MARKUP = ' <span foreground="gray" size="xx-large">★</span> '
 
   def update_favorite_toggle_button
     ch = @model.selected_channel

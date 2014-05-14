@@ -25,12 +25,12 @@ class ChannelNameLabel < Gtk::Label
     end
 
     def render_channel_name(ch)
-      "<span font_weight=\"bold\" size=\"12000\">" +
+      '<span font_weight="bold" size="12000">' +
         ch.name.escape_html +
-        "</span>" +
-        "　<span font_weight=\"bold\" foreground=\"red\" size=\"medium\">" +
+        '</span>' +
+        '　<span font_weight="bold" foreground="red" size="medium">' +
         ChannelNameLabel.duration_on_air(ch.time) +
-        "</span>"
+        '</span>'
     end
   end
 

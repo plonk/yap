@@ -35,8 +35,8 @@ def measure_width(str)
 end
 
 def get_highlighted_markup(txt, term)
-  span_begin = "<span foreground=\"black\" font_weight=\"bold\" background=\"yellow\">"
-  span_end = "</span>"
+  span_begin = '<span foreground="black" font_weight="bold" background="yellow">'
+  span_end = '</span>'
   if term != '' && txt =~ /#{Regexp.escape(term)}/i
     $`.escape_html + span_begin + $&.escape_html + span_end + $'.escape_html
   else
