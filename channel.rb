@@ -96,7 +96,7 @@ class Channel
   end
 
   def playlist_url_name
-    "http://#{to_host(Settings[:USER_PEERCAST]}/pls/#{@id}?tip=#{@tip}"
+    "http://#{to_host(Settings[:USER_PEERCAST])}/pls/#{@id}?tip=#{@tip}"
   end
 
   def stream_url_name
