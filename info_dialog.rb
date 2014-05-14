@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
 require_relative 'gtk_helper'
 
+# チャンネル情報ダイアログ
 class InfoDialog < Gtk::Dialog
   include Gtk, GtkHelper
 
   def initialize(parent, ch)
     super "#{ch.name}のチャンネル情報", parent, MODAL, [Stock::OK, RESPONSE_NONE]
 
-    rows = [
-      [get_framed_favicon_image(ch), cell(ch.name)],
-      [head('リスナー数/リレー数'), cell("#{ch.listener}/#{ch.relay}")],
-      [head('TIP'), cell("#{ch.tip}#{get_tip_info(ch.tip)}")],
-      [head('コンタクトURL'), cell(ch.contact_url)],
-      [head('ID'), cell(ch.id)],
-      [head('タイプ'), cell(ch.type)],
-      [head('詳細'), cell(ch.detail)],
-      [head('ジャンル'), cell(ch.genre)],
-      [head('コメント'), cell(ch.comment)]
-            ]
+    rows =
+      [
+       [get_framed_favicon_image(ch), cell(ch.name)],
+       [head('リスナー数/リレー数'), cell("#{ch.listener}/#{ch.relay}")],
+       [head('TIP'), cell("#{ch.tip}#{get_tip_info(ch.tip)}")],
+       [head('コンタクトURL'), cell(ch.contact_url)],
+       [head('ID'), cell(ch.id)],
+       [head('タイプ'), cell(ch.type)],
+       [head('詳細'), cell(ch.detail)],
+       [head('ジャンル'), cell(ch.genre)],
+       [head('コメント'), cell(ch.comment)]
+      ]
 
     table = create(Table, 2, rows.size, row_spacings: 5, column_spacings: 10)
 
@@ -50,36 +52,30 @@ class InfoDialog < Gtk::Dialog
   end
 
   def get_framed_favicon_image(ch)
-    f = Frame.new
-    unless ch.contact_url.empty?
-      i = get_favicon_image_for(ch.contact_url)
-      i.pixbuf = i.pixbuf.scale(64, 64, Gdk::Pixbuf::INTERP_NEAREST)
-      f.add i
+    create Frame do |frame|
+      frame.add Image.new favicon_pixbuf_for(ch).scale(64, 64, Gdk::Pixbuf::INTERP_NEAREST)
     end
-    f
   end
 
-  def get_favicon_image_for(url)
-    buf = WebResource.get_page(url)
-    image = Gtk::Image.new
-    if buf =~ /<link rel="?(shortcut )?icon"? href="([^"]+)"/i
-      puts 'favicon is specified'
-      favicon_url = Regexp.last_match[2]
-      p favicon_url
-      uri = URI.join(url, favicon_url)
+  def default_icon_pixbuf
+    IconFactory.lookup_default('gtk-network')
+      .render_icon(style,
+                   Widget::TEXT_DIR_RTL,
+                   STATE_NORMAL,
+                   IconSize::LARGE_TOOLBAR)
+  end
+
+  def favicon_pixbuf_for(ch)
+    favicon_url = ch.favicon_url
+    icon_data = WebResource.get_favicon(favicon_url) if favicon_url
+    if icon_data
       Gdk::PixbufLoader.open do |loader|
-        loader.write WebResource.get_favicon(uri.to_s)
+        loader.write icon_data
         loader.close
-        image.pixbuf = loader.pixbuf
+        return loader.pixbuf
       end
     else
-      image.pixbuf = Gtk::IconFactory
-        .lookup_default('gtk-network')
-        .render_icon(style,
-                     Gtk::Widget::TEXT_DIR_RTL,
-                     Gtk::STATE_NORMAL,
-                     Gtk::IconSize::LARGE_TOOLBAR)
+      default_icon_pixbuf
     end
-    image
   end
 end

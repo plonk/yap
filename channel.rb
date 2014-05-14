@@ -3,12 +3,12 @@ require 'digest/md5'
 require_relative 'launcher'
 require_relative 'type_association'
 
+# チャンネルクラス
 class Channel
   attr_reader :genre, :id, :tip, :comment, :contact_url, :type, :detail
   attr_reader :fields
   attr_accessor :yp
-  attr_reader :hash
-  attr_reader :channel_id
+  attr_reader :channel_id, :hash
 
   include Digest
 
@@ -20,22 +20,25 @@ class Channel
   NAME = 0
   ID = 1 # etc.
 
-  def initialize(line, yp)
-    row = line.split(/<>/, 19).map { |x| x.unescape_html }
-    @fields = row
-    @genre = row[4]
-    @id = row[1]
-    @tip = row[2]
-    @comment = row[17]
-    @contact_url = row[3]
-    @type = row[9]
-    @detail = row[5]
-    @yp = yp
+  def initialize(line, source_yp)
+    load_line(line)
 
-    @channel_id = yp.name + row[NAME] + @id
+    @yp = source_yp
 
     # チャンネル名とストリームIDから同定する
+    @channel_id = yp.name + @fields[NAME] + @id
     @hash = MD5.hexdigest(@channel_id).to_i(16).truncate_to_fixnum
+  end
+
+  def load_line(line)
+    @fields = line.split(/<>/, 19).map { |x| x.unescape_html }
+    @genre = @fields[4]
+    @id = @fields[1]
+    @tip = @fields[2]
+    @comment = @fields[17]
+    @contact_url = @fields[3]
+    @type = @fields[9]
+    @detail = @fields[5]
   end
 
   def ==(other)
@@ -117,20 +120,24 @@ class Channel
     @fields[7].to_i
   end
 
+  def top_page(url)
+    # したらばで特定のスレやレスへのリンクである。
+    if url =~ %r{^http://jbbs\.shitaraba\.net/bbs/read\.cgi/([a-z]+/\d+)}
+      "http://jbbs.shitaraba.net/#{Regexp.last_match[1]}/"
+    else
+      url
+    end
+  end
+
   # 今のところしたらばだけ。
   def favicon_url
-    # したらばで特定のスレやレスへのリンクである。
-    if contact_url =~ %r{^http://jbbs\.shitaraba\.net/bbs/read\.cgi/([a-z]+/\d+)}
-      top_url = "http://jbbs.shitaraba.net/#{Regexp.last_match[1]}/"
-    else
-      top_url = contact_url
-    end
+    top = top_page(contact_url)
 
-    favicon_url = WebResource.specified_favicon_url(top_url)
-    if favicon_url
-      favicon_url 
+    spec_fav = WebResource.specified_favicon_url(top)
+    if spec_fav
+      spec_fav
     else
-      'http://' + URI.parse(contact_url).host / 'favicon.ico'
+      'http://' + URI.parse(top).host / 'favicon.ico'
     end
   rescue
     nil
