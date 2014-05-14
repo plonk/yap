@@ -40,8 +40,9 @@ class FavoriteDialog < Gtk::Dialog
     vbox.pack_start(sw, true)
 
     button_hbox = create(HButtonBox, layout_style: ButtonBox::END, spacing: 10)
-    add_button = create(Button, '追加', width_request: 60,
-                                      on_clicked: proc do
+    add_button = create(Button, '追加',
+                        width_request: 60,
+                        on_clicked: proc do
                           dialog = LinePrompt.new('お気に入りのチャンネルを追加', self)
                           dialog.show_all
                           dialog.run do |response|
@@ -52,8 +53,9 @@ class FavoriteDialog < Gtk::Dialog
                           end
                           dialog.destroy
                         end)
-    del_button = create(Button, '削除', width_request: 60,
-                                      on_clicked: proc do
+    del_button = create(Button, '削除',
+                        width_request: 60,
+                        on_clicked: proc do
                           path, column = @treeview.cursor
                           if path
                             iter = @treeview.model.get_iter(path)

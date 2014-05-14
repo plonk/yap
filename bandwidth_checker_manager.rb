@@ -63,7 +63,7 @@ class BandwidthCheckerManager
   end
 
   def update(message, *args)
-    if self.respond_to? message
+    if respond_to? message
       __send__(message, *args)
     end
   end
@@ -73,7 +73,7 @@ class BandwidthCheckerManager
   end
 
   def update_lists
-    finished  = @checking.group_by { |checker| (checker.state =~ /finished/) }
+    finished  = @checking.group_by { |checker| (checker.state =~ /finished/).to_bool }
     @finished_recently += finished[true] || []
     @checking = finished[false] || []
 

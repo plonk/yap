@@ -40,7 +40,8 @@ class ObjectList < Gtk::ScrolledWindow
   end
 
   def create_renderer(col_id)
-    renderer = create(CellRendererText, editable: @writer_list[col_id])
+    renderer = create(CellRendererText,
+                      editable: @writer_list[col_id].to_bool)
     renderer.signal_connect 'edited' do |_, path, value|
       iter = @list_store.get_iter(path)
       obj = get_object(iter)

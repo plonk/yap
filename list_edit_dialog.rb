@@ -219,7 +219,8 @@ class ListEditDialog < Gtk::Dialog
 
     @types.each_with_index do |type, i|
       renderer = create_renderer(type, editable[i], i)
-      col = TreeViewColumn.new(@headers[i], renderer,  model_property(type) => i)
+      col = TreeViewColumn.new(@headers[i], renderer,
+                               model_property(type) => i)
       @treeview.append_column col
     end
 

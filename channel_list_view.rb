@@ -85,7 +85,7 @@ class ChannelListView < Gtk::TreeView
       hour = i / 60
       min = i % 60
       renderer.text = sprintf('%2d:%02d', hour, min)
-      renderer.foreground = 'gray' if hour == 0  and  min == 0
+      renderer.foreground = 'gray' if hour == 0 && min == 0
     else
       if false
         day = i.to_f / (24 * 60)

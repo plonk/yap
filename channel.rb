@@ -88,25 +88,25 @@ class Channel
   end
 
   def playlist_url
-    "http://#{Settings[:USER_PEERCAST] || '127.0.0.1:7144'}/pls/#{@id}?tip=#{@tip}"
+    "http://#{Settings[:USER_PEERCAST]}/pls/#{@id}?tip=#{@tip}"
   end
 
   def stream_url
-    "http://#{Settings[:USER_PEERCAST] || '127.0.0.1:7144'}/stream/#{@id}.wmv?tip=#{@tip}"
+    "http://#{Settings[:USER_PEERCAST]}/stream/#{@id}.wmv?tip=#{@tip}"
   end
 
   def playlist_url_name
-    "http://#{to_host(Settings[:USER_PEERCAST] || '127.0.0.1:7144')}/pls/#{@id}?tip=#{@tip}"
+    "http://#{to_host(Settings[:USER_PEERCAST]}/pls/#{@id}?tip=#{@tip}"
   end
 
   def stream_url_name
-    "http://#{to_host(Settings[:USER_PEERCAST] || '127.0.0.1:7144')}/stream/#{@id}.wmv?tip=#{@tip}"
+    "http://#{to_host(Settings[:USER_PEERCAST])}/stream/#{@id}.wmv?tip=#{@tip}"
   end
 
   def playable?
     !tip.empty? &&
       @id !=  '000000000000000000000000000000000' &&
-      TypeAssociation.instance.launcher(@type)
+      TypeAssociation.instance.launcher(@type).to_bool
   end
 
   def listener

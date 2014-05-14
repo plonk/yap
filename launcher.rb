@@ -37,11 +37,11 @@ class Launcher
     '$x' => :playlist_url.to_proc,	# IP:Port
     '$Y' => :stream_url_name.to_proc,	# Host:Port
     '$y' => :stream_url.to_proc,	# IP:Port
-    '$Z' => proc { Settings[:USER_PEERCAST] || '127.0.0.1:7144' },
-    '$z' => proc { Settings[:USER_PEERCAST] || '127.0.0.1:7144' },
+    '$Z' => proc { Settings[:USER_PEERCAST] },
+    '$z' => proc { Settings[:USER_PEERCAST] },
     '$T' => proc { |ch| ch.type.upcase },
   }
-  VAR_PATTERN = Regexp.new('(' + VAR_DEFINITION.keys.map(& Regexp.method(:escape)).join('|') + ')')
+  VAR_PATTERN = Regexp.new('(' + VAR_DEFINITION.keys.map(&Regexp.method(:escape)).join('|') + ')')
 
   def initialize(template)
     @template = template

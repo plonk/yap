@@ -7,6 +7,10 @@ class Object
     instance_eval &blk
     self
   end
+
+  def to_bool
+    self ? true : false
+  end
 end
 
 class String
