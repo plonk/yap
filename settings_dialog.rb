@@ -11,7 +11,7 @@ class SettingsDialog < Gtk::Dialog
 
   def show_message(message, title, kind = MessageDialog::ERROR)
     md = MessageDialog.new(self,
-                           Dialog::DESTROY_WITH_PARENT,
+                           DESTROY_WITH_PARENT,
                            kind,
                            MessageDialog::BUTTONS_OK,
                            message)
@@ -23,7 +23,7 @@ class SettingsDialog < Gtk::Dialog
 
   def initialize(parent)
     # ピアキャストのポート番号、動画プレーヤーのパス？
-    super('設定', parent, Dialog::MODAL)
+    super('設定', parent, MODAL)
 
     do_layout
 

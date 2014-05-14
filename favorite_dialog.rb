@@ -9,7 +9,7 @@ class FavoriteDialog < Gtk::Dialog
   attr_reader :list
 
   def initialize(parent_window, list)
-    super('お気に入りの整理', parent_window, Dialog::MODAL)
+    super('お気に入りの整理', parent_window, MODAL)
 
     @list = list
 
