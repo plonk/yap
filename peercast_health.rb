@@ -15,7 +15,7 @@ class PeercastHealth
   end
 
   def to_s
-    "#{@host}:#{@port}"
+    "\#<PeercastHealth: P#{@host}:#{@port}>"
   end
 
   def check

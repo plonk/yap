@@ -121,15 +121,18 @@ class MainWindowModel
     end
   end
 
+  def acknowledge_child(child)
+    child.add_observer(self, :child_process_changed)
+    @child_processes << child
+    changed
+    notify_observers(:child_process_changed)
+  end
+
   def play(channel)
     player = TypeAssociation.instance.launcher(channel.type)
     if player
       STDERR.puts "Launching #{player.interpolate(channel)}"
-      child = player.spawn(channel)
-      child.add_observer(self, :child_process_changed)
-      @child_processes << child
-      changed
-      notify_observers(:child_process_changed)
+      acknowledge_child player.spawn(channel)
     end
   rescue StandardError => e
     self.notification = "エラー: #{e.message}"
@@ -190,6 +193,7 @@ class MainWindowModel
   end
 
   def spawn_yp_updater_threads
+    puts 'Updating channels...'
     threads = []
     @yellow_pages.each do |yp|
       threads << Thread.new do
@@ -197,44 +201,51 @@ class MainWindowModel
         puts "Failed in retrieving from #{yp.name}" unless success
       end
     end
+    puts 'Done.'
     threads
   end
 
   # 通知テキストを更新する。
   def update_notification
-    if @update_first_time
-      @update_first_time = false
+    return @update_first_time = false if @update_first_time
+
+    self.notification = notification_text
+  end
+
+  def notification_text
+    if @just_began.empty?
+      '新着チャンネルはありません。'
     else
-      self.notification =
-        if @just_began.empty?
-          '新着チャンネルはありません。'
-        else
-          @just_began.map(&:name)
-            .sort
-            .map { |name| favorites.include?(name) ? name + '★' : name }
-            .join('、') + ' が配信を開始しています。'
-        end
+      @just_began.map(&:name)
+        .sort
+        .map { |name| favorites.include?(name) ? name + '★' : name }
+        .join('、') + ' が配信を開始しています。'
     end
   end
 
-  def do_update_channel_list(download, notify)
-    if download
-      puts 'Updating channels...'
-      spawn_yp_updater_threads.each(&:join)
-      puts 'Done.'
-    else
-      @yellow_pages.each do |yp|
-        yp.retrieve unless yp.loaded?
-      end
+  def ascertain_yellow_pages_loaded
+    @yellow_pages.each do |yp|
+      yp.retrieve unless yp.loaded?
     end
+  end
 
+  def update_tables
     new_table = @yellow_pages.flat_map(&:to_a)
     @finished = @master_table - new_table
     @just_began = new_table - @master_table
     @master_table = new_table
-
     changed
     notify_observers(:channel_list_updated)
+  end
+
+  def do_update_channel_list(full_update, notify)
+    if full_update
+      spawn_yp_updater_threads.each(&:join)
+    else
+      ascertain_yellow_pages_loaded
+    end
+
+    update_tables
 
     update_notification if notify
   end
@@ -243,43 +254,52 @@ class MainWindowModel
   def start_reload_button_manager_thread
     @reload_history = []
 
-    @reload_button_state_helper = Thread.start do
-      loop do
-        now = Time.now
-        @reload_history.delete_if { |x| now - x > MANUAL_UPDATE_INTERVAL }
-        if @reload_history.size < MANUAL_UPDATE_COUNT
-          changed
-          notify_observers(:until_reload_toolbutton_available, 0)
-        else
-          i = (@reload_history[0] + MANUAL_UPDATE_INTERVAL - Time.now).to_i
-          changed
-          notify_observers(:until_reload_toolbutton_available, i)
-        end
-        sleep 1
-      end
+    @reload_button_state_helper =
+      Thread.start(&method(:reload_button_manager_thread))
+  end
+
+  def delete_old_reload_history
+    @reload_history.delete_if { |x| Time.now - x > MANUAL_UPDATE_INTERVAL }
+  end
+
+  def time_until_user_can_reload
+    if @reload_history.size < MANUAL_UPDATE_COUNT
+      0
+    else
+      (@reload_history[0] + MANUAL_UPDATE_INTERVAL - Time.now).ceil
+    end
+  end
+
+  def reload_button_manager_thread
+    every_nseconds 1 do
+      delete_old_reload_history
+      changed
+      notify_observers(:until_reload_toolbutton_available,
+                       time_until_user_can_reload)
     end
   end
 
   def start_updater_thread
     # 自動更新スレッド
     @updater_thread = Thread.start do
-      loop do
+      every_nseconds UPDATE_INTERVAL_MINUTE * 60 do
         update_channel_list
-        sleep UPDATE_INTERVAL_MINUTE * 60
       end
     end
   end
 
   def start_peercast_watcher_thread
-    @peercast_watcher_thread = Thread.start do
-      loop do
-        host, port = ::Settings[:USER_PEERCAST].split(/:/)
-        watcher = PeercastHealth.new(host, port.to_i, 0.5)
-        result = watcher.check
-        unless result
-          self.notification = "#{watcher} に接続できません。(#{watcher.error_reason})"
-        end
-        sleep 5 * 60
+    host, port = ::Settings[:USER_PEERCAST].split(/:/)
+    @peercast_watcher_thread =
+      Thread.start(host, port.to_i, &method(:peercast_watcher))
+  end
+
+  def peercast_watcher(host, port)
+    watcher = PeercastHealth.new(host, port, 0.5)
+    every_nseconds 5 * 60 do
+      unless watcher.check
+        self.notification =
+          "#{host}:#{port} に接続できません。(#{watcher.error_reason})"
       end
     end
   end

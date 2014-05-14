@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+def every_nseconds n
+  loop do
+    yield
+    sleep n
+  end
+end
+
 # このスクリプトを実行している ruby.exe とか rubyw.exe のパスを得る
 def exec_filename
   if true
