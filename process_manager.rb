@@ -58,11 +58,13 @@ class ProcessManager < Gtk::Dialog
   end
 
   def object_list_update
-    @kill_button.sensitive = @object_list.selected && !@object_list.selected.finished?
-    @clear_button.sensitive = !@object_list.get.select(&:finished?).empty?
+    @kill_button.sensitive =
+      @object_list.selected && !@object_list.selected.finished?
+    @clear_button.sensitive =
+      !@object_list.get.select(&:finished?).empty?
   end
 
-  def model_update(what, *args)
+  def model_update(what, *_args)
     case what
     when :child_process_changed
       @object_list.set @model.child_processes

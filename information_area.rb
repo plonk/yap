@@ -187,9 +187,7 @@ class InformationArea < Gtk::VBox
       end
     else
       ch = @model.selected_channel
-      if ch
-        @model.favorites.delete ch.name
-      end
+      @model.favorites.delete ch.name if ch
     end
   end
 

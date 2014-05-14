@@ -19,7 +19,7 @@ class YellowPage
     if IDENTITY_MAP.key? args
       IDENTITY_MAP[args]
     else
-      IDENTITY_MAP[args] = new *args
+      IDENTITY_MAP[args] = new(*args)
     end
   end
 
@@ -38,7 +38,7 @@ class YellowPage
   end
 
   def loaded?
-    !!@timestamp
+    @timestamp.to_bool
   end
 
   def retrieve
@@ -78,7 +78,7 @@ class YellowPage
   end
 
   def each(&block)
-    each_channel &block
+    each_channel(&block)
   end
 
   def each_channel
@@ -94,18 +94,22 @@ class YellowPage
   end
 
   def stat_url_for(ch)
-    if @stat_url_string and ch.id != '00000000000000000000000000000000' and !ch.chname_proper.empty?
-      return "#{url}#{@stat_url_string}#{ch.chname_proper.url_encode}"
+    if @stat_url_string &&
+        ch.id != '00000000000000000000000000000000' &&
+        !ch.chname_proper.empty?
+      "#{url}#{@stat_url_string}#{ch.chname_proper.url_encode}"
     else
-      return ''
+      ''
     end
   end
 
   def chat_url_for(ch)
-    if @chat_url_string and ch.id != '00000000000000000000000000000000' and !ch.chname_proper.empty?
-      return "#{url}#{@chat_url_string}#{ch.chname_proper.url_encode}"
+    if @chat_url_string &&
+        ch.id != '00000000000000000000000000000000' &&
+        !ch.chname_proper.empty?
+      "#{url}#{@chat_url_string}#{ch.chname_proper.url_encode}"
     else
-      return ''
+      ''
     end
   end
 end

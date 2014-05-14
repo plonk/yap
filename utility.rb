@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # このスクリプトを実行している ruby.exe とか rubyw.exe のパスを得る
-def get_exec_filename
+def exec_filename
   if true
     RbConfig.ruby
   else
@@ -14,7 +14,10 @@ end
 
 # 英字（全半）→かな（全半）→漢字の順でソートされるようにする
 def regularize(str)
-  str.tr('Ａ-ｚ', 'A-z').tr('A-Z', 'a-z').tr('ア-ン', 'あ-ん').tr('ｱ-ﾝ', 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよわをん')
+  str.tr('Ａ-ｚ', 'A-z')
+    .tr('A-Z', 'a-z')
+    .tr('ア-ン', 'あ-ん')
+    .tr('ｱ-ﾝ', 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよわをん')
 end
 
 # Measure width in hankaku, asssuming all non latin characters are
@@ -32,13 +35,13 @@ def measure_width(str)
 end
 
 def get_highlighted_markup(txt, term)
-  markup = nil
-  if term != '' and txt =~ /#{Regexp.escape(term)}/i
-    markup = $`.escape_html + "<span foreground=\"black\" font_weight=\"bold\" background=\"yellow\">" + $&.escape_html + '</span>' + $'.escape_html
+  span_begin = "<span foreground=\"black\" font_weight=\"bold\" background=\"yellow\">"
+  span_end = "</span>"
+  if term != '' && txt =~ /#{Regexp.escape(term)}/i
+    $`.escape_html + span_begin + $&.escape_html + span_end + $'.escape_html
   else
-    markup = txt.escape_html
+    txt.escape_html
   end
-  markup
 end
 
 require 'resolv'

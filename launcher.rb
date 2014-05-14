@@ -8,9 +8,9 @@ require_relative 'child_process'
 # spawn で実行する。
 class Launcher
   # 定数関数。
-  K = lambda { |constant| proc { |ch| constant } }
+  K = lambda { |constant| lambda { |_ch| constant } }
   # N 番目のフィールドを選択する proc を返す。
-  F = lambda { |n| proc { |ch| ch.fields[n] } }
+  F = lambda { |n| lambda { |ch| ch.fields[n] } }
   # PecaRecorder 互換の変数名。
   VAR_DEFINITION = {
     '$\$' => K.call('$'),
@@ -39,20 +39,26 @@ class Launcher
     '$y' => :stream_url.to_proc,	# IP:Port
     '$Z' => proc { Settings[:USER_PEERCAST] },
     '$z' => proc { Settings[:USER_PEERCAST] },
-    '$T' => proc { |ch| ch.type.upcase },
+    '$T' => proc { |ch| ch.type.upcase }
   }
-  VAR_PATTERN = Regexp.new('(' + VAR_DEFINITION.keys.map(&Regexp.method(:escape)).join('|') + ')')
+
+  def self.var_pattern
+    regexp = '(' + VAR_DEFINITION.keys.map(&Regexp.method(:escape)).join('|') + ')'
+    Regexp.new regexp
+  end
+
+  VAR_PATTERN = var_pattern
 
   def initialize(template)
     @template = template
   end
 
   def interpolate(channel)
-    @template.gsub(VAR_PATTERN) { |var|
+    @template.gsub(VAR_PATTERN) do |var|
       fn = VAR_DEFINITION[var]
       fail "unknown variable #{var}" unless fn
       fn.call(channel).shellescape
-    }
+    end
   end
 
   def spawn(channel)

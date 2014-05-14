@@ -60,7 +60,7 @@ class ListEditDialog < Gtk::Dialog
 
       set_alternative_button_order [RESPONSE_OK, RESPONSE_CANCEL]
 
-      @ok_button.signal_connect 'clicked' do |button|
+      @ok_button.signal_connect 'clicked' do
         @result = @views.map(&method(:value))
       end
     end
@@ -74,7 +74,7 @@ class ListEditDialog < Gtk::Dialog
     when :toggle
       result = CellRendererToggle.new
       if editable
-        result.signal_connect 'toggled' do |renderer, path|
+        result.signal_connect 'toggled' do |_renderer, path|
           iter = @liststore.get_iter path
           iter[col_id] = !iter[col_id]
         end
@@ -83,8 +83,8 @@ class ListEditDialog < Gtk::Dialog
       result = CellRendererToggle.new
       result.radio = true
       if editable
-        result.signal_connect 'toggled' do |renderer, path|
-          @liststore.each do |model, path, iter|
+        result.signal_connect 'toggled' do |_renderer, path|
+          @liststore.each do |_model, _path, iter|
             iter[col_id] = false
           end
           iter = @liststore.get_iter path
@@ -94,7 +94,7 @@ class ListEditDialog < Gtk::Dialog
     when :text
       result = CellRendererText.new
       result.editable = editable
-      result.signal_connect 'edited' do |renderer, path, value|
+      result.signal_connect 'edited' do |_renderer, path, value|
         @liststore.get_iter(path)[col_id] = value
       end
     else
@@ -150,7 +150,7 @@ class ListEditDialog < Gtk::Dialog
   def create_context_menu
     create(Menu) do |menu|
       create(MenuItem, '追加') do |add_item|
-        add_item.signal_connect('activate') do |item|
+        add_item.signal_connect('activate') do
           dialog = AddItemDialog.new(self, @headers, @types).show_all
           dialog.run do |response|
             p dialog.result
@@ -171,11 +171,9 @@ class ListEditDialog < Gtk::Dialog
         menu.append add_item
       end
       create(MenuItem, '削除') do |del_item|
-        del_item.signal_connect('activate') do |item|
+        del_item.signal_connect('activate') do
           iter = @treeview.selection.selected
-          if iter
-            @liststore.remove iter
-          end
+          @liststore.remove iter if iter
         end
 
         menu.append del_item
@@ -185,7 +183,7 @@ class ListEditDialog < Gtk::Dialog
   end
 
   def result
-    @liststore.to_enum.map do |liststore, path, iter|
+    @liststore.to_enum.map do |_liststore, _path, iter|
       @numfields.times.map { |i| iter[i] }
     end
   end
@@ -198,9 +196,7 @@ class ListEditDialog < Gtk::Dialog
 
     @numfields = @types.size
 
-    if optary.any?(&:nil?)
-      fail ArgumentError, 'lack of mandatory options'
-    end
+    fail ArgumentError, 'lack of mandatory options' if optary.any?(&:nil?)
     fail ArgumentError unless options_consistent?(options)
 
     do_layout
@@ -208,7 +204,7 @@ class ListEditDialog < Gtk::Dialog
     @menu = create_context_menu.show_all
 
     @treeview.events = Gdk::Event::BUTTON_PRESS_MASK
-    @treeview.signal_connect('button-press-event') do |button, e|
+    @treeview.signal_connect('button-press-event') do |_button, e|
       if e.button == 3
         @menu.popup(nil, nil, e.button, e.time)
         true

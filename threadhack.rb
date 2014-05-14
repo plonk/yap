@@ -64,9 +64,7 @@ module Gtk
   end
 
   def self.main_quit
-    if @queue.size != 0
-      STDERR.puts 'Warning: queue is not empty'
-    end
+    STDERR.puts 'Warning: queue is not empty' if @queue.size != 0
     old_main_quit
   end
 end

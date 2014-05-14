@@ -34,7 +34,7 @@ class WebResourceClass
   def get_favicon(url)
     data = get_page(url)
 
-    if data and data[0..3] == "\x00\x00\x01\x00"
+    if data && data[0..3] == "\x00\x00\x01\x00"
       data
     else
       nil
@@ -53,7 +53,7 @@ class WebResourceClass
           return PIXBUF_CACHE[url] = loader.pixbuf
         end
       rescue
-        return PIXBUF_CACHE[url] = QUESTION_64
+        return PIXBUF_CACHE[url] = fallback
       end
     end
   end

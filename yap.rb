@@ -18,7 +18,7 @@ require_relative 'resource'
 $log = StringIO.new('', 'w')
 $real_stdout = $stdout.dup
 $RUNNING_ON_RUBYW = false
-if File.basename(get_exec_filename).downcase == 'rubyw.exe'
+if File.basename(exec_filename).downcase == 'rubyw.exe'
   $RUNNING_ON_RUBYW = true
 end
 if $RUNNING_ON_RUBYW
@@ -51,9 +51,7 @@ model = MainWindowModel.new
 window = MainWindow.new model
 BandwidthCheckerManager.new model
 
-unless defined? Ocra
-  window.show_all
-end
+window.show_all unless defined? Ocra
 
 begin
   puts 'Going into the main loop'

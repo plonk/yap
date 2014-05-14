@@ -35,7 +35,7 @@ class Favorites
   end
 
   def each(&block)
-    @list.each &block
+    @list.each(&block)
   end
 
   def to_a
@@ -47,7 +47,7 @@ class Favorites
   end
 
   def touch(path)
-    File.open path, 'w' do end
+    File.open(path, 'w').close
   end
 
   def load

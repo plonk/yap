@@ -14,7 +14,7 @@ class LogDialog < Gtk::Dialog
     scrolledwindow.add textview
     vbox.pack_start scrolledwindow
     set_default_size(512, 384)
-    signal_connect('response') do |d, res|
+    signal_connect('response') do
       destroy
     end
   end

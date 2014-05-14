@@ -24,9 +24,7 @@ module GtkHelper
       widget.send(name.to_s + '=', value)
     end
 
-    if block
-      block.call(widget)
-    end
+    block.call(widget) if block
 
     widget
   end
@@ -35,9 +33,7 @@ module GtkHelper
     label = Gtk::Label.new(str + ':')
     label.xalign = 1
     label.yalign = 0.5
-    if tooltip
-      label.tooltip_text = tooltip
-    end
+    label.tooltip_text = tooltip if tooltip
     label
   end
 

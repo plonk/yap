@@ -8,7 +8,7 @@ class ChannelListView::ContextMenu < Gtk::Menu
     super()
 
     @play = MenuItem.new('再生')
-    @play.signal_connect('activate') do |w|
+    @play.signal_connect('activate') do
       @mw_model.play(@channel) if @channel
     end
     append(@play)
@@ -16,19 +16,19 @@ class ChannelListView::ContextMenu < Gtk::Menu
     append(MenuItem.new) # separator
 
     @contact_url = MenuItem.new('コンタクトURLを開く')
-    @contact_url.signal_connect('activate') do |w|
+    @contact_url.signal_connect('activate') do
       Environment.open(@channel.contact_url) if @channel
     end
     append(@contact_url)
 
     @chat_url = MenuItem.new('チャットURLを開く')
-    @chat_url.signal_connect('activate') do |w|
+    @chat_url.signal_connect('activate') do
       Environment.open(@channel.chat_url) if @channel
     end
     append(@chat_url)
 
     @stat_url = MenuItem.new('統計URLを開く')
-    @stat_url.signal_connect('activate') do |w|
+    @stat_url.signal_connect('activate') do
       Environment.open(@channel.stat_url) if @channel
     end
     append(@stat_url)
@@ -36,7 +36,7 @@ class ChannelListView::ContextMenu < Gtk::Menu
     append(MenuItem.new)
 
     @fav = MenuItem.new('お気に入りに追加/削除')
-    @fav.signal_connect('activate') do |w|
+    @fav.signal_connect('activate') do
       @mw_model.toggle_favorite
     end
     append(@fav)
@@ -44,7 +44,7 @@ class ChannelListView::ContextMenu < Gtk::Menu
     append(MenuItem.new)
 
     @info = MenuItem.new('チャンネル情報')
-    @info.signal_connect('activate') do |w|
+    @info.signal_connect('activate') do
       fail unless @channel
 
       @mw_model.show_channel_info(@channel)

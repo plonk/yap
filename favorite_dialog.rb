@@ -56,7 +56,7 @@ class FavoriteDialog < Gtk::Dialog
     del_button = create(Button, '削除',
                         width_request: 60,
                         on_clicked: proc do
-                          path, column = @treeview.cursor
+                          path, _column = @treeview.cursor
                           if path
                             iter = @treeview.model.get_iter(path)
                             @list.delete(iter[0])

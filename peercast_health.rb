@@ -6,6 +6,8 @@ class PeercastHealth
 
   include Timeout
 
+  HELO = "\x70\x63\x70\x0a\x04\x00\x00\x00\x01\x00\x00\x00\x68\x65\x6c\x6f\x00\x00\x00\x80"
+
   def initialize(host, port, timeout_seconds = 3)
     @host = host
     @port = port
@@ -20,7 +22,7 @@ class PeercastHealth
     response = nil
     timeout @timeout_seconds do
       Addrinfo.tcp(@host, @port).connect do |socket|
-        socket.write "\x70\x63\x70\x0a\x04\x00\x00\x00\x01\x00\x00\x00\x68\x65\x6c\x6f\x00\x00\x00\x80"
+        socket.write HELO
         response = socket.recv(4)
       end
     end

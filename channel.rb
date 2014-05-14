@@ -117,18 +117,19 @@ class Channel
     @fields[7].to_i
   end
 
-  # 今のところしたらばだけ
+  # 今のところしたらばだけ。
+  # FIX: Cyclomatic complexity for favicon_url is too high.
   def favicon_url
-    if contact_url =~ /^http:\/\/jbbs\.shitaraba\.net\/bbs\/read\.cgi\/([a-z]+\/\d+)/ # l50などと続く可能性あり
+    if contact_url =~ %r{^http://jbbs\.shitaraba\.net/bbs/read\.cgi/([a-z]+/\d+)} # l50などと続く可能性あり
       # the link is to a specific thread or a post
       t = get_specified_favicon_url("http://jbbs.shitaraba.net/#{Regexp.last_match[1]}/")
       return t if t
-    elsif contact_url =~ /^http:\/\/jbbs\.shitaraba\.net\/[a-z]+\/\d+\// # スレやレスでなく掲示板のトップなら
+    elsif contact_url =~ %r{^http://jbbs\.shitaraba\.net/[a-z]+/\d+/} # スレやレスでなく掲示板のトップなら
       t = get_specified_favicon_url(contact_url)
       return t if t
     end
 
-    if contact_url =~ /^http:\/\/jbbs\.shitaraba\.net\//
+    if contact_url =~ %r{^http://jbbs\.shitaraba\.net/}
       'http://jbbs.shitaraba.net/favicon.ico'
     else
       begin

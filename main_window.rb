@@ -56,14 +56,14 @@ class MainWindow < Gtk::Window
       ['ProcessManagerAction', nil, 'プロセスマネージャ(_P)', '', nil, proc { open_process_manager }],
 
       ['HelpMenuAction', Stock::HELP, 'ヘルプ(_H)', '', nil, proc {}],
-      ['AboutAction', Stock::ABOUT, 'このアプリケーションについて(_A)', '', nil, proc { run_about_dialog }],
+      ['AboutAction', Stock::ABOUT, 'このアプリケーションについて(_A)', '', nil, proc { run_about_dialog }]
     ]
 
     # [name, stock_id, label, accelarator, tooltip, proc, is_active]
     action_group.add_toggle_actions \
     [
       ['ToolbarVisibleAction', nil, 'ツールバー(_T)', '', nil, proc { toggle_toolbar_visibility }, ::Settings[:TOOLBAR_VISIBLE]],
-      ['ChannelInfoVisibleAction', nil, 'チャンネル情報(_C)', '', nil, proc { toggle_channel_info_visibility }, ::Settings[:CHANNEL_INFO_VISIBLE]],
+      ['ChannelInfoVisibleAction', nil, 'チャンネル情報(_C)', '', nil, proc { toggle_channel_info_visibility }, ::Settings[:CHANNEL_INFO_VISIBLE]]
     ]
     action_group
   end
@@ -81,19 +81,25 @@ class MainWindow < Gtk::Window
     create(VBox, false, 0) do |outermost_vbox|
       outermost_vbox.pack_start @ui_manager['/ui/menubar'], false
 
-      @toolbar = create(Toolbar, toolbar_style: Toolbar::Style::BOTH_HORIZ) do |toolbar|
-        @reload_toolbutton = create(ToolButton, Stock::REFRESH,
-                                    label: 'すぐに更新',
-                                    tooltip_text: ('次の自動更新を待たずにチャンネルリストを更新します' \
-                                                   "\n（#{MainWindowModel::MANUAL_UPDATE_INTERVAL}秒間に#{MainWindowModel::MANUAL_UPDATE_COUNT}回まで実行できます）"),
-                                    important: true)
+      @toolbar = create(Toolbar,
+                        toolbar_style: Toolbar::Style::BOTH_HORIZ) do |toolbar|
+        @reload_toolbutton =
+          create(ToolButton, Stock::REFRESH,
+                 label: 'すぐに更新',
+                 tooltip_text:
+                 '次の自動更新を待たずにチャンネルリストを更新します' \
+                 "\n（#{MainWindowModel::MANUAL_UPDATE_INTERVAL}秒間に" \
+                 "#{MainWindowModel::MANUAL_UPDATE_COUNT}回まで実行できます）",
+                 important: true)
 
         if $ENABLE_VIEWLOG
           @viewlog_toolbutton = create(ToolButton, Stock::JUSTIFY_LEFT,
                                        label: 'ログ',
                                        important: true)
         end
-        @settings_toolbutton = create(ToolButton, Stock::PREFERENCES, important: true)
+        @settings_toolbutton = create(ToolButton,
+                                      Stock::PREFERENCES,
+                                      important: true)
 
         @spring = create(SeparatorToolItem, expand: true, draw: false)
 
@@ -157,14 +163,14 @@ class MainWindow < Gtk::Window
     end
 
     menu = create_status_icon_menu
-    @status_icon.signal_connect('popup-menu') do |tray, button, time|
+    @status_icon.signal_connect('popup-menu') do |_tray, button, time|
       menu.popup(nil, nil, button, time)
     end
 
     # メインウィンドウが最小化されたら非表示にする。
-    signal_connect('window-state-event') do |win, e|
+    signal_connect('window-state-event') do |_win, e|
       if e.changed_mask.iconified?
-        if e.new_window_state.iconified? and !e.new_window_state.withdrawn?
+        if e.new_window_state.iconified? && !e.new_window_state.withdrawn?
           hide
           next true
         end
@@ -198,7 +204,7 @@ class MainWindow < Gtk::Window
       menu.append(Gtk::SeparatorMenuItem.new)
 
       create(ImageMenuItem, Stock::QUIT) do |quit|
-        quit.signal_connect('activate') do self.quit end
+        quit.signal_connect('activate') { self.quit }
         menu.append(quit)
       end
 
@@ -219,7 +225,7 @@ class MainWindow < Gtk::Window
   def show_channel_info(ch)
     dialog = InfoDialog.new(self, ch)
     dialog.show_all
-    dialog.run do |response|
+    dialog.run do |_response|
       dialog.destroy
     end
   end
@@ -240,9 +246,7 @@ class MainWindow < Gtk::Window
     dialog = FavoriteDialog.new(self, @model.favorites.to_a)
     dialog.show_all
     dialog.run do |response|
-      if response == Dialog::RESPONSE_OK
-        @model.favorites.replace(dialog.list)
-      end
+      @model.favorites.replace(dialog.list) if response == Dialog::RESPONSE_OK
     end
     dialog.destroy
   end
@@ -276,7 +280,7 @@ class MainWindow < Gtk::Window
     @model.delete_observer(self)
   end
 
-  def main_window_destroy_callback(widget)
+  def main_window_destroy_callback(_widget)
     puts 'destroying main window'
     quit
   end
@@ -299,14 +303,15 @@ class MainWindow < Gtk::Window
 
   # -- class MainWindow
 
-  def reload_toolbutton_callback(widget)
+  def reload_toolbutton_callback(_widget)
     STDERR.puts 'RELOAD CLICKED'
     @model.reload
   end
 
   def update_window_title
     # ウィンドウタイトルを更新する
-    str = "YAP - #{Time.now.strftime('%H時%M分')}現在 #{@model.total_channel_count} chが配信中"
+    str = "YAP - #{Time.now.strftime('%H時%M分')}現在 " +
+      "#{@model.total_channel_count} chが配信中"
     self.title = str
   end
 

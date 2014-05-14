@@ -18,7 +18,7 @@ class Notification < Gtk::InfoBar
     signal_connect('response', &method(:on_response))
   end
 
-  def on_response(widget, res)
+  def on_response(_widget, res)
     case res
     when Dialog::RESPONSE_OK
       hide

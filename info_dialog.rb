@@ -16,7 +16,7 @@ class InfoDialog < Gtk::Dialog
       [head('タイプ'), cell(ch.type)],
       [head('詳細'), cell(ch.detail)],
       [head('ジャンル'), cell(ch.genre)],
-      [head('コメント'), cell(ch.comment)],
+      [head('コメント'), cell(ch.comment)]
             ]
 
     table = create(Table, 2, rows.size, row_spacings: 5, column_spacings: 10)

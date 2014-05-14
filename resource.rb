@@ -1,13 +1,13 @@
 require_relative 'config.rb'
 
-class Resource_
+class ResourceClass
   def initialize(directory)
     @directory = directory
   end
 
   def path(name)
     path = @directory / name
-    unless File.exist? path and File.readable? path
+    unless File.exist?(path) && File.readable?(path)
       fail Errno::ENOENT, "No file for resource name #{name.inspect}"
     end
     path
@@ -16,4 +16,4 @@ class Resource_
   alias_method :[], :path
 end
 
-Resource = Resource_.new($RESOURCE_DIR)
+Resource = ResourceClass.new($RESOURCE_DIR)

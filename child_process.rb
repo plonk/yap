@@ -8,7 +8,7 @@ class ChildProcess
 
   def initialize(cmdline)
     @name = File.basename cmdline.split(/\s+/).first
-    @pid = Kernel.spawn *cmdline.shellsplit
+    @pid = Kernel.spawn(*cmdline.shellsplit)
     @status = 'running'
 
     Thread.start do

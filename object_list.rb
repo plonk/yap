@@ -18,9 +18,8 @@ class ObjectList < Gtk::ScrolledWindow
 
     @objects = []
     @reader_list = reader_list.map(&:to_proc)
-    @writer_list = writer_list.map { |writer|
-      if writer then writer.to_proc else nil end
-    }
+    @writer_list = writer_list.map { |writer| writer ? writer.to_proc : nil }
+
     types = [String] * @reader_list.size
     @list_store = ListStore.new(*[String] + types)
     @treeview = create(TreeView, @list_store)
@@ -35,6 +34,7 @@ class ObjectList < Gtk::ScrolledWindow
   end
 
   private
+
   def get_object(iter)
     @objects.select { |obj| obj.object_id.to_s == iter[0] }.first
   end
@@ -61,12 +61,10 @@ class ObjectList < Gtk::ScrolledWindow
              resizable: true, clickable: false) do |col|
         col.signal_connect('clicked') do
           @treeview.columns.each do |c|
-            if c != col
-              c.sort_indicator = false
-            end
+            c.sort_indicator = false if c != col
           end
 
-          if !col.sort_indicator? or col.sort_order == DOWN_ARROW
+          if !col.sort_indicator? || col.sort_order == DOWN_ARROW
             col.sort_indicator = true
             col.sort_order = UP_ARROW
             @list_store.set_sort_column_id(i + 1, Gtk::SORT_ASCENDING)
@@ -81,7 +79,8 @@ class ObjectList < Gtk::ScrolledWindow
   end
 
   def on_cursor_changed(*_)
-    if iter = @treeview.selection.selected
+    iter = @treeview.selection.selected
+    if iter
       object_id = iter[0]
       @selected = @objects.select { |obj| obj.object_id.to_s == object_id }.first
     else
@@ -104,7 +103,7 @@ class ObjectList < Gtk::ScrolledWindow
 
   def select_row(index)
     i = 0
-    @list_store.each do |model, path, iter|
+    @list_store.each do |_model, _path, iter|
       if i == index
         @treeview.selection.select_iter iter
         break
@@ -114,6 +113,7 @@ class ObjectList < Gtk::ScrolledWindow
   end
 
   public
+
   def set(ary)
     fail unless ary.is_a? Array
 
@@ -205,15 +205,9 @@ class ObjectList < Gtk::ScrolledWindow
     fail 'object constructor not set' unless @constructor
 
     dialog = AddItemDialog.new(parent, @headers, @constructor).show_all
-    result = nil
     dialog.run do |response|
-      if response == RESPONSE_OK
-        result = dialog.result
-      end
-    end
-    dialog.destroy
-    if result
-      add_object(result)
+      add_object(dialog.result) if response == RESPONSE_OK
+      dialog.destroy
     end
   end
 

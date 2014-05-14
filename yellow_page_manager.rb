@@ -23,7 +23,7 @@ class YellowPageManager < ListEditDialog
   def intern(yellow_pages)
     yellow_pages.as([[::Object, String, String, ::Object, ::Object]])
       .map do |enabled, name, url, chat, stat|
-      [enabled, name, url, !!chat, !!stat]
+      [enabled, name, url, chat.to_bool, stat.to_bool]
     end
   end
 
@@ -31,8 +31,8 @@ class YellowPageManager < ListEditDialog
     rows.as([[::Object, String, String, ::Object, ::Object]])
       .map do |enabled, name, url, has_chat, has_stat|
       [enabled, name, url,
-       if has_chat then 'chat.php?cn=' end,
-       if has_stat then 'getgmt.php?cn=' end]
+       has_chat ? 'chat.php?cn=' : nil,
+       has_stat ? 'getgmt.php?cn=' : nil]
     end
   end
 

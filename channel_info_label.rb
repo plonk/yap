@@ -16,7 +16,9 @@ class ChannelInfoLabel < Gtk::Label
       if ch.detail.empty?
         "<span foreground=\"navy\" size=\"large\">(詳細なし)</span>"
       else
-        "<span font_weight=\"bold\" foreground=\"navy\" size=\"large\">#{ch.detail.escape_html}</span>"
+        "<span font_weight=\"bold\" foreground=\"navy\" size=\"large\">" +
+          "#{ch.detail.escape_html}" +
+          "</span>"
       end
     end
 
