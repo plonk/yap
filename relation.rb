@@ -26,23 +26,23 @@ module Relation
   end
 
   private
-  def do_add_relation listener, writer, subject, reader, transform
+  def do_add_relation(listener, writer, subject, reader, transform)
     @_relations ||= []
     listener.__send__(writer, transform.call(subject.__send__(reader))) # first sync
     @_relations << [listener, writer, subject, reader, transform]
   end
 
-  def parse_specifier_writer str
+  def parse_specifier_writer(str)
     obj, sym = parse_specifier str
-    [obj, (sym.to_s.sub(/[?=]$/, '') + "=").to_sym]
+    [obj, (sym.to_s.sub(/[?=]$/, '') + '=').to_sym]
   end
 
-  def parse_specifier_reader str
+  def parse_specifier_reader(str)
     parse_specifier str
   end
 
-  def parse_specifier str
-    thing, property = str.split('.',2)
+  def parse_specifier(str)
+    thing, property = str.split('.', 2)
     [eval(thing), property.to_sym]
   end
 

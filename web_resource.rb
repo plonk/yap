@@ -3,15 +3,15 @@
 class WebResourceClass
   include Singleton
 
-  PAGE_CACHE = DBM.new(ENV['HOME'] / ".yap/pagecache") # URL to HTML text
-  PIXBUF_CACHE = Hash.new
+  PAGE_CACHE = DBM.new(ENV['HOME'] / '.yap/pagecache') # URL to HTML text
+  PIXBUF_CACHE = {}
 
   def initialize
   end
-  
+
   def get_page(url)
     cache = PAGE_CACHE[url]
-    if cache == nil
+    if cache.nil?
       puts "MISS: #{url}\n"
       begin
         res = Net::HTTP.get_response(URI(url))
@@ -21,7 +21,7 @@ class WebResourceClass
           return res.body
         end
       rescue
-        puts "Error occured, probably connection refusal."
+        puts 'Error occured, probably connection refusal.'
       end
     else
       puts "HIT: #{url}\n"
@@ -43,7 +43,7 @@ class WebResourceClass
 
   def get_pixbuf(url, fallback = QUESTION_64)
     if PIXBUF_CACHE[url]
-      return PIXBUF_CACHE[url] 
+      return PIXBUF_CACHE[url]
     else
       begin
         Gdk::PixbufLoader.open do |loader|

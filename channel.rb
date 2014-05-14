@@ -21,7 +21,7 @@ class Channel
   ID = 1 # etc.
 
   def initialize(line, yp)
-    row = line.split(/<>/, 19).map{|x| x.unescape_html }
+    row = line.split(/<>/, 19).map { |x| x.unescape_html }
     @fields = row
     @genre = row[4]
     @id = row[1]
@@ -39,17 +39,17 @@ class Channel
   end
 
   def ==(other)
-    self.channel_id == other.channel_id
+    channel_id == other.channel_id
   end
 
   # Array#- の為に eql? と hash をオーバーライドする。
   # 両方ともオーバーライドする必要があるらしい。
-  def eql? other
+  def eql?(other)
     self == other
   end
 
   def chname_proper
-    @fields[14].url_decode.force_encoding("utf-8")
+    @fields[14].url_decode.force_encoding('utf-8')
   end
 
   def chat_url
@@ -70,9 +70,9 @@ class Channel
 
   def time
     if @fields[15] =~ /^(\d+):(\d+)$/
-      $1.to_i * 60 + $2.to_i
+      Regexp.last_match[1].to_i * 60 + Regexp.last_match[2].to_i
     else
-      print "#{self.name}: failed to parse time #{@fields[15].inspect}\n"
+      print "#{name}: failed to parse time #{@fields[15].inspect}\n"
       -1
 #      raise "time format error"
     end
@@ -80,19 +80,19 @@ class Channel
 
   # Over, Free, Open, 2M Over etc.
   def port_stat
-    if @detail =~ / - <([A-z ]+)>$/ or @detail =~ /^([A-z ]+)>$/
-      "<" + $1 + ">"
+    if @detail =~ / - <([A-z ]+)>$/ || @detail =~ /^([A-z ]+)>$/
+      '<' + Regexp.last_match[1] + '>'
     else
       nil
     end
   end
 
   def playlist_url
-    "http://#{Settings[:USER_PEERCAST] or '127.0.0.1:7144'}/pls/#{@id}?tip=#{@tip}"
+    "http://#{Settings[:USER_PEERCAST] || '127.0.0.1:7144'}/pls/#{@id}?tip=#{@tip}"
   end
 
   def stream_url
-    "http://#{Settings[:USER_PEERCAST] or '127.0.0.1:7144'}/stream/#{@id}.wmv?tip=#{@tip}"
+    "http://#{Settings[:USER_PEERCAST] || '127.0.0.1:7144'}/stream/#{@id}.wmv?tip=#{@tip}"
   end
 
   def playlist_url_name
@@ -104,15 +104,15 @@ class Channel
   end
 
   def playable?
-    !tip.empty? and
-      @id !=  "000000000000000000000000000000000" and
-      TypeAssociation.instance.launcher(@type) != nil
+    !tip.empty? &&
+      @id !=  '000000000000000000000000000000000' &&
+      TypeAssociation.instance.launcher(@type)
   end
 
   def listener
     @fields[6].to_i
   end
-  
+
   def relay
     @fields[7].to_i
   end
@@ -121,7 +121,7 @@ class Channel
   def favicon_url
     if contact_url =~ /^http:\/\/jbbs\.shitaraba\.net\/bbs\/read\.cgi\/([a-z]+\/\d+)/ # l50などと続く可能性あり
       # the link is to a specific thread or a post
-      t = get_specified_favicon_url("http://jbbs.shitaraba.net/#{$1}/")
+      t = get_specified_favicon_url("http://jbbs.shitaraba.net/#{Regexp.last_match[1]}/")
       return t if t
     elsif contact_url =~ /^http:\/\/jbbs\.shitaraba\.net\/[a-z]+\/\d+\// # スレやレスでなく掲示板のトップなら
       t = get_specified_favicon_url(contact_url)
@@ -129,24 +129,24 @@ class Channel
     end
 
     if contact_url =~ /^http:\/\/jbbs\.shitaraba\.net\//
-      "http://jbbs.shitaraba.net/favicon.ico"
+      'http://jbbs.shitaraba.net/favicon.ico'
     else
       begin
-        "http://" + URI.parse(contact_url).host / "favicon.ico"
+        'http://' + URI.parse(contact_url).host / 'favicon.ico'
       rescue
         nil
       end
     end
   end
-  
+
   # 見つからなければ nil
   def get_specified_favicon_url(url)
-    puts "get_specified_favicon_url"
+    puts 'get_specified_favicon_url'
     p [:get_specified_favicon_url, url]
     buf = WebResource.get_page(url)
     if buf =~ /<link rel="?(shortcut )?icon"? href="([^"]+)"/i
-      puts "found!"
-      (URI.parse(url) + $2).to_s
+      puts 'found!'
+      (URI.parse(url) + Regexp.last_match[2]).to_s
     else
       puts 'not found'
       nil

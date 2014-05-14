@@ -5,28 +5,28 @@ require_relative 'utility'
 class Favorites
   include Enumerable, Observable
 
-  FAVORITES_FILE = ENV['HOME'] / ".yap/favorites.txt"
+  FAVORITES_FILE = ENV['HOME'] / '.yap/favorites.txt'
 
   def initialize
     @list = []
   end
 
-  def set_equal? a, b
+  def set_equal?(a, b)
     (a & b).size == a.size
   end
 
   def replace(ary)
     if set_equal? ary, @list
       @list.replace(ary)
-    else 
+    else
       @list.replace(ary)
       changed
       notify_observers
     end
   end
 
-  def << item
-    raise unless item.is_a? String
+  def <<(item)
+    fail unless item.is_a? String
     unless @list.include? item
       @list << item
       changed
@@ -46,24 +46,24 @@ class Favorites
     @list.join(separator)
   end
 
-  def touch path
-    File.open path, "w" do end
+  def touch(path)
+    File.open path, 'w' do end
   end
 
   def load
     # お気に入りチャンネルファイル
     touch FAVORITES_FILE unless File.exist? FAVORITES_FILE
 
-    File.open(FAVORITES_FILE, "r:utf-8") do |fm|
-      self.replace(fm.each_line.map(&:chomp))
+    File.open(FAVORITES_FILE, 'r:utf-8') do |fm|
+      replace(fm.each_line.map(&:chomp))
     end
     changed
     notify_observers
   end
 
   def save
-    File.open(FAVORITES_FILE, "w") do |fm|
-      fm.print self.map { |chname| chname + "\n" }.join
+    File.open(FAVORITES_FILE, 'w') do |fm|
+      fm.print map { |chname| chname + "\n" }.join
     end
   end
 

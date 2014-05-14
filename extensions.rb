@@ -3,7 +3,7 @@ require 'cgi'
 
 class Object
   # instance tap
-  def itap &blk
+  def itap(&blk)
     instance_eval &blk
     self
   end
@@ -12,7 +12,7 @@ end
 class String
   require 'pathname'
 
-  def / other
+  def /(other)
     (Pathname.new(self) + other.remove(/\A\/+/)).to_s
   end
 
@@ -21,27 +21,27 @@ class String
   end
 
   def escape_html
-    CGI::escapeHTML(self)
+    CGI.escapeHTML(self)
   end
 
   def unescape_html
-    CGI::unescapeHTML(self)
+    CGI.unescapeHTML(self)
   end
 
   def url_encode
-    CGI::escape(self)
+    CGI.escape(self)
   end
 
   def url_decode
-    CGI::unescape(self)
+    CGI.unescape(self)
   end
 end
 
 class Integer
-  MIN_POSITIVE_BIGNUM = 1 << 1.size*8-2
+  MIN_POSITIVE_BIGNUM = 1 << 1.size * 8 - 2
 
   def truncate_to_fixnum
-    if not self.is_a? Fixnum
+    if !self.is_a? Fixnum
       self % MIN_POSITIVE_BIGNUM
     else
       self
@@ -56,7 +56,7 @@ class Array
   # [ :succ, ->(x){x*10} ].juxt.call(1)
   # => [2, 10]
   def juxt
-    fs = self.map(&:to_proc)
+    fs = map(&:to_proc)
     lambda { |*args|
       fs.map { |f| f.call(*args) }
     }

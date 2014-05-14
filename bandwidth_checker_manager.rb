@@ -6,7 +6,7 @@ class BandwidthCheckerManager
   class Checker
     include Observable
 
-    def self.valid_unchecked? ch
+    def self.valid_unchecked?(ch)
       ch.name =~ /アップロード帯域$/ and
         ch.contact_url =~ /uptest\/$/ and
         ch.detail =~ /^No data/
@@ -14,13 +14,13 @@ class BandwidthCheckerManager
 
     attr_reader :finished_time, :channel
 
-    def initialize channel
+    def initialize(channel)
       @channel = channel
       @monitor = Monitor.new
-      self.state = "initialized"
+      self.state = 'initialized'
     end
 
-    def state= value
+    def state=(value)
       @monitor.synchronize do
         @state = value
       end
@@ -35,13 +35,13 @@ class BandwidthCheckerManager
     end
 
     def run
-      normal_post_url = channel.contact_url + "uptest_n.php"
+      normal_post_url = channel.contact_url + 'uptest_n.php'
 
       mech = Mechanize.new
-      self.state = "getting form"
+      self.state = 'getting form'
       mech.get(normal_post_url) do |page|
-        self.state = "submitting form"
-        check_result = page.form_with(name: "uptest").submit
+        self.state = 'submitting form'
+        check_result = page.form_with(name: 'uptest').submit
 
         doc = Nokogiri::HTML(check_result.body)
         doc.css('span').each do |elem|
@@ -50,11 +50,11 @@ class BandwidthCheckerManager
         end
       end
     rescue
-      self.state = "finished (error)"
+      self.state = 'finished (error)'
     end
   end
 
-  def initialize model
+  def initialize(model)
     @model = model
     @model.add_observer(self, :update)
     @checking = []
@@ -62,18 +62,18 @@ class BandwidthCheckerManager
     @running = false
   end
 
-  def update message, *args
+  def update(message, *args)
     if self.respond_to? message
-      self.__send__(message, *args)
+      __send__(message, *args)
     end
   end
 
-  def reject_finished checkers
+  def reject_finished(checkers)
     checkers.reject { |checker| checker.state =~ /finished/ }
   end
 
   def update_lists
-    finished  = @checking.group_by { |checker| (checker.state =~ /finished/) != nil }
+    finished  = @checking.group_by { |checker| (checker.state =~ /finished/) }
     @finished_recently += finished[true] || []
     @checking = finished[false] || []
 
@@ -100,7 +100,7 @@ class BandwidthCheckerManager
       Checker.valid_unchecked? ch
     end
 
-    update_lists 
+    update_lists
 
     to_be_checked = unchecked - (@checking + @finished_recently).map(&:channel)
 
@@ -136,18 +136,18 @@ class BandwidthCheckerManager
       set_width_request 320
 
       @progress_bar = ProgressBar.new
-      self.vbox.add @progress_bar
+      vbox.add @progress_bar
 
       add_button Stock::OK, RESPONSE_OK
     end
-    
-    def state_to_fraction state
+
+    def state_to_fraction(state)
       case state
-      when "initialized"
+      when 'initialized'
         0.0
-      when "getting form"
+      when 'getting form'
         0.33
-      when "submitting form"
+      when 'submitting form'
         0.66
       when /finished/
         1.0

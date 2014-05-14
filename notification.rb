@@ -10,23 +10,22 @@ class Notification < Gtk::InfoBar
     super
 
     set_no_show_all true
-    @info_bar_label = create(Label, "", wrap: true)
+    @info_bar_label = create(Label, '', wrap: true)
     @info_bar_label.show
     add_button Stock::OK, Dialog::RESPONSE_OK
     content_area.pack_start @info_bar_label
 
-    signal_connect("response", &method(:on_response))
+    signal_connect('response', &method(:on_response))
   end
 
-  def on_response widget, res
+  def on_response(widget, res)
     case res
     when Dialog::RESPONSE_OK
       hide
     else
-      fail "unexpected response"
+      fail 'unexpected response'
     end
   end
-
 
   def put_up(message)
     @info_bar_label.text = message
@@ -39,4 +38,3 @@ class Notification < Gtk::InfoBar
     end
   end
 end
-

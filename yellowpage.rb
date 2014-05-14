@@ -1,7 +1,7 @@
 #!ruby
 # -*- coding: utf-8 -*-
-require_relative "channel.rb"
-require "net/http"
+require_relative 'channel.rb'
+require 'net/http'
 require 'uri'
 
 class YellowPage
@@ -15,8 +15,8 @@ class YellowPage
 
   IDENTITY_MAP = {}
 
-  def self.get *args
-    if IDENTITY_MAP.has_key? args
+  def self.get(*args)
+    if IDENTITY_MAP.key? args
       IDENTITY_MAP[args]
     else
       IDENTITY_MAP[args] = new *args
@@ -25,16 +25,16 @@ class YellowPage
 
   def initialize(name, url, chat, stat)
     @name = name
-    @url = url =~ /\/$/ ? url : url + "/"
+    @url = url =~ /\/$/ ? url : url + '/'
 
-    @chlist = Array.new
+    @chlist = []
 
     @chat_url_string = chat
     @stat_url_string = stat
   end
 
   def favicon_url
-    return @url + "favicon.ico"  # Ad hoc
+    @url + 'favicon.ico'  # Ad hoc
   end
 
   def loaded?
@@ -50,7 +50,7 @@ class YellowPage
     end
 
     @chlist.clear
-    txt.force_encoding("utf-8")
+    txt.force_encoding('utf-8')
     txt.each_line do |line|
       line.chomp!
       ch = Channel.new(line, self)
@@ -59,21 +59,21 @@ class YellowPage
 
     @timestamp = Time.now
 
-    return true
+    true
   end
 
   def is_on_air?(chname)
     each_channel do |ch|
       return true if ch.name == chname
     end
-    return false
+    false
   end
 
   def get_channel(chname)
     each_channel do |ch|
       return ch if ch.name == chname
     end
-    return nil
+    nil
   end
 
   def channel_names
@@ -81,7 +81,7 @@ class YellowPage
     @chlist.each do |ch|
       rv << ch.name
     end
-    return rv
+    rv
   end
 
   def each(&block)
@@ -104,7 +104,7 @@ class YellowPage
     if @stat_url_string and ch.id != '00000000000000000000000000000000' and !ch.chname_proper.empty?
       return "#{url}#{@stat_url_string}#{ch.chname_proper.url_encode}"
     else
-      return ""
+      return ''
     end
   end
 
@@ -112,7 +112,7 @@ class YellowPage
     if @chat_url_string and ch.id != '00000000000000000000000000000000' and !ch.chname_proper.empty?
       return "#{url}#{@chat_url_string}#{ch.chname_proper.url_encode}"
     else
-      return ""
+      return ''
     end
   end
 end

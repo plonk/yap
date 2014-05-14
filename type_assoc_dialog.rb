@@ -11,8 +11,8 @@ class TypeAssocDialog < Gtk::Dialog
 
   FORMAT = [[String, String]]
 
-  def initialize parent, type_assoc
-    super("タイプ関連付け", parent, MODAL)
+  def initialize(parent, type_assoc)
+    super('タイプ関連付け', parent, MODAL)
 
     @type_assoc = type_assoc.as(FORMAT).map(&:dup)
 
@@ -52,8 +52,8 @@ class TypeAssocDialog < Gtk::Dialog
   end
 
   def layout
-    self.set_size_request(480,320)
-    self.vbox.spacing = 5
+    set_size_request(480, 320)
+    vbox.spacing = 5
 
     @assoc_list = create_assoc_list
 
@@ -74,9 +74,9 @@ class TypeAssocDialog < Gtk::Dialog
 
         hbox.pack_start(bbox, false)
       end
-      self.vbox.pack_start(hbox)
+      vbox.pack_start(hbox)
     end
-    self.vbox.pack_end(HSeparator.new, false)
+    vbox.pack_end(HSeparator.new, false)
 
     add_button(CANCEL, RESPONSE_CANCEL)
     add_button(OK,     RESPONSE_OK)
@@ -86,13 +86,12 @@ class TypeAssocDialog < Gtk::Dialog
 
   def create_assoc_list
     headers = ['タイプ', 'コマンドライン']
-    readers = [ proc { |obj| obj[0] },
-                proc { |obj| obj[1] } ]
-    writers = [ proc { |obj, val| obj[0] = val },
-                proc { |obj, val| obj[1] = val } ]
+    readers = [proc { |obj| obj[0] },
+               proc { |obj| obj[1] }]
+    writers = [proc { |obj, val| obj[0] = val },
+               proc { |obj, val| obj[1] = val }]
     constructor = Array.method(:[])
     create(ObjectList, headers, readers, writers, constructor,
            vscrollbar_policy: POLICY_AUTOMATIC)
-    
   end
 end

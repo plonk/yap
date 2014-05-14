@@ -9,7 +9,7 @@ class ListEditDialog < Gtk::Dialog
 
     attr_reader :result
 
-    def value widget
+    def value(widget)
       case widget
       when ToggleButton
         widget.active?
@@ -18,7 +18,7 @@ class ListEditDialog < Gtk::Dialog
       end
     end
 
-    def initialize parent_window, headers, types
+    def initialize(parent_window, headers, types)
       super('アイテムを追加', parent_window)
 
       @views = []
@@ -27,7 +27,7 @@ class ListEditDialog < Gtk::Dialog
       create(Table, 2, headers.size, row_spacings: 5, column_spacings: 10) do |table|
         headers.each_with_index do |header, col_id|
           create(Label, header, xalign: 1) do |legend|
-            table.attach_defaults(legend, 0, 1, col_id, col_id+1)
+            table.attach_defaults(legend, 0, 1, col_id, col_id + 1)
           end
 
           case types[col_id]
@@ -35,19 +35,19 @@ class ListEditDialog < Gtk::Dialog
             create(Entry) do |entry|
               entry.width_request = 150
               @views << entry
-              table.attach_defaults(entry, 1, 2, col_id, col_id+1)
+              table.attach_defaults(entry, 1, 2, col_id, col_id + 1)
             end
           when :toggle
             create(CheckButton) do |toggle|
               @views << toggle
-              table.attach_defaults(toggle, 1, 2, col_id, col_id+1)
+              table.attach_defaults(toggle, 1, 2, col_id, col_id + 1)
             end
           when :radio
             create(CheckButton) do |toggle|
               toggle.active = false
               toggle.sensitive = false
               @views << toggle
-              table.attach_defaults(toggle, 1, 2, col_id, col_id+1)
+              table.attach_defaults(toggle, 1, 2, col_id, col_id + 1)
             end
           else fail
           end
@@ -73,7 +73,7 @@ class ListEditDialog < Gtk::Dialog
     case type
     when :toggle
       result = CellRendererToggle.new
-      if editable 
+      if editable
         result.signal_connect 'toggled' do |renderer, path|
           iter = @liststore.get_iter path
           iter[col_id] = !iter[col_id]
@@ -82,7 +82,7 @@ class ListEditDialog < Gtk::Dialog
     when :radio
       result = CellRendererToggle.new
       result.radio = true
-      if editable 
+      if editable
         result.signal_connect 'toggled' do |renderer, path|
           @liststore.each do |model, path, iter|
             iter[col_id] = false
@@ -132,11 +132,11 @@ class ListEditDialog < Gtk::Dialog
 
   def do_layout
     create(VBox) do |vbox|
-      vbox.add(@scrolled_window = create(ScrolledWindow) { |sw|
+      vbox.add(@scrolled_window = create(ScrolledWindow) do |sw|
                  @liststore = ListStore.new(*to_ruby_types(@types))
                  @treeview = TreeView.new(@liststore)
                  sw.add @treeview
-               })
+               end)
       @scrolled_window.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
       self.vbox.add vbox
     end
@@ -149,7 +149,7 @@ class ListEditDialog < Gtk::Dialog
 
   def create_context_menu
     create(Menu) do |menu|
-      create(MenuItem, "追加") do |add_item|
+      create(MenuItem, '追加') do |add_item|
         add_item.signal_connect('activate') do |item|
           dialog = AddItemDialog.new(self, @headers, @types).show_all
           dialog.run do |response|
@@ -170,14 +170,14 @@ class ListEditDialog < Gtk::Dialog
 
         menu.append add_item
       end
-      create(MenuItem, "削除") do |del_item|
+      create(MenuItem, '削除') do |del_item|
         del_item.signal_connect('activate') do |item|
           iter = @treeview.selection.selected
           if iter
             @liststore.remove iter
           end
         end
-          
+
         menu.append del_item
       end
       menu
@@ -190,7 +190,7 @@ class ListEditDialog < Gtk::Dialog
     end
   end
 
-  def initialize parent_window, options
+  def initialize(parent_window, options)
     super(options[:title] || 'List Edit Dialog', parent_window)
 
     optary = [:types, :editable, :table, :headers].map(&options.method(:[]))
@@ -199,9 +199,9 @@ class ListEditDialog < Gtk::Dialog
     @numfields = @types.size
 
     if optary.any?(&:nil?)
-      raise ArgumentError, 'lack of mandatory options'
+      fail ArgumentError, 'lack of mandatory options'
     end
-    raise ArgumentError unless options_consistent?(options)
+    fail ArgumentError unless options_consistent?(options)
 
     do_layout
 
@@ -219,7 +219,7 @@ class ListEditDialog < Gtk::Dialog
 
     @types.each_with_index do |type, i|
       renderer = create_renderer(type, editable[i], i)
-      col = TreeViewColumn.new(@headers[i], renderer, { model_property(type) => i })
+      col = TreeViewColumn.new(@headers[i], renderer,  model_property(type) => i)
       @treeview.append_column col
     end
 

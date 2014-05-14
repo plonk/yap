@@ -3,7 +3,7 @@ class InformationArea < Gtk::VBox
   include Gtk
   include GtkHelper
 
-  URL2PIXBUF = Hash.new # contact URL to favicon pixbuf
+  URL2PIXBUF = {} # contact URL to favicon pixbuf
 
   def initialize(model)
     super()
@@ -12,7 +12,7 @@ class InformationArea < Gtk::VBox
 
     do_layout
 
-    signal_connect("destroy") do
+    signal_connect('destroy') do
       @model.delete_observer(self)
     end
   end
@@ -21,13 +21,13 @@ class InformationArea < Gtk::VBox
     set(homogeneous: false, spacing: 5, border_width: 10)
 
     create(HBox, false, 15) do |hbox|
-      @play_button = create(Button, 
-                            tooltip_text: "チャンネルを再生する",
+      @play_button = create(Button,
+                            tooltip_text: 'チャンネルを再生する',
                             sensitive: false,
                             height_request: 75,
                             width_request: 120)
-      @play_button.add Image.new Resource["play.ico"]
-      @play_button.signal_connect("clicked") do 
+      @play_button.add Image.new Resource['play.ico']
+      @play_button.signal_connect('clicked') do
         if ch = @model.selected_channel
           @model.play(ch)
         end
@@ -44,8 +44,8 @@ class InformationArea < Gtk::VBox
       end
 
       create(Alignment, 1, 0, 0, 0) do |align| # place in the top-right corner
-        @favorite_toggle_button = create(ToggleButton, "",
-                                         tooltip_text: "お気に入り",
+        @favorite_toggle_button = create(ToggleButton, '',
+                                         tooltip_text: 'お気に入り',
                                          sensitive: false,
                                          draw_indicator: false,
                                          on_toggled: method(:on_favorite_toggle_button_toggled))
@@ -58,7 +58,6 @@ class InformationArea < Gtk::VBox
       pack_start(hbox, false)
     end
 
-
     create(VBox) do |detail_vbox|
       create(HBox, false, 5) do |genre_hbox|
         @genre_label = create(Label, '',
@@ -68,11 +67,11 @@ class InformationArea < Gtk::VBox
                               ellipsize: Pango::Layout::ELLIPSIZE_END)
 
         @favicon_image = Image.new
-        @link_button = create(LinkButton, "", "",
+        @link_button = create(LinkButton, '', '',
                               xalign: 0)
         @link_button.child.set(ellipsize: Pango::Layout::ELLIPSIZE_END)
 
-        genre_hbox.pack_start(@genre_label, false);
+        genre_hbox.pack_start(@genre_label, false)
         genre_hbox.pack_start(@favicon_image, false)
         genre_hbox.pack_start(@link_button, true)
 
@@ -82,11 +81,11 @@ class InformationArea < Gtk::VBox
     end
   end
 
-  def update message, *args
+  def update(message, *args)
     if self.respond_to? message
       # 別スレッドから呼ばれる可能性があるはず。
-      Gtk.queue do 
-        self.__send__(message, *args)
+      Gtk.queue do
+        __send__(message, *args)
       end
     end
   end
@@ -97,7 +96,7 @@ class InformationArea < Gtk::VBox
 
   COLORED_STAR_MARKUP = " <span foreground=\"#FEA315\" size=\"xx-large\">★</span> "
   GRAY_STAR_MARKUP = " <span foreground=\"gray\" size=\"xx-large\">★</span> "
-  
+
   def update_favorite_toggle_button
     if ch = @model.selected_channel
       @favorite_toggle_button.sensitive = true
@@ -130,7 +129,7 @@ class InformationArea < Gtk::VBox
           pixbuf = get_favicon_pixbuf_for(ch)
           pixbuf = pixbuf.scale(16, 16, Gdk::Pixbuf::INTERP_NEAREST)
           URL2PIXBUF[ch.contact_url] = pixbuf
-          Gtk.queue do 
+          Gtk.queue do
             current_channel = @model.selected_channel
             if current_channel == ch
               @favicon_image.pixbuf = pixbuf
@@ -177,7 +176,7 @@ class InformationArea < Gtk::VBox
     update_genre_label
   end
 
-  def on_favorite_toggle_button_toggled widget
+  def on_favorite_toggle_button_toggled(widget)
     if @favorite_toggle_button.active?
       if ch = @model.selected_channel
         @model.favorites << ch.name unless @model.favorites.include? ch.name
@@ -192,8 +191,8 @@ class InformationArea < Gtk::VBox
   def update_link_button
     if ch = @model.selected_channel
       if ch.contact_url.empty?
-        @link_button.child.text = "今からpeercastでゲーム実況配信"
-        @link_button.uri = "http://yy25.60.kg/peercastjikkyou/"
+        @link_button.child.text = '今からpeercastでゲーム実況配信'
+        @link_button.uri = 'http://yy25.60.kg/peercastjikkyou/'
       else
         @link_button.child.text = ch.contact_url
         @link_button.uri = ch.contact_url
@@ -203,5 +202,4 @@ class InformationArea < Gtk::VBox
       @link_button.uri = ''
     end
   end
-
 end

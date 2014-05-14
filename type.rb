@@ -24,23 +24,23 @@ module Type
     if constraint.is_a? Array
       ary = constraint
       if ary == []
-        self.is_a? Array 
+        self.is_a? Array
       elsif ary.size == 1
         elementExample = ary[0]
-        self.is_a? Array and self.all? {|e| e.is_type? elementExample }
+        self.is_a? Array and self.all? { |e| e.is_type? elementExample }
       else
         tuple = ary
-        self.is_a? Array and self.size == tuple.size and self.zip(ary).all? {|e,x| e.is_type? x }
+        self.is_a? Array and size == tuple.size and zip(ary).all? { |e, x| e.is_type? x }
       end
     elsif constraint.is_a? Hash
       hash = constraint
       if hash == {}
         self.is_a? Hash
       else
-        raise ArgumentError.new('Hash constraint contains >1 key-value pairs') unless hash.size == 1
+        fail ArgumentError.new('Hash constraint contains >1 key-value pairs') unless hash.size == 1
         key = hash.keys[0]
         value = hash.values[0]
-        self.is_a? Hash and self.all? {|k,v| k.is_type? key and v.is_type? value }
+        self.is_a? Hash and self.all? { |k, v| k.is_type? key and v.is_type? value }
       end
     elsif constraint.is_a? Module
       self.is_a? constraint
@@ -51,7 +51,7 @@ module Type
 
   def as(constraint)
     unless self.is_type? constraint
-      raise TypeError, "#{self.inspect} is not of the expected type #{constraint}"
+      fail TypeError, "#{inspect} is not of the expected type #{constraint}"
     end
     self
   end

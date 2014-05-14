@@ -39,15 +39,15 @@ class ChannelListPage < Gtk::VBox
 
   def do_layout
     create(HBox, false, 1) do |hbox|
-      @search_label = Label.new("")
+      @search_label = Label.new('')
       @search_field = Entry.new
-      @search_field.signal_connect("activate", &method(:search_field_activate_callback))
+      @search_field.signal_connect('activate', &method(:search_field_activate_callback))
       clear_icon = IconFactory
-        .lookup_default("gtk-clear")
-        .render_icon(self.style, Widget::TEXT_DIR_RTL, STATE_NORMAL, IconSize::MENU)
+        .lookup_default('gtk-clear')
+        .render_icon(style, Widget::TEXT_DIR_RTL, STATE_NORMAL, IconSize::MENU)
       @clear_button = create(Button, image: Image.new(clear_icon),
-                             tooltip_text: "入力欄をクリアして検索をやめる",
-                             on_clicked: method(:clear_button_clicked_callback))
+                                     tooltip_text: '入力欄をクリアして検索をやめる',
+                                     on_clicked: method(:clear_button_clicked_callback))
 
       hbox.pack_end(@clear_button, false)
       hbox.pack_end(@search_field, false)
@@ -57,7 +57,7 @@ class ChannelListPage < Gtk::VBox
     end
 
     @channel_list_view = ChannelListView.new(@model, @func)
-    create(ScrolledWindow, 
+    create(ScrolledWindow,
            shadow_type: SHADOW_ETCHED_IN,
            hscrollbar_policy: POLICY_AUTOMATIC,
            vscrollbar_policy: POLICY_ALWAYS) do |sw|
@@ -67,17 +67,17 @@ class ChannelListPage < Gtk::VBox
     end
   end
 
-  def clear_button_clicked_callback widget
+  def clear_button_clicked_callback(widget)
     @channel_list_view.reset_model
-    @search_field.text = ""
-    @search_label.markup = ""
+    @search_field.text = ''
+    @search_label.markup = ''
     @channel_list_view.search(@search_field.text)
   end
 
-  def search_field_activate_callback widget
-    if @search_field.text == ""
+  def search_field_activate_callback(widget)
+    if @search_field.text == ''
       @channel_list_view.reset_model
-      @search_label.markup = ""
+      @search_label.markup = ''
       @channel_list_view.search(@search_field.text)
     else
       @channel_list_view.reset_model

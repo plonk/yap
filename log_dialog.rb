@@ -3,7 +3,7 @@ class LogDialog < Gtk::Dialog
   include Gtk
 
   def initialize(parent)
-    super("ログ", parent, MODAL)
+    super('ログ', parent, MODAL)
     add_button(Stock::OK, RESPONSE_OK)
     buf = TextBuffer.new
     buf.text = $log.string
@@ -14,9 +14,8 @@ class LogDialog < Gtk::Dialog
     scrolledwindow.add textview
     vbox.pack_start scrolledwindow
     set_default_size(512, 384)
-    signal_connect("response") do |d, res|
+    signal_connect('response') do |d, res|
       destroy
     end
   end
 end
-

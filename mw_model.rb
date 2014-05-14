@@ -23,14 +23,14 @@ class MainWindowModel
   attr_reader :finished
 
   attr_reader :selected_channel
-  
+
   # YP リスト
   attr_reader :yellow_pages
 
   attr_reader :child_processes
 
   UPDATE_INTERVAL_MINUTE = 10
-  MANUAL_UPDATE_INTERVAL = 5*60
+  MANUAL_UPDATE_INTERVAL = 5 * 60
   MANUAL_UPDATE_COUNT = 5
 
   def initialize
@@ -42,7 +42,7 @@ class MainWindowModel
 
     Settings.add_observer(self, :settings_changed)
 
-    @notification = ""
+    @notification = ''
     @master_table = []
     @update_first_time = true
     @child_processes = []
@@ -94,7 +94,7 @@ class MainWindowModel
         return ch if ch.name == name
       end
     end
-    return nil
+    nil
   end
 
   def get_channels(name)
@@ -104,14 +104,14 @@ class MainWindowModel
     end
   end
 
-  def show_channel_info ch
+  def show_channel_info(ch)
     if master_table.include? ch
       changed
       notify_observers(:show_channel_info, ch)
     end
   end
 
-  def select_channel ch
+  def select_channel(ch)
     STDERR.puts "#{ch} selected in mw_model"
     @selected_channel = ch
     changed
@@ -184,7 +184,7 @@ class MainWindowModel
 
   def reload
     @reload_history.push Time.now
-    Thread.new do 
+    Thread.new do
       update_channel_list
     end
   end
@@ -197,7 +197,7 @@ class MainWindowModel
   def spawn_yp_updater_threads
     threads = []
     @yellow_pages.each do |yp|
-      threads << Thread.new do 
+      threads << Thread.new do
         unless yp.retrieve
           puts "Failed in retrieving from #{yp.name}"
         end
@@ -211,22 +211,22 @@ class MainWindowModel
     if @update_first_time
       @update_first_time = false
     else
-      self.notification = if @just_began.empty? 
-                            "新着チャンネルはありません。"
+      self.notification = if @just_began.empty?
+                            '新着チャンネルはありません。'
                           else
                             @just_began.map(&:name)
                               .sort
-                              .map { |name| favorites.include?(name) ? name+"★" : name }
-                              .join("、") + " が配信を開始しています。"
+                              .map { |name| favorites.include?(name) ? name + '★' : name }
+                              .join('、') + ' が配信を開始しています。'
                           end
     end
   end
 
   def do_update_channel_list(download, notify)
     if download
-      puts "Updating channels..."
-      spawn_yp_updater_threads().each &:join
-      puts "Done."
+      puts 'Updating channels...'
+      spawn_yp_updater_threads.each &:join
+      puts 'Done.'
     else
       @yellow_pages.each do |yp|
         unless yp.loaded?
@@ -285,15 +285,15 @@ class MainWindowModel
         host, port = ::Settings[:USER_PEERCAST].split(/:/)
         watcher = PeercastHealth.new(host, port.to_i, 0.5)
         result = watcher.check
-        if not result
-          self.notification = "#{watcher.to_s} に接続できません。(#{watcher.error_reason})"
+        unless result
+          self.notification = "#{watcher} に接続できません。(#{watcher.error_reason})"
         end
         sleep 5 * 60
       end
     end
   end
 
-  def notify_observers *args
+  def notify_observers(*args)
     STDERR.puts "mw_model: notify_observers: #{args.inspect}"
     super
   end

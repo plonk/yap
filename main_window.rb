@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'gtk2'
-require_relative "mw_model"
+require_relative 'mw_model'
 require_relative 'channel_info_label'
 require_relative 'channel_name_label'
 require_relative 'process_manager'
@@ -25,7 +25,7 @@ class MainWindow < Gtk::Window
     create_status_icon
 
     setup_accel_keys
-    signal_connect("destroy", &method(:main_window_destroy_callback))
+    signal_connect('destroy', &method(:main_window_destroy_callback))
 
     @model.add_observer(self, :update)
     @model.start_helper_threads
@@ -40,30 +40,30 @@ class MainWindow < Gtk::Window
     action_group = ActionGroup.new('default action group')
     action_group.add_actions \
     [
-     ["FileMenuAction", Stock::FILE, "ファイル(_F)", "", nil, proc { }],
-     ["ReloadAction", Stock::REFRESH, "更新(_R)", "", nil, proc { @model.reload }],
-     ["ExitAction", Stock::QUIT, "終了(_X)", "", nil, proc { quit }],
+      ['FileMenuAction', Stock::FILE, 'ファイル(_F)', '', nil, proc {}],
+      ['ReloadAction', Stock::REFRESH, '更新(_R)', '', nil, proc { @model.reload }],
+      ['ExitAction', Stock::QUIT, '終了(_X)', '', nil, proc { quit }],
 
-     ["ViewMenuAction", nil, "表示(_V)", "", nil, proc { }],
+      ['ViewMenuAction', nil, '表示(_V)', '', nil, proc {}],
 
-     ["FavoritesMenuAction", nil, "お気に入り(_A)", "", nil, proc { }],
-     ["OrganizeFavoritesAction", nil, "整理(_A)", "", nil, proc { run_favorite_dialog }],
+      ['FavoritesMenuAction', nil, 'お気に入り(_A)', '', nil, proc {}],
+      ['OrganizeFavoritesAction', nil, '整理(_A)', '', nil, proc { run_favorite_dialog }],
 
-     ["ToolMenuAction", nil, "ツール(_T)", "", nil, proc { }],
-     ["SettingsAction", Stock::PREFERENCES, "一般設定(_S)", "", nil, proc { open_settings_dialog }],
-     ["TypeAssocAction", nil, "プレーヤー設定(_T)", "", nil, proc { }],
-     ["YellowPageAction", nil, "YP 設定(_Y)", "", nil, proc { open_yellow_page_manager }],
-     ["ProcessManagerAction", nil, "プロセスマネージャ(_P)", "", nil, proc { open_process_manager }],
+      ['ToolMenuAction', nil, 'ツール(_T)', '', nil, proc {}],
+      ['SettingsAction', Stock::PREFERENCES, '一般設定(_S)', '', nil, proc { open_settings_dialog }],
+      ['TypeAssocAction', nil, 'プレーヤー設定(_T)', '', nil, proc {}],
+      ['YellowPageAction', nil, 'YP 設定(_Y)', '', nil, proc { open_yellow_page_manager }],
+      ['ProcessManagerAction', nil, 'プロセスマネージャ(_P)', '', nil, proc { open_process_manager }],
 
-     ["HelpMenuAction", Stock::HELP, "ヘルプ(_H)", "", nil, proc { }],
-     ["AboutAction", Stock::ABOUT, "このアプリケーションについて(_A)", "", nil, proc { run_about_dialog }],
+      ['HelpMenuAction', Stock::HELP, 'ヘルプ(_H)', '', nil, proc {}],
+      ['AboutAction', Stock::ABOUT, 'このアプリケーションについて(_A)', '', nil, proc { run_about_dialog }],
     ]
 
     # [name, stock_id, label, accelarator, tooltip, proc, is_active]
     action_group.add_toggle_actions \
     [
-     ["ToolbarVisibleAction", nil, "ツールバー(_T)", "", nil, proc { toggle_toolbar_visibility }, ::Settings[:TOOLBAR_VISIBLE] ],
-     ["ChannelInfoVisibleAction", nil, "チャンネル情報(_C)", "", nil, proc { toggle_channel_info_visibility }, ::Settings[:CHANNEL_INFO_VISIBLE] ],
+      ['ToolbarVisibleAction', nil, 'ツールバー(_T)', '', nil, proc { toggle_toolbar_visibility }, ::Settings[:TOOLBAR_VISIBLE]],
+      ['ChannelInfoVisibleAction', nil, 'チャンネル情報(_C)', '', nil, proc { toggle_channel_info_visibility }, ::Settings[:CHANNEL_INFO_VISIBLE]],
     ]
     action_group
   end
@@ -73,7 +73,7 @@ class MainWindow < Gtk::Window
     set(icon: Resource['yap.png'], border_width: 0)
 
     @ui_manager = UIManager.new
-    @ui_manager.add_ui(Resource["ui_definition.xml"])
+    @ui_manager.add_ui(Resource['ui_definition.xml'])
 
     @action_group = create_default_action_group
     @ui_manager.insert_action_group(@action_group, 0)
@@ -83,14 +83,14 @@ class MainWindow < Gtk::Window
 
       @toolbar = create(Toolbar, toolbar_style: Toolbar::Style::BOTH_HORIZ) do |toolbar|
         @reload_toolbutton = create(ToolButton, Stock::REFRESH,
-                                    label: "すぐに更新",
-                                    tooltip_text: ("次の自動更新を待たずにチャンネルリストを更新します" +
+                                    label: 'すぐに更新',
+                                    tooltip_text: ('次の自動更新を待たずにチャンネルリストを更新します' \
                                                    "\n（#{MainWindowModel::MANUAL_UPDATE_INTERVAL}秒間に#{MainWindowModel::MANUAL_UPDATE_COUNT}回まで実行できます）"),
                                     important: true)
 
         if $ENABLE_VIEWLOG
           @viewlog_toolbutton = create(ToolButton, Stock::JUSTIFY_LEFT,
-                                       label: "ログ",
+                                       label: 'ログ',
                                        important: true)
         end
         @settings_toolbutton = create(ToolButton, Stock::PREFERENCES, important: true)
@@ -111,9 +111,9 @@ class MainWindow < Gtk::Window
         @channel_list_page = ChannelListPage.new(@model, 'すべて')
         notebook.append_page(@channel_list_page, @channel_list_page.label)
         fav_page = ChannelListPage.new(@model, 'お気に入り',
-                                       proc { |ch|
+                                       proc do |ch|
                                          @model.favorites.include? ch.name
-                                       })
+                                       end)
         notebook.append_page(fav_page, fav_page.label)
 
         outermost_vbox.pack_start(notebook, true)
@@ -127,16 +127,16 @@ class MainWindow < Gtk::Window
   end
 
   def connect_callbacks
-    @reload_toolbutton.signal_connect("clicked", &method(:reload_toolbutton_callback))
+    @reload_toolbutton.signal_connect('clicked', &method(:reload_toolbutton_callback))
 
     if $ENABLE_VIEWLOG
-      @viewlog_toolbutton.signal_connect("clicked") do
+      @viewlog_toolbutton.signal_connect('clicked') do
         d = LogDialog.new(self)
         d.show_all
       end
     end
 
-    @settings_toolbutton.signal_connect("clicked") do
+    @settings_toolbutton.signal_connect('clicked') do
       open_settings_dialog
     end
   end
@@ -144,7 +144,7 @@ class MainWindow < Gtk::Window
   def create_status_icon
     @status_icon = create(StatusIcon,
                           pixbuf: Gdk::Pixbuf.new(Resource['yap.png']),
-                          tooltip: "YAP")
+                          tooltip: 'YAP')
 
     # クリックされたらメインウィンドウの表示・非表示を切り替える。
     @status_icon.signal_connect('activate') do
@@ -162,10 +162,10 @@ class MainWindow < Gtk::Window
     end
 
     # メインウィンドウが最小化されたら非表示にする。
-    self.signal_connect('window-state-event') do |win, e|
+    signal_connect('window-state-event') do |win, e|
       if e.changed_mask.iconified?
         if e.new_window_state.iconified? and !e.new_window_state.withdrawn?
-          self.hide
+          hide
           next true
         end
       end
@@ -216,7 +216,7 @@ class MainWindow < Gtk::Window
     @information_area.visible = ::Settings[:CHANNEL_INFO_VISIBLE]
   end
 
-  def show_channel_info ch
+  def show_channel_info(ch)
     dialog = InfoDialog.new(self, ch)
     dialog.show_all
     dialog.run do |response|
@@ -224,11 +224,11 @@ class MainWindow < Gtk::Window
     end
   end
 
-  def update message, *args
+  def update(message, *args)
     if self.respond_to? message
       # 別スレッドから呼ばれる可能性があるはず。
-      Gtk.queue do 
-        self.__send__(message, *args)
+      Gtk.queue do
+        __send__(message, *args)
       end
     end
   end
@@ -240,7 +240,7 @@ class MainWindow < Gtk::Window
     dialog = FavoriteDialog.new(self, @model.favorites.to_a)
     dialog.show_all
     dialog.run do |response|
-      if response==Dialog::RESPONSE_OK
+      if response == Dialog::RESPONSE_OK
         @model.favorites.replace(dialog.list)
       end
     end
@@ -276,8 +276,8 @@ class MainWindow < Gtk::Window
     @model.delete_observer(self)
   end
 
-  def main_window_destroy_callback widget
-    puts "destroying main window"
+  def main_window_destroy_callback(widget)
+    puts 'destroying main window'
     quit
   end
 
@@ -286,9 +286,9 @@ class MainWindow < Gtk::Window
     Gtk.main_quit
   end
 
-  def until_reload_toolbutton_available sec
+  def until_reload_toolbutton_available(sec)
     @reload_toolbutton.sensitive = (sec == 0)
-    @reload_toolbutton.label = (sec == 0) ? "すぐに更新" : "すぐに更新（あと#{sec}秒）"
+    @reload_toolbutton.label = (sec == 0) ? 'すぐに更新' : "すぐに更新（あと#{sec}秒）"
   end
 
   # -- class MainWindow --
@@ -299,8 +299,8 @@ class MainWindow < Gtk::Window
 
   # -- class MainWindow
 
-  def reload_toolbutton_callback widget
-    STDERR.puts "RELOAD CLICKED"
+  def reload_toolbutton_callback(widget)
+    STDERR.puts 'RELOAD CLICKED'
     @model.reload
   end
 

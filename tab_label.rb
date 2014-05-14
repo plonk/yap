@@ -1,12 +1,12 @@
 class TabLabel < Gtk::Label
-  def initialize page
+  def initialize(page)
     @page = page
 
     super(@page.title)
 
     @page.add_observer(self)
-    
-    signal_connect("destroy") do 
+
+    signal_connect('destroy') do
       @page.delete_observer(self)
     end
   end

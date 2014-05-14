@@ -16,11 +16,11 @@ class ChannelNameLabel < Gtk::Label
     def duration_on_air(minutes)
       if minutes == 0
         # no point in showing
-        ""
+        ''
       elsif minutes < 60
         "#{minutes}分経過"
       else
-        "%d時間%d分経過" % [minutes/60, minutes%60]
+        '%d時間%d分経過' % [minutes / 60, minutes % 60]
       end
     end
 

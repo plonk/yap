@@ -11,7 +11,7 @@ class ObjectList < Gtk::ScrolledWindow
   UP_ARROW = Gtk::SORT_DESCENDING
   DOWN_ARROW = Gtk::SORT_ASCENDING
 
-  def initialize headers, reader_list, writer_list, constructor = nil
+  def initialize(headers, reader_list, writer_list, constructor = nil)
     super()
 
     self.hscrollbar_policy = POLICY_AUTOMATIC
@@ -38,40 +38,40 @@ class ObjectList < Gtk::ScrolledWindow
   def get_object(iter)
     @objects.select { |obj| obj.object_id.to_s == iter[0] }.first
   end
-  
-  def create_renderer col_id
-    renderer = create(CellRendererText, editable: @writer_list[col_id] != nil)
+
+  def create_renderer(col_id)
+    renderer = create(CellRendererText, editable: @writer_list[col_id])
     renderer.signal_connect 'edited' do |_, path, value|
       iter = @list_store.get_iter(path)
-      obj = get_object(iter) 
-      iter[col_id+1] = value
+      obj = get_object(iter)
+      iter[col_id + 1] = value
       @writer_list[col_id].call(obj, value)
     end
     renderer
   end
 
-  def install_columns headers
+  def install_columns(headers)
     nfields = headers.size
     nfields.times do |i|
       renderer = create_renderer(i)
       create(TreeViewColumn, headers[i],
              renderer,
-             {text: i+1},
+             { text: i + 1 },
              resizable: true, clickable: false) do |col|
         col.signal_connect('clicked') do
           @treeview.columns.each do |c|
-            if c!=col
+            if c != col
               c.sort_indicator = false
             end
           end
 
-          if !col.sort_indicator? or col.sort_order==DOWN_ARROW
+          if !col.sort_indicator? or col.sort_order == DOWN_ARROW
             col.sort_indicator = true
             col.sort_order = UP_ARROW
-            @list_store.set_sort_column_id(i+1, Gtk::SORT_ASCENDING)
+            @list_store.set_sort_column_id(i + 1, Gtk::SORT_ASCENDING)
           else
             col.sort_order = DOWN_ARROW
-            @list_store.set_sort_column_id(i+1, Gtk::SORT_DESCENDING)
+            @list_store.set_sort_column_id(i + 1, Gtk::SORT_DESCENDING)
           end
         end
         @treeview.append_column col
@@ -79,7 +79,7 @@ class ObjectList < Gtk::ScrolledWindow
     end
   end
 
-  def on_cursor_changed *_
+  def on_cursor_changed(*_)
     if iter = @treeview.selection.selected
       object_id = iter[0]
       @selected = @objects.select { |obj| obj.object_id.to_s == object_id }.first
@@ -96,15 +96,15 @@ class ObjectList < Gtk::ScrolledWindow
       iter = @list_store.append
       values = @reader_list.map { |f| f.call(obj) }
       iter[0] = obj.object_id.to_s
-      values.each_with_index { |val, i| iter[i+1] = val }
+      values.each_with_index { |val, i| iter[i + 1] = val }
     end
-    @treeview.columns.each {|c| c.sort_indicator = false }
+    @treeview.columns.each { |c| c.sort_indicator = false }
   end
 
-  def select_row index
+  def select_row(index)
     i = 0
     @list_store.each do |model, path, iter|
-      if i==index
+      if i == index
         @treeview.selection.select_iter iter
         break
       end
@@ -113,7 +113,7 @@ class ObjectList < Gtk::ScrolledWindow
   end
 
   public
-  def set ary
+  def set(ary)
     fail unless ary.is_a? Array
 
     @objects = ary
@@ -127,7 +127,7 @@ class ObjectList < Gtk::ScrolledWindow
   end
 
   def can_go_up?
-    selected and @objects.index(selected) != 0
+    selected && @objects.index(selected) != 0
   end
 
   def go_up
@@ -137,13 +137,13 @@ class ObjectList < Gtk::ScrolledWindow
     @objects.delete(obj)
     @objects.insert(old_pos - 1, obj)
     populate_table
-    select_row(old_pos-1)
+    select_row(old_pos - 1)
     changed
     notify_observers
   end
 
   def can_go_down?
-    selected and @objects.index(selected) != @objects.size - 1
+    selected && @objects.index(selected) != @objects.size - 1
   end
 
   def go_down
@@ -153,7 +153,7 @@ class ObjectList < Gtk::ScrolledWindow
     @objects.delete(obj)
     @objects.insert(old_pos + 1, obj)
     populate_table
-    select_row(old_pos+1)
+    select_row(old_pos + 1)
     changed
     notify_observers
   end
@@ -170,7 +170,7 @@ class ObjectList < Gtk::ScrolledWindow
   class AddItemDialog < Gtk::Dialog
     include Gtk::Stock, GtkHelper, Gtk
 
-    def initialize parent, headers, constructor
+    def initialize(parent, headers, constructor)
       super('項目を追加する', parent, MODAL)
 
       @constructor = constructor
@@ -178,16 +178,16 @@ class ObjectList < Gtk::ScrolledWindow
 
       headers.each do |text|
         create Label, text do |label|
-          self.vbox.pack_start(label, false)
+          vbox.pack_start(label, false)
         end
 
         create Entry do |entry|
           @entries << entry
-          self.vbox.pack_start(entry, false)
+          vbox.pack_start(entry, false)
         end
       end
 
-      self.vbox.pack_start(HSeparator.new, false)
+      vbox.pack_start(HSeparator.new, false)
 
       add_button(CANCEL, RESPONSE_CANCEL)
       add_button(OK, RESPONSE_OK)
@@ -200,8 +200,8 @@ class ObjectList < Gtk::ScrolledWindow
     end
   end
 
-  def run_add_dialog parent
-    raise "object constructor not set" unless @constructor
+  def run_add_dialog(parent)
+    fail 'object constructor not set' unless @constructor
 
     dialog = AddItemDialog.new(parent, @headers, @constructor).show_all
     result = nil

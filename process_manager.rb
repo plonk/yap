@@ -13,13 +13,13 @@ class ProcessManager < Gtk::Dialog
     set_size_request(480, 320)
 
     create(HBox, false, 5) do |hbox|
-      @object_list = ObjectList.new( ['PID', '名前', '状態'],
-                                     [ proc { |p| p.pid.to_s },
-                                       :name,
-                                       :status ],
-                                     [ nil,
-                                       nil,
-                                       nil ] )
+      @object_list = ObjectList.new(['PID', '名前', '状態'],
+                                    [proc { |p| p.pid.to_s },
+                                     :name,
+                                     :status],
+                                    [nil,
+                                     nil,
+                                     nil])
       @object_list.add_observer(self, :object_list_update)
 
       hbox.pack_start(@object_list, true)
@@ -52,7 +52,7 @@ class ProcessManager < Gtk::Dialog
       @model.delete_observer(self)
     end
 
-    signal_connect('response') do 
+    signal_connect('response') do
       destroy
     end
   end

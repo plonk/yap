@@ -6,10 +6,10 @@ module GtkHelper
     if args.last.is_a? Hash
       options = args.pop
     else
-      options = Hash.new
+      options = {}
     end
     widget = klass.new(*args)
-    
+
     callbacks, normal = options.keys.partition { |sym| sym =~ /^on_/ }
 
     # オプション引数の処理
@@ -21,7 +21,7 @@ module GtkHelper
 
     normal.each do |name|
       value = options[name]
-      widget.send(name.to_s + "=", value)
+      widget.send(name.to_s + '=', value)
     end
 
     if block
@@ -32,13 +32,13 @@ module GtkHelper
   end
 
   def head(str, tooltip = nil)
-    label = Gtk::Label.new(str+":")
+    label = Gtk::Label.new(str + ':')
     label.xalign = 1
     label.yalign = 0.5
     if tooltip
       label.tooltip_text = tooltip
     end
-    return label
+    label
   end
 
   def cell(str)
@@ -46,14 +46,14 @@ module GtkHelper
     label.selectable = true
     label.yalign = 0.5
     label.xalign = 0
-    return label
-  end    
+    label
+  end
 end
 
 class Gtk::Object
   def set(hash)
     hash.each_pair do |name, value|
-      self.send(name.to_s + "=", value)
+      send(name.to_s + '=', value)
     end
     self
   end

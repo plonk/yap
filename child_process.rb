@@ -6,17 +6,17 @@ class ChildProcess
 
   attr_reader :pid, :status, :name
 
-  def initialize cmdline
+  def initialize(cmdline)
     @name = File.basename cmdline.split(/\s+/).first
     @pid = Kernel.spawn *cmdline.shellsplit
-    @status = "running"
+    @status = 'running'
 
     Thread.start do
       begin
         _, st = Process.wait2(@pid)
         @status = exit_status(st)
       rescue Errno::ECHILD
-        @status = "no child error"
+        @status = 'no child error'
       end
       changed
       notify_observers
@@ -24,14 +24,14 @@ class ChildProcess
   end
 
   def finished?
-    @status != "running"
+    @status != 'running'
   end
 
   def kill(signum)
     Process.kill(signum, @pid)
   end
 
-  def exit_status st
+  def exit_status(st)
     case
     when st.signaled?
       "killed by signal #{st.termsig}"

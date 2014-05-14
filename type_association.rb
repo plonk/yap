@@ -12,7 +12,7 @@ class TypeAssociation
   def launcher(type)
     Settings[:TYPE_ASSOC].each do |type_pattern, cmdline|
       if type =~ /^#{type_pattern}$/i
-        unless @identity_map.has_key? cmdline
+        unless @identity_map.key? cmdline
           @identity_map[cmdline] = Launcher.new(cmdline)
         end
         return @identity_map[cmdline]

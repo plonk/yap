@@ -7,7 +7,7 @@ class YellowPageManager < ListEditDialog
   include Gtk
   include GtkHelper
 
-  def initialize parent
+  def initialize(parent)
     table = intern(::Settings[:YELLOW_PAGES])
 
     super(parent,
@@ -20,26 +20,26 @@ class YellowPageManager < ListEditDialog
     signal_connect 'response', &method(:on_response)
   end
 
-  def intern yellow_pages
+  def intern(yellow_pages)
     yellow_pages.as([[::Object, String, String, ::Object, ::Object]])
       .map do |enabled, name, url, chat, stat|
-      [enabled, name, url, !!chat, !!stat] 
+      [enabled, name, url, !!chat, !!stat]
     end
   end
 
-  def extern rows
+  def extern(rows)
     rows.as([[::Object, String, String, ::Object, ::Object]])
       .map do |enabled, name, url, has_chat, has_stat|
       [enabled, name, url,
-       if has_chat then "chat.php?cn=" end,
-       if has_stat then "getgmt.php?cn=" end]
+       if has_chat then 'chat.php?cn=' end,
+       if has_stat then 'getgmt.php?cn=' end]
     end
   end
 
-  def on_response _, response_id
+  def on_response(_, response_id)
     case response_id
     when RESPONSE_OK
-      ::Settings[:YELLOW_PAGES] = extern self.result
+      ::Settings[:YELLOW_PAGES] = extern result
       ::Settings.save
     end
 

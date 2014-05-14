@@ -22,7 +22,7 @@ class ChannelInfoLabel < Gtk::Label
 
     def render_detail_tooltip(ch)
       if ch.detail.empty?
-        "(詳細なし)"
+        '(詳細なし)'
       else
         ch.detail
       end

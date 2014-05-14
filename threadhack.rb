@@ -6,22 +6,22 @@ class ThreadSafeQueue
   end
 
   def initialize
-    @data = Array.new
+    @data = []
     @monitor = Monitor.new
   end
 
-  def enq item
+  def enq(item)
     @monitor.synchronize do
       @data.push item
     end
   end
 
-  alias :<< :enq
+  alias_method :<<, :enq
 
   def deq
     @monitor.synchronize do
       if @data.empty?
-        raise EmptyQueueException, "empty queue"
+        fail EmptyQueueException, 'empty queue'
       else
         @data.shift
       end
@@ -59,13 +59,13 @@ module Gtk
 
   # Gtk.queue: キューに処理を追加する。サブスレッドが Gtk の機能を使うと
   # きは必ず使う。
-  def self.queue &block
+  def self.queue(&block)
     @queue << block
   end
 
   def self.main_quit
     if @queue.size != 0
-      STDERR.puts "Warning: queue is not empty"
+      STDERR.puts 'Warning: queue is not empty'
     end
     old_main_quit
   end
