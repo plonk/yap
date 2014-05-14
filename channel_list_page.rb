@@ -14,7 +14,7 @@ class ChannelListPage < Gtk::VBox
 
     @model = model
     @func = func
-    set(homogeneous: false)
+    set(homogeneous: false, spacing: 2)
     @base_title = title
 
     do_layout
