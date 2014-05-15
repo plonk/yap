@@ -2,8 +2,6 @@
 class ChannelListStore < Gtk::ListStore
   include Pango, Gtk, GtkHelper
 
-  attr_reader :count
-
   FLD_CHNAME   = 0
   FLD_GENRE    = 1
   FLD_DETAIL   = 2
@@ -22,8 +20,7 @@ class ChannelListStore < Gtk::ListStore
                  String,	# ch_id
                  String]	# ypname
 
-  def initialize(mw_model, filter_fn)
-    @mw_model = mw_model
+  def initialize(filter_fn)
     @filter_fn = filter_fn
 
     super(*FIELD_TYPES)
@@ -31,14 +28,17 @@ class ChannelListStore < Gtk::ListStore
     set_sort_column_id FLD_CHNAME, SORT_ASCENDING
   end
 
-  def copy_from_master_table
+  def replace(channel_list)
     clear
-    match = @mw_model.master_table.select(&@filter_fn.method(:call))
-    match.each do |ch|
+    @match = channel_list.select(&@filter_fn.method(:call))
+    @match.each do |ch|
       iter = append
       channel_copy(iter, ch)
     end
-    @count = match.size
+  end
+
+  def count
+    @match.size
   end
 
   # セルデータ関数とインターリーブで動くようなので、
@@ -57,7 +57,7 @@ class ChannelListStore < Gtk::ListStore
     iter[FLD_YPNAME]   = ch.yp.name
   end
 
-  def path_of_channel(ch)
+  def channel_to_path(ch)
     return nil unless ch
     each do |_m, path, iter|
       return path if iter[FLD_CH_ID] == ch.channel_id
@@ -65,17 +65,21 @@ class ChannelListStore < Gtk::ListStore
     nil
   end
 
+  def find_channel_by_channel_id(channel_id)
+    @match.find { |ch| ch.channel_id == channel_id }
+  end
+
   def path_to_channel(path)
     iter = get_iter(path)
-    @mw_model.find_channel_by_channel_id(iter[FLD_CH_ID])
+    find_channel_by_channel_id(iter[FLD_CH_ID])
   end
 
   def iter_to_channel(iter)
-    @mw_model.find_channel_by_channel_id(iter[FLD_CH_ID])
+    find_channel_by_channel_id(iter[FLD_CH_ID])
   end
 
   def create_filter(term)
-    filter = TreeModelFilter.new(model)
+    filter = TreeModelFilter.new(self)
     esc_term = Regexp.escape(regularize(term))
     filter.set_visible_func do |_model, iter|
       [FLD_CHNAME, FLD_GENRE, FLD_DETAIL]

@@ -68,7 +68,6 @@ class ChannelListPage < Gtk::VBox
   end
 
   def clear_button_clicked_callback(_widget)
-    @channel_list_view.reset_model
     @search_field.text = ''
     @search_label.markup = ''
     @channel_list_view.search(@search_field.text)
@@ -76,15 +75,12 @@ class ChannelListPage < Gtk::VBox
 
   def search_field_activate_callback(_widget)
     if @search_field.text == ''
-      @channel_list_view.reset_model
       @search_label.markup = ''
-      @channel_list_view.search(@search_field.text)
     else
-      @channel_list_view.reset_model
       # 10pt bold
       @search_label.markup =
         '<span size="10000" background="yellow" font_weight="bold">検索中</span>'
-      @channel_list_view.search(@search_field.text)
     end
+    @channel_list_view.search(@search_field.text)
   end
 end

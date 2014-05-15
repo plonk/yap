@@ -113,7 +113,7 @@ class ChannelListView < Gtk::TreeView
     @count = -1
     @suppress_selection_change = false
 
-    @list_store = ChannelListStore.new(mw_model, filter_fn)
+    @list_store = ChannelListStore.new(filter_fn)
     @cr = CellRendererSet.new(@mw_model)
 
     super(@list_store)
@@ -140,13 +140,9 @@ class ChannelListView < Gtk::TreeView
 
   def do_layout
     setup_selection
-
     install_columns
-
     set_view_preferences
-
     install_context_menu
-
     setup_own_callbacks
   end
 
@@ -200,12 +196,11 @@ class ChannelListView < Gtk::TreeView
 
   def search(term)
     @cr.highlight_term = term
-    self.model = @list_store.create_filter(term)
-  end
-
-  # 制限されたビューから全てのチャンネルのリストに戻す。
-  def reset_model
-    self.model = @list_store
+    if term == ''
+      self.model = @list_store
+    else
+      self.model = @list_store.create_filter(term)
+    end
   end
 
   def selected_channel
@@ -224,7 +219,7 @@ class ChannelListView < Gtk::TreeView
   end
 
   def select_appropriate_row
-    to_be_selected = @list_store.path_of_channel @mw_model.selected_channel
+    to_be_selected = @list_store.channel_to_path @mw_model.selected_channel
     if to_be_selected
       silently { selection.select_path to_be_selected }
     else
@@ -249,7 +244,7 @@ class ChannelListView < Gtk::TreeView
   def refresh
     value = @scrolled_window.vadjustment.value if @scrolled_window
 
-    silently { @list_store.copy_from_master_table }
+    silently { @list_store.replace(@mw_model.master_table) }
 
     select_appropriate_row
 

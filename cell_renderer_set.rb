@@ -8,7 +8,6 @@ class CellRendererSet
 
   TARGET_NAME_CELL_WIDTH = 16.0
 
-
   def initialize(mw_model)
     @mw_model = mw_model
     @highlight_term = ''
@@ -41,12 +40,12 @@ class CellRendererSet
 
     set_font_size(chname, renderer.font_desc)
     fg, bg, weight = name_cell_font_style(chname)
-    renderer.set(foreground: fg,
-                 background: bg)
+    renderer.set(foreground: fg, background: bg)
     if weight
       renderer.set(weight: weight)
     else
-      renderer.set(weight: Pango::FontDescription.new(::Settings[:LIST_FONT]).weight)
+      base_font = Pango::FontDescription.new(::Settings[:LIST_FONT])
+      renderer.set(weight: base_font.weight)
     end
     renderer.set_property('markup',
                           get_highlighted_markup(chname, @highlight_term))
@@ -100,7 +99,8 @@ class CellRendererSet
   end
 
   def yp_cell_data_func(_col, renderer, _model, iter)
-    ch = @mw_model.find_channel_by_channel_id(iter[ChannelListStore::FLD_CH_ID])
+    channel_id = iter[ChannelListStore::FLD_CH_ID]
+    ch = @mw_model.find_channel_by_channel_id(channel_id)
     if ch
       renderer.pixbuf = WebResource.get_pixbuf(ch.yp.favicon_url)
         .scale(16, 16, Gdk::Pixbuf::INTERP_BILINEAR)
@@ -112,7 +112,8 @@ class CellRendererSet
   end
 
   def detail_cell_data_func(_col, renderer, _model, iter)
-    renderer.markup = get_highlighted_markup(iter[ChannelListStore::FLD_DETAIL], @highlight_term)
+    detail = iter[ChannelListStore::FLD_DETAIL]
+    renderer.markup = get_highlighted_markup(detail, @highlight_term)
   end
 
   def set_cell_renderer_font
