@@ -37,12 +37,12 @@ class ChannelListView < Gtk::TreeView
 
   TARGET_NAME_CELL_WIDTH = 16.0
 
-  def set_font_size(chname, font_desc)
+  def set_font_size(chname, font)
     half_widths = measure_width(chname)
 
     if half_widths > TARGET_NAME_CELL_WIDTH
       factor = TARGET_NAME_CELL_WIDTH / half_widths
-      font_desc.size = [10 * factor, 8].max * 1000
+      font.size = [10 * factor, 8].max * 1000
     end
   end
 
@@ -65,7 +65,11 @@ class ChannelListView < Gtk::TreeView
     fg, bg, weight = name_cell_font_style(chname)
     renderer.set(foreground: fg,
                  background: bg)
-    renderer.set(weight: weight) if weight
+    if weight
+      renderer.set(weight: weight)
+    else
+      renderer.set(weight: Pango::FontDescription.new(::Settings[:LIST_FONT]).weight)
+    end
     renderer.set_property('markup',
                           get_highlighted_markup(chname, @search_term))
   end
