@@ -10,7 +10,7 @@ SRC = %w(channel.rb channel_info_label.rb channel_list_view.rb bandwidth_checker
          notification.rb object_list.rb process_manager.rb rc.rb relation.rb
          resource.rb settings.rb settings_dialog.rb web_resource.rb
          threadhack.rb type.rb type_assoc_dialog.rb type_association.rb
-         utility.rb yap.rb yellowpage.rb)
+         utility.rb yap.rb yellowpage.rb channel_list_store.rb cell_renderer_set.rb)
 
 file 'yap' => SRC do |task|
   sh 'ruby rc.rb -o yap yap.rb'
