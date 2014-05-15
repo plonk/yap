@@ -1,64 +1,10 @@
 # -*- coding: utf-8 -*-
 require 'mechanize'
 require 'nokogiri'
-require 'checker_window'
+require_relative 'bandwidth_checker_window'
+require_relative 'bandwidth_checker'
 
 class BandwidthCheckerManager
-  class Checker
-    include Observable
-
-    def self.valid_unchecked?(ch)
-      ch.name =~ /アップロード帯域$/ &&
-        ch.contact_url =~ /uptest\/$/ &&
-        ch.detail =~ /^No data/
-    end
-
-    attr_reader :finished_time, :channel
-
-    def initialize(channel)
-      fail unless valid_unchecked?(ch)
-      @channel = channel
-      @monitor = Monitor.new
-      self.state = 'initialized'
-    end
-
-    def state=(value)
-      @monitor.synchronize do
-        @state = value
-      end
-      changed
-      notify_observers
-    end
-
-    def state
-      @monitor.synchronize do
-        @state
-      end
-    end
-
-    def extract_kbps(html)
-      Nokogiri::HTML(html).css('span').each do |elem|
-        return elem.content
-      end
-      '???'
-    end
-
-    def run
-      normal_post_url = channel.contact_url + 'uptest_n.php'
-
-      self.state = 'getting form'
-      Mechanize.new.get(normal_post_url) do |page|
-        self.state = 'submitting form'
-        check_result = page.form_with(name: 'uptest').submit
-
-        @finished_time = Time.now
-        self.state = "finished (#{extract_kbps(check_result.body)})"
-      end
-    rescue
-      self.state = 'finished (error)'
-    end
-  end
-
   def initialize(model)
     @model = model
     @model.add_observer(self, :update)
@@ -100,7 +46,7 @@ class BandwidthCheckerManager
 
     @running = true
     unchecked =
-      @model.master_table.select { |ch| Checker.valid_unchecked?(ch) }
+      @model.master_table.select { |ch| BandwidthChecker.valid_unchecked?(ch) }
 
     update_lists
 
@@ -111,10 +57,10 @@ class BandwidthCheckerManager
   end
 
   def check(ch)
-    checker = Checker.new(ch)
+    checker = BandwidthChecker.new(ch)
     checker.add_observer(self, :checker_changed)
     @checking << checker
-    CheckerWindow.new(checker).show_all
+    BandwidthCheckerWindow.new(checker).show_all
     checker.run
   end
 end
