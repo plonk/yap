@@ -192,7 +192,7 @@ class ChannelListView < Gtk::TreeView
   def create_columns
     @yp_column = TreeViewColumn.new('YP', @cr_yp)
     @name_column = TreeViewColumn.new('名前', @cr_name, text: 0)
-      .set(resizable: true, min_width: 120, expand: true)
+      .set(resizable: true, min_width: 100, expand: true)
     @genre_column = TreeViewColumn.new('ジャンル', @cr_genre, text: 1)
       .set(resizable: true, min_width: 50, expand: true)
     @detail_column = TreeViewColumn.new('配信内容', @cr_detail, text: 2)
@@ -330,7 +330,7 @@ class ChannelListView < Gtk::TreeView
   def handle_middle_click(_event)
     # 中クリックの位置によらず、既に選択されている行のコンタクト
     # URLが開かれるのは問題。
-    open_url(ch.contact_url) if selected_channel
+    open_url(selected_channel.contact_url) if selected_channel
     true
   end
 
