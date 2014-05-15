@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# YP4G の uptest で帯域測定をする。
 class BandwidthChecker
   include Observable
 
