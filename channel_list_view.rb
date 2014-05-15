@@ -12,7 +12,6 @@ class ChannelListView < Gtk::TreeView
   include Pango, Gtk, GtkHelper
   include Observable
 
-  attr_reader :count
   attr_accessor :scrolled_window
   attr_accessor :list_store
 
@@ -110,7 +109,6 @@ class ChannelListView < Gtk::TreeView
     @mw_model = mw_model
     @mw_model.add_observer(self, :update)
 
-    @count = -1
     @suppress_selection_change = false
 
     @list_store = ChannelListStore.new(filter_fn)
@@ -235,10 +233,6 @@ class ChannelListView < Gtk::TreeView
           [@scrolled_window.vadjustment.upper, value].min
       end
     end
-  end
-
-  def count
-    @list_store.count
   end
 
   def refresh

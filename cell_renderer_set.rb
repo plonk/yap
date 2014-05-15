@@ -56,7 +56,8 @@ class CellRendererSet
     if genre.empty?
       renderer.set(text: 'n/a', foreground: 'gray')
     else
-      renderer.markup = get_highlighted_markup(genre, @highlight_term)
+      renderer.set(markup: get_highlighted_markup(genre, @highlight_term),
+                   foreground: nil)
     end
   end
 
@@ -65,7 +66,7 @@ class CellRendererSet
     if listeners < 0
       renderer.set(text: 'n/a', foreground: 'gray')
     else
-      renderer.text = listeners.to_s
+      renderer.set(text: listeners.to_s, foreground: nil)
     end
   end
 
@@ -91,10 +92,12 @@ class CellRendererSet
     if bps == 0
       renderer.set(text: 'n/a', foreground: 'gray')
     elsif bps < 1000
-      renderer.text = "#{bps}K"
+      renderer.set(text: "#{bps}K",
+                   foreground: nil)
     else
       mbps = bps.to_f / 1000
-      renderer.text = format('%.2fM', mbps)
+      renderer.set(text: format('%.2fM', mbps),
+                   foreground: nil)
     end
   end
 

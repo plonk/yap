@@ -29,7 +29,7 @@ class ChannelListPage < Gtk::VBox
   end
 
   def title
-    "#{@base_title}(#{@channel_list_view.count})"
+    "#{@base_title}(#{@channel_list_view.list_store.count})"
   end
 
   def update
@@ -57,6 +57,14 @@ class ChannelListPage < Gtk::VBox
     end
 
     @channel_list_view = ChannelListView.new(@model, @func)
+    @channel_list_view.list_store.signal_connect('row-inserted') do
+      changed
+      notify_observers
+    end
+    @channel_list_view.list_store.signal_connect('row-deleted') do
+      changed
+      notify_observers
+    end
     create(ScrolledWindow,
            shadow_type: SHADOW_ETCHED_IN,
            hscrollbar_policy: POLICY_AUTOMATIC,

@@ -47,8 +47,10 @@ module Gtk
   def self.main(timeout_milliseconds = 33)
     timeout_add timeout_milliseconds do
       begin
-        block = @queue.deq
-        block.call
+        loop do
+          block = @queue.deq
+          block.call
+        end
       rescue ThreadSafeQueue::EmptyQueueException
         # wait for next tick
       end
