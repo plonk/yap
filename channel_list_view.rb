@@ -54,9 +54,9 @@ class ChannelListView < Gtk::TreeView
       # pink if favorite
       [nil, '#FFBBBB', WEIGHT_BOLD]
     elsif chname =~ /\(要帯域チェック\)$/
-      [nil, 'yellow', WEIGHT_NORMAL]
+      [nil, 'yellow', nil]
     else
-      [nil, nil, WEIGHT_NORMAL]
+      [nil, nil, nil]
     end
   end
 
@@ -66,8 +66,8 @@ class ChannelListView < Gtk::TreeView
     renderer.font = name_cell_font(chname)
     fg, bg, weight = name_cell_font_style(chname)
     renderer.set(foreground: fg,
-                 background: bg,
-                 weight: weight)
+                 background: bg)
+    renderer.set(weight: weight) if weight
     renderer.set_property('markup',
                           get_highlighted_markup(chname, @search_term))
   end
