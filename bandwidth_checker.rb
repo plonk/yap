@@ -11,7 +11,8 @@ class BandwidthChecker
   attr_reader :finished_time, :channel
 
   def initialize(channel)
-    fail unless valid_unchecked?(ch)
+    fail ArgumentError, 'not an uptest channel object' unless
+      BandwidthChecker.valid_unchecked?(channel)
     @channel = channel
     @monitor = Monitor.new
     self.state = 'initialized'
