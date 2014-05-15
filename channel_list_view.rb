@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 require_relative 'gtk_helper'
+require_relative 'cell_renderer_set'
+require_relative 'channel_list_store'
 
 class ChannelListView < Gtk::TreeView
 end
@@ -12,130 +14,13 @@ class ChannelListView < Gtk::TreeView
 
   attr_reader :count
   attr_accessor :scrolled_window
+  attr_accessor :list_store
 
-  FLD_CHNAME   = 0
-  FLD_GENRE    = 1
-  FLD_DETAIL   = 2
-  FLD_LISTENER = 3
-  FLD_TIME     = 4
-  FLD_BITRATE  = 5
-  FLD_CH_ID    = 6
-  FLD_YPNAME   = 7
-
-  FIELD_TYPES = [String,	# chname
-                 String,	# genre
-                 String,	# detail
-                 Integer,	# listener
-                 Integer,	# time
-                 Integer,	# bitrate
-                 String,	# ch_id
-                 String]	# ypname
-
-  def open_url(url)
-    Environment.open(url)
-  end
-
-  TARGET_NAME_CELL_WIDTH = 16.0
-
-  def set_font_size(chname, font)
-    half_widths = measure_width(chname)
-
-    if half_widths > TARGET_NAME_CELL_WIDTH
-      factor = TARGET_NAME_CELL_WIDTH / half_widths
-      font.size = [10 * factor, 8].max * 1000
-    end
-  end
-
-  # foreground, background, weight
-  def name_cell_font_style(chname)
-    if @mw_model.favorites.include? chname
-      # pink if favorite
-      [nil, '#FFBBBB', WEIGHT_BOLD]
-    elsif chname =~ /\(要帯域チェック\)$/
-      [nil, 'yellow', nil]
-    else
-      [nil, nil, nil]
-    end
-  end
-
-  def name_cell_data_func(_col, renderer, _model, iter)
-    chname = iter[FLD_CHNAME]
-
-    set_font_size(chname, renderer.font_desc)
-    fg, bg, weight = name_cell_font_style(chname)
-    renderer.set(foreground: fg,
-                 background: bg)
-    if weight
-      renderer.set(weight: weight)
-    else
-      renderer.set(weight: Pango::FontDescription.new(::Settings[:LIST_FONT]).weight)
-    end
-    renderer.set_property('markup',
-                          get_highlighted_markup(chname, @search_term))
-  end
-
-  def genre_cell_data_func(_col, renderer, _model, iter)
-    genre = iter[FLD_GENRE]
-    if genre.empty?
-      renderer.set(text: 'n/a', foreground: 'gray')
-    else
-      renderer.markup = get_highlighted_markup(genre, @search_term)
-    end
-  end
-
-  def listener_cell_data_func(_col, renderer, _model, iter)
-    listeners = iter[FLD_LISTENER]
-    if listeners < 0
-      renderer.set(text: 'n/a', foreground: 'gray')
-    else
-      renderer.text = listeners.to_s
-    end
-  end
-
-  def time_string(total_min)
-    if total_min < 24 * 60
-      hour = total_min / 60
-      min = total_min % 60
-      format('%2d:%02d', hour, min)
-    else
-      day = total_min / (24 * 60)
-      format('%d日+', day)
-    end
-  end
-
-  def time_cell_data_func(_col, renderer, _model, iter)
-    time = iter[FLD_TIME]
-    renderer.set(text: time_string(time),
-                 foreground: time == 0 ? 'gray' : nil)
-  end
-
-  def bitrate_cell_data_func(_col, renderer, _model, iter)
-    bps = iter[FLD_BITRATE]
-    if bps == 0
-      renderer.set(text: 'n/a', foreground: 'gray')
-    elsif bps < 1000
-      renderer.text = "#{bps}K"
-    else
-      mbps = bps.to_f / 1000
-      renderer.text = format('%.2fM', mbps)
-    end
-  end
-
-  def yp_cell_data_func(_col, renderer, _model, iter)
-    ch = @mw_model.find_channel_by_channel_id(iter[FLD_CH_ID])
-    if ch
-      renderer.pixbuf = WebResource.get_pixbuf(ch.yp.favicon_url)
-        .scale(16, 16, Gdk::Pixbuf::INTERP_BILINEAR)
-    else
-      # リストの表示とイエローページのロードが非同期だから到達するだろう。
-      STDERR.puts 'Warning: failed to get YP favicon pixbuf.'
-      renderer.pixbuf = QUESTION_16
-    end
-  end
-
-  def detail_cell_data_func(_col, renderer, _model, iter)
-    renderer.markup = get_highlighted_markup(iter[FLD_DETAIL], @search_term)
-  end
+  GRID_LINE_CONSTANTS =
+    [GRID_LINES_NONE,
+     GRID_LINES_HORIZONTAL,
+     GRID_LINES_VERTICAL,
+     GRID_LINES_BOTH]
 
   # ソートするカラムを column_id に切り替える手続きオブジェクトを返す。
   def sort_changer(column_id, order)
@@ -163,83 +48,54 @@ class ChannelListView < Gtk::TreeView
   end
 
   def settings_changed
-    set_cell_renderer_font
+    @cr.set_cell_renderer_font
     set_view_preferences
   end
 
-  def set_cell_renderer_font
-    @cr_name.font =
-      @cr_genre.font =
-      @cr_detail.font =
-      @cr_listener.font =
-      @cr_bitrate.font =
-      @cr_time.font = ::Settings[:LIST_FONT]
-  end
-
-  GRID_LINE_CONSTANTS =
-    [GRID_LINES_NONE,
-     GRID_LINES_HORIZONTAL,
-     GRID_LINES_VERTICAL,
-     GRID_LINES_BOTH]
-
-  def create_cell_renderers
-    @cr_name	= create CellRendererText, ellipsize: Layout::ELLIPSIZE_END
-    @cr_genre	= create CellRendererText, ellipsize: Layout::ELLIPSIZE_END
-    @cr_detail	= create CellRendererText, ellipsize: Layout::ELLIPSIZE_END
-    @cr_listener = create CellRendererText, xalign: 1
-    @cr_bitrate	= create CellRendererText, xalign: 1
-    @cr_yp	= create CellRendererPixbuf
-    @cr_time	= create CellRendererText, xalign: 1
-    set_cell_renderer_font
-  end
-
   def create_columns
-    @yp_column = TreeViewColumn.new('YP', @cr_yp)
-    @name_column = TreeViewColumn.new('名前', @cr_name, text: 0)
+    @yp_column = TreeViewColumn.new('YP', @cr.yp)
+    @name_column = TreeViewColumn.new('名前', @cr.name, text: 0)
       .set(resizable: true, min_width: 100, expand: true)
-    @genre_column = TreeViewColumn.new('ジャンル', @cr_genre, text: 1)
+    @genre_column = TreeViewColumn.new('ジャンル', @cr.genre, text: 1)
       .set(resizable: true, min_width: 50, expand: true)
-    @detail_column = TreeViewColumn.new('配信内容', @cr_detail, text: 2)
+    @detail_column = TreeViewColumn.new('配信内容', @cr.detail, text: 2)
       .set(resizable: true, min_width: 240, expand: true)
-    @listener_column = TreeViewColumn.new('人数', @cr_listener, text: 3)
-    @time_column = TreeViewColumn.new('時間', @cr_time, text: 4)
-    @bitrate_column = TreeViewColumn.new('Bps', @cr_bitrate, text: 5)
+    @listener_column = TreeViewColumn.new('人数', @cr.listener, text: 3)
+    @time_column = TreeViewColumn.new('時間', @cr.time, text: 4)
+    @bitrate_column = TreeViewColumn.new('Bps', @cr.bitrate, text: 5)
   end
 
   def connect_sort_changers
-    [[@yp_column,       FLD_YPNAME,   SORT_ASCENDING],
-     [@name_column,     FLD_CHNAME,   SORT_ASCENDING],
-     [@genre_column,    FLD_GENRE,    SORT_ASCENDING],
-     [@detail_column,   FLD_DETAIL,   SORT_ASCENDING],
-     [@listener_column, FLD_LISTENER, SORT_DESCENDING],
-     [@time_column,     FLD_TIME,     SORT_DESCENDING],
-     [@bitrate_column,  FLD_BITRATE,  SORT_DESCENDING]]
+    [[@yp_column,       ChannelListStore::FLD_YPNAME,   SORT_ASCENDING],
+     [@name_column,     ChannelListStore::FLD_CHNAME,   SORT_ASCENDING],
+     [@genre_column,    ChannelListStore::FLD_GENRE,    SORT_ASCENDING],
+     [@detail_column,   ChannelListStore::FLD_DETAIL,   SORT_ASCENDING],
+     [@listener_column, ChannelListStore::FLD_LISTENER, SORT_DESCENDING],
+     [@time_column,     ChannelListStore::FLD_TIME,     SORT_DESCENDING],
+     [@bitrate_column,  ChannelListStore::FLD_BITRATE,  SORT_DESCENDING]]
       .each do |col, fldnum, order|
       col.signal_connect('clicked', &sort_changer(fldnum, order))
     end
   end
 
   def set_cell_data_funcs
-    [[@yp_column,       @cr_yp,       :yp_cell_data_func],
-     [@name_column,     @cr_name,     :name_cell_data_func],
-     [@genre_column,    @cr_genre,    :genre_cell_data_func],
-     [@detail_column,   @cr_detail,   :detail_cell_data_func],
-     [@listener_column, @cr_listener, :listener_cell_data_func],
-     [@time_column,     @cr_time,     :time_cell_data_func],
-     [@bitrate_column,  @cr_bitrate,  :bitrate_cell_data_func]]
+    [[@yp_column,       @cr.yp,       :yp_cell_data_func],
+     [@name_column,     @cr.name,     :name_cell_data_func],
+     [@genre_column,    @cr.genre,    :genre_cell_data_func],
+     [@detail_column,   @cr.detail,   :detail_cell_data_func],
+     [@listener_column, @cr.listener, :listener_cell_data_func],
+     [@time_column,     @cr.time,     :time_cell_data_func],
+     [@bitrate_column,  @cr.bitrate,  :bitrate_cell_data_func]]
       .each do |col, cr, sym|
-      col.set_cell_data_func(cr, &method(sym))
+      col.set_cell_data_func(cr, &@cr.method(sym))
     end
   end
 
   def append_columns
-    append_column @yp_column
-    append_column @name_column
-    append_column @genre_column
-    append_column @detail_column
-    append_column @listener_column
-    append_column @time_column
-    append_column @bitrate_column
+    [@yp_column, @name_column, @genre_column, @detail_column,
+     @listener_column, @time_column, @bitrate_column].each do |col|
+      append_column col
+    end
   end
 
   def install_columns
@@ -250,22 +106,15 @@ class ChannelListView < Gtk::TreeView
     set(headers_clickable: true)
   end
 
-  def create_list_store
-    list_store = ListStore.new(*FIELD_TYPES)
-    list_store.set_sort_column_id 0, SORT_ASCENDING
-    list_store
-  end
-
   def initialize(mw_model, filter_fn)
-    @filter_fn = filter_fn
     @mw_model = mw_model
     @mw_model.add_observer(self, :update)
 
     @count = -1
     @suppress_selection_change = false
 
-    @search_term = ''
-    @list_store = create_list_store
+    @list_store = ChannelListStore.new(mw_model, filter_fn)
+    @cr = CellRendererSet.new(@mw_model)
 
     super(@list_store)
 
@@ -292,8 +141,6 @@ class ChannelListView < Gtk::TreeView
   def do_layout
     setup_selection
 
-    create_cell_renderers
-
     install_columns
 
     set_view_preferences
@@ -305,8 +152,7 @@ class ChannelListView < Gtk::TreeView
 
   def setup_own_callbacks
     signal_connect('row-activated') do |_treeview, path, _column|
-      iter = model.get_iter(path)
-      ch = @mw_model.find_channel_by_channel_id(iter[FLD_CH_ID])
+      ch = @list_store.path_to_channel(path)
       fail unless ch
       @mw_model.play(ch) if ch.playable?
     end
@@ -334,7 +180,7 @@ class ChannelListView < Gtk::TreeView
   def handle_middle_click(_event)
     # 中クリックの位置によらず、既に選択されている行のコンタクト
     # URLが開かれるのは問題。
-    open_url(selected_channel.contact_url) if selected_channel
+    Environment.open(selected_channel.contact_url) if selected_channel
     true
   end
 
@@ -352,19 +198,9 @@ class ChannelListView < Gtk::TreeView
     end
   end
 
-  def create_filter(term)
-    filter = TreeModelFilter.new(model)
-    esc_term = Regexp.escape(regularize(term))
-    filter.set_visible_func do |_model, iter|
-      [FLD_CHNAME, FLD_GENRE, FLD_DETAIL]
-        .any? { |fld| regularize(iter[fld]) =~ /#{esc_term}/ }
-    end
-    filter
-  end
-
   def search(term)
-    @search_term = term
-    self.model = create_filter(term)
+    @cr.highlight_term = term
+    self.model = @list_store.create_filter(term)
   end
 
   # 制限されたビューから全てのチャンネルのリストに戻す。
@@ -372,39 +208,14 @@ class ChannelListView < Gtk::TreeView
     self.model = @list_store
   end
 
-  # ch_id で判断するように変える。
   def selected_channel
     iter = selection.selected
 
     if iter
-      @mw_model.find_channel_by_channel_id(iter[FLD_CH_ID])
+      @list_store.iter_to_channel(iter)
     else
       nil
     end
-  end
-
-  def get_path_of_channel(ch)
-    return nil unless ch
-    @list_store.each do |_m, path, iter|
-      return path if iter[FLD_CH_ID] == ch.channel_id
-    end
-    nil
-  end
-
-  # セルデータ関数とインターリーブで動くようなので、
-  # モデルを切り離してから呼び出そう。
-  def channel_copy(iter, ch)
-    ch = ch.as Channel
-    iter = iter.as TreeIter
-
-    iter[FLD_CHNAME]   = ch.name
-    iter[FLD_GENRE]    = ch.genre
-    iter[FLD_DETAIL]   = ch.detail
-    iter[FLD_LISTENER] = ch.listener
-    iter[FLD_TIME]     = ch.time
-    iter[FLD_BITRATE]  = ch.bitrate
-    iter[FLD_CH_ID]    = ch.channel_id
-    iter[FLD_YPNAME]   = ch.yp.name
   end
 
   def unselect_current_selection
@@ -413,22 +224,12 @@ class ChannelListView < Gtk::TreeView
   end
 
   def select_appropriate_row
-    to_be_selected = get_path_of_channel @mw_model.selected_channel
+    to_be_selected = @list_store.path_of_channel @mw_model.selected_channel
     if to_be_selected
       silently { selection.select_path to_be_selected }
     else
       silently { unselect_current_selection }
     end
-  end
-
-  def copy_from_master_table
-    @list_store.clear
-    match = @mw_model.master_table.select(&@filter_fn.method(:call))
-    match.each do |ch|
-      iter = @list_store.append
-      channel_copy(iter, ch)
-    end
-    match.size
   end
 
   def schedule_vadjustment_restore(value)
@@ -441,10 +242,14 @@ class ChannelListView < Gtk::TreeView
     end
   end
 
+  def count
+    @list_store.count
+  end
+
   def refresh
     value = @scrolled_window.vadjustment.value if @scrolled_window
 
-    silently { @count = copy_from_master_table }
+    silently { @list_store.copy_from_master_table }
 
     select_appropriate_row
 
