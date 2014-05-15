@@ -25,9 +25,13 @@ class Channel
 
     @yp = source_yp
 
-    # チャンネル名とストリームIDから同定する
+    # YPの名前とチャンネル名とストリームIDから同定する
     @channel_id = yp.name + @fields[NAME] + @id
     @hash = MD5.hexdigest(@channel_id).to_i(16).truncate_to_fixnum
+  end
+
+  def inspect
+    "#<Channel:name=#{name}>"
   end
 
   def load_line(line)
