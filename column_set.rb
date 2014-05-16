@@ -6,6 +6,9 @@ class ColumnSet
 
   attr_reader :cell_renderer_set
 
+  ID_TO_NAME = ['YP', '名前', 'ジャンル', '配信内容', '人数', '時間', 'Bps'].freeze
+  NUM_IDS = ID_TO_NAME.size
+
   def initialize(mw_model, list_store)
     @list_store = list_store
     @mw_model  = mw_model
@@ -27,15 +30,19 @@ class ColumnSet
   end
     
   def each
+    ::Settings[:COLUMN_PREFERENCE].each do |i|
+      yield id_to_column(i)
+    end
+  end
+
+  def id_to_column(id)
     [@yp_column,
      @name_column,
      @genre_column,
      @detail_column,
      @listener_column,
      @time_column,
-     @bitrate_column].each do |col|
-      yield(col)
-    end
+     @bitrate_column][id]
   end
 
   def settings_changed

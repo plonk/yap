@@ -31,7 +31,8 @@ class SettingsClass
     LIST_FONT: 'Sans 10',
     ENABLE_AUTO_BANDWIDTH_CHECK: true,
     GRID_LINES: 1,
-    RULES_HINT: true
+    RULES_HINT: true,
+    COLUMN_PREFERENCE: [0, 1, 2, 3, 4, 5, 6]
   }
 
   VAR_NAMES = VARIABLES.keys

@@ -45,8 +45,14 @@ class ChannelListView < Gtk::TreeView
     ColumnSet.new(@mw_model, @list_store)
   end
 
+  def clear_columns
+    columns.each do |col|
+      remove_column col
+    end
+  end
+
   def install_columns
-    @column_set = create_column_set
+    clear_columns
     append_columns @column_set
     set(headers_clickable: true)
   end
@@ -89,6 +95,7 @@ class ChannelListView < Gtk::TreeView
 
   def do_layout
     setup_selection
+    @column_set = create_column_set
     install_columns
     set_view_preferences
     install_context_menu
@@ -112,6 +119,7 @@ class ChannelListView < Gtk::TreeView
   def set_view_preferences
     set(rules_hint: ::Settings[:RULES_HINT],
         enable_grid_lines: GRID_LINE_CONSTANTS[::Settings[:GRID_LINES]])
+    install_columns
   end
 
   def handle_right_click(event)
