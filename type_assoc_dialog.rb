@@ -2,11 +2,11 @@
 require_relative 'relation'
 require_relative 'type'
 require_relative 'gtk_helper'
+require_relative 'object_list_control_box'
 
 # ストリームタイプとプレーヤーの対応付けを編集するためのダイアログ
 class TypeAssocDialog < Gtk::Dialog
   include Gtk, GtkHelper, Gtk::Stock
-  include Relation
 
   attr_reader :type_assoc
 
@@ -18,34 +18,7 @@ class TypeAssocDialog < Gtk::Dialog
     @type_assoc = type_assoc.as(FORMAT).map(&:dup)
 
     layout
-    wire_up_button_callbacks
-    declare_relations
     load
-
-    signal_connect('destroy') do
-      dissolve_relations
-    end
-  end
-
-  def wire_up_button_callbacks
-    @add_button.signal_connect('clicked') do
-      @assoc_list.run_add_dialog(self)
-    end
-    @delete_button.signal_connect('clicked') do
-      @assoc_list.delete
-    end
-    @up_button.signal_connect('clicked') do
-      @assoc_list.go_up
-    end
-    @down_button.signal_connect('clicked') do
-      @assoc_list.go_down
-    end
-  end
-
-  def declare_relations
-    relation '@delete_button.sensitive mimics @assoc_list.selected'
-    relation '@up_button.sensitive mimics @assoc_list.can_go_up?'
-    relation '@down_button.sensitive mimics @assoc_list.can_go_down?'
   end
 
   def load
@@ -61,20 +34,10 @@ class TypeAssocDialog < Gtk::Dialog
     create(HBox, false, 5) do |hbox|
       hbox.pack_start(@assoc_list, true)
 
-      create(VButtonBox,
-             layout_style: ButtonBox::START,
-             spacing: 5) do |bbox|
-        buttons = [ADD, DELETE, GO_UP, GO_DOWN]
-          .map { |type| create(Button, type) }
-
-        [:pack_start, :pack_start, :pack_end, :pack_end].zip(buttons)
-          .each do |pack, button|
-          bbox.send(pack, button, false)
-        end
-        @add_button, @delete_button, @up_button, @down_button = buttons
-
-        hbox.pack_start(bbox, false)
+      create(ObjectListControlBox, @assoc_list) do |control_box|
+        hbox.pack_start(control_box, false)
       end
+
       vbox.pack_start(hbox)
     end
     vbox.pack_end(HSeparator.new, false)
