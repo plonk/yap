@@ -13,42 +13,44 @@ class ObjectList < Gtk::ScrolledWindow
   UP_ARROW = Gtk::SORT_DESCENDING
   DOWN_ARROW = Gtk::SORT_ASCENDING
 
+  FLD_ID = 0
+
   def initialize(headers, reader_list, writer_list, constructor = nil)
     super()
 
-    self.hscrollbar_policy = POLICY_AUTOMATIC
-
     @objects = []
+    @headers = headers
     @reader_list = reader_list.map(&:to_proc)
     @writer_list = writer_list.map { |writer| writer ? writer.to_proc : nil }
+    @constructor = constructor
+
+    do_layout
+  end
+
+  def do_layout
+    self.hscrollbar_policy = POLICY_AUTOMATIC
 
     types = [String] * @reader_list.size
     @list_store = ListStore.new(*[String] + types)
     @treeview = create(TreeView, @list_store)
 
-    install_columns(headers)
-    @headers = headers
-    @constructor = constructor
-    @treeview.search_column = 1
+    install_columns(@headers)
 
+    @treeview.search_column = 1
     @treeview.selection.signal_connect('changed', &method(:on_cursor_changed))
     add @treeview
   end
 
   private
 
-  def get_object(iter)
-    @objects.select { |obj| obj.object_id.to_s == iter[0] }.first
-  end
-
   def create_renderer(col_id)
     renderer = create(CellRendererText,
                       editable: @writer_list[col_id].to_bool)
     renderer.signal_connect 'edited' do |_, path, value|
       iter = @list_store.get_iter(path)
-      obj = get_object(iter)
       iter[col_id + 1] = value
-      @writer_list[col_id].call(obj, value)
+      obj = object(iter[FLD_ID].to_i)
+      copy_to_obj(iter, obj)
     end
     renderer
   end
@@ -57,37 +59,39 @@ class ObjectList < Gtk::ScrolledWindow
     nfields = headers.size
     nfields.times do |i|
       renderer = create_renderer(i)
-      create(TreeViewColumn, headers[i],
-             renderer,
-             { text: i + 1 },
+      create(TreeViewColumn, headers[i], renderer, { text: i + 1 },
              resizable: true, clickable: false) do |col|
-        col.signal_connect('clicked') do
-          @treeview.columns.each do |c|
-            c.sort_indicator = false if c != col
-          end
-
-          if !col.sort_indicator? || col.sort_order == DOWN_ARROW
-            col.sort_indicator = true
-            col.sort_order = UP_ARROW
-            @list_store.set_sort_column_id(i + 1, Gtk::SORT_ASCENDING)
-          else
-            col.sort_order = DOWN_ARROW
-            @list_store.set_sort_column_id(i + 1, Gtk::SORT_DESCENDING)
-          end
-        end
+        col.signal_connect('clicked', &column_click_handler(col, i))
         @treeview.append_column col
+      end
+    end
+  end
+
+  def column_click_handler(col, i)
+    proc do
+      @treeview.columns.each { |c| c.sort_indicator = false if c != col }
+      if !col.sort_indicator? || col.sort_order == DOWN_ARROW
+        col.set(sort_indicator: true, sort_order: UP_ARROW)
+        @list_store.set_sort_column_id(i + 1, Gtk::SORT_ASCENDING)
+      else
+        col.set(sort_order: DOWN_ARROW)
+        @list_store.set_sort_column_id(i + 1, Gtk::SORT_DESCENDING)
       end
     end
   end
 
   def on_cursor_changed(*_)
     iter = @treeview.selection.selected
-    if iter
-      object_id = iter[0]
-      @selected = @objects.select { |obj| obj.object_id.to_s == object_id }.first
-    else
-      @selected = nil
-    end
+    self.selected = iter ? object(iter[FLD_ID].to_i) : nil
+  end
+
+  def object(id)
+    fail TypeError, '#{id.inspect} is not an object ID' unless id.is_a? Fixnum
+    @objects.find { |obj| obj.object_id == id }
+  end
+
+  def selected=(obj)
+    @selected = obj
     changed
     notify_observers
   end
@@ -96,21 +100,29 @@ class ObjectList < Gtk::ScrolledWindow
     @list_store.clear
     @objects.each do |obj|
       iter = @list_store.append
-      values = @reader_list.map { |f| f.call(obj) }
-      iter[0] = obj.object_id.to_s
-      values.each_with_index { |val, i| iter[i + 1] = val }
+      copy_to_iter(obj, iter)
     end
     @treeview.columns.each { |c| c.sort_indicator = false }
   end
 
-  def select_row(index)
-    i = 0
-    @list_store.each do |_model, _path, iter|
-      if i == index
+  def copy_to_iter(obj, iter)
+    values = @reader_list.map { |f| f.call(obj) }
+    iter[FLD_ID] = obj.object_id.to_s
+    values.each_with_index { |val, i| iter[i + 1] = val }
+  end
+
+  def copy_to_obj(iter, obj)
+    @writer_list.each_with_index do |writer, i|
+      @writer_list[i].call(obj, iter[i+1])
+    end
+  end
+
+  def select_row(row_number)
+    @list_store.to_enum.with_index do |(_model, _path, iter), i|
+      if i == row_number
         @treeview.selection.select_iter iter
         break
       end
-      i += 1
     end
   end
 
@@ -162,12 +174,12 @@ class ObjectList < Gtk::ScrolledWindow
   end
 
   def delete
-    if selected
-      @objects.delete(selected)
-      populate_table
-      changed
-      notify_observers
-    end
+    return unless selected
+
+    @objects.delete(selected)
+    populate_table
+    changed
+    notify_observers
   end
 
   # アイテム追加用サブダイアログ
@@ -180,11 +192,12 @@ class ObjectList < Gtk::ScrolledWindow
       @constructor = constructor
       @entries = []
 
-      headers.each do |text|
-        create Label, text do |label|
-          vbox.pack_start(label, false)
-        end
+      do_layout(headers)
+    end
 
+    def do_layout(headers)
+      headers.each do |text|
+        create(Label, text) { |label| vbox.pack_start(label, false) }
         create Entry do |entry|
           @entries << entry
           vbox.pack_start(entry, false)
@@ -192,7 +205,10 @@ class ObjectList < Gtk::ScrolledWindow
       end
 
       vbox.pack_start(HSeparator.new, false)
+      add_buttons
+    end
 
+    def add_buttons
       add_button(CANCEL, RESPONSE_CANCEL)
       add_button(OK, RESPONSE_OK)
 
@@ -204,7 +220,7 @@ class ObjectList < Gtk::ScrolledWindow
     end
   end
 
-  def run_add_dialog(parent)
+  def run_add_dialog(parent = nil)
     fail 'object constructor not set' unless @constructor
 
     dialog = AddItemDialog.new(parent, @headers, @constructor).show_all
