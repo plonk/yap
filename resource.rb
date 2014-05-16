@@ -1,4 +1,4 @@
-# -*- coding: undecided -*-
+# -*- coding: utf-8 -*-
 require_relative 'config.rb'
 
 # インストールディレクトリのファイルを参照するためのクラス
