@@ -170,6 +170,8 @@ class ListEditView < Gtk::TreeView
     end
   end
 
+  # 以下 ObjectListControlBox とお話するためのインターフェイス
+
   def run_add_dialog(parent_window = @parent_window)
     dialog = AddItemDialog.new(parent_window, @headers, @types).show_all
     dialog.run do |response|
