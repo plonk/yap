@@ -9,7 +9,6 @@ class ListEditView < Gtk::TreeView
 
   def initialize(parent_window, options)
     @parent_window = parent_window
-    super()
     check_options(options)
 
     @types = options[:types]
