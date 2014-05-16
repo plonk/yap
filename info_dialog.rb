@@ -6,21 +6,35 @@ class InfoDialog < Gtk::Dialog
   include Gtk, GtkHelper
 
   def initialize(parent, ch)
-    super "#{ch.name}のチャンネル情報", parent, MODAL, [Stock::OK, RESPONSE_NONE]
+    super "#{ch.name}のチャンネル情報", parent, nil, [Stock::OK, RESPONSE_NONE]
 
     do_layout(ch)
   end
 
   def widget_table(ch)
-    [[get_framed_favicon_image(ch), cell(ch.name)],
-     [head('リスナー数/リレー数'), cell("#{ch.listener}/#{ch.relay}")],
-     [head('TIP'), cell("#{ch.tip}#{get_tip_info(ch.tip)}")],
-     [head('コンタクトURL'), cell(ch.contact_url)],
-     [head('ID'), cell(ch.id)],
-     [head('タイプ'), cell(ch.type)],
-     [head('詳細'), cell(ch.detail)],
-     [head('ジャンル'), cell(ch.genre)],
-     [head('コメント'), cell(ch.comment)]]
+    [[get_framed_favicon_image(ch), label(ch.name)],
+     [header('リスナー数/リレー数'), label("#{ch.listener}/#{ch.relay}")],
+     [header('TIP'), label("#{ch.tip}#{get_tip_info(ch.tip)}")],
+     [header('コンタクトURL'), label(ch.contact_url)],
+     [header('ID'), label(ch.id)],
+     [header('タイプ'), label(ch.type)],
+     [header('詳細'), label(ch.detail)],
+     [header('ジャンル'), label(ch.genre)],
+     [header('コメント'), label(ch.comment)]]
+  end
+
+  def header(str)
+    create(Label, str + ':',
+           xalign: 1,
+           yalign: 0)
+  end
+
+  def label(str)
+    create(Label, str,
+           selectable: true,
+           xalign: 0,
+           yalign: 0,
+           wrap: true)
   end
 
   def do_layout(ch)
