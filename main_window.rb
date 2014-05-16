@@ -12,6 +12,7 @@ require_relative 'notification'
 require_relative 'gtk_helper'
 require_relative 'about_dialog'
 
+# メインウィンドウクラス。MainWindowModel とは深い仲。
 class MainWindow < Gtk::Window
   include Gtk
   include GtkHelper

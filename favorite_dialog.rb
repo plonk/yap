@@ -4,6 +4,7 @@ require_relative 'utility'
 require_relative 'line_prompt'
 require_relative 'gtk_helper'
 
+# お気に入り編集用ダイアログ
 class FavoriteDialog < Gtk::Dialog
   include Gtk, GtkHelper
   attr_reader :list

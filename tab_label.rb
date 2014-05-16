@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# Notebookのタブのラベル
 class TabLabel < Gtk::Label
   def initialize(page)
     @page = page

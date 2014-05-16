@@ -2,6 +2,7 @@
 require 'gtk2'
 require_relative 'gtk_helper'
 
+# 二次元のリストを受け取って編集するためのダイアログウィンドウ。
 class ListEditDialog < Gtk::Dialog
   class AddItemDialog < Gtk::Dialog
     include Gtk

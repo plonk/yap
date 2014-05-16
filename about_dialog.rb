@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# バージョン情報ダイアログ
 class YapAboutDialog < Gtk::AboutDialog
   include Gtk
   include GtkHelper

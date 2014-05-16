@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# チャンネル情報表示、操作ボタンエリア
 class InformationArea < Gtk::VBox
   include Gtk
   include GtkHelper

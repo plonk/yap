@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'gtk2'
 
+# チャンネル情報表示エリアで使うラベル
 class ChannelInfoLabel < Gtk::Label
   include Pango, Gtk
 

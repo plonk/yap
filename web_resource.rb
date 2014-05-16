@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'uri'
 
+# ウェブリソース取得用クラス
 class WebResourceClass
   include Singleton
 

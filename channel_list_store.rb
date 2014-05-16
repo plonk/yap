@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# チャンネルリスト表示用データ
 class ChannelListStore < Gtk::ListStore
   include Pango, Gtk, GtkHelper
 

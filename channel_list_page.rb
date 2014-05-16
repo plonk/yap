@@ -2,6 +2,8 @@
 require_relative 'channel_list_view'
 require_relative 'tab_label'
 
+# Notebook のページ。チャンネルリスト、検索フィールドを含む。
+# タブラベルにチャンネル数を通知する。
 class ChannelListPage < Gtk::VBox
   include Gtk
   include GtkHelper

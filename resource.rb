@@ -1,5 +1,7 @@
+# -*- coding: undecided -*-
 require_relative 'config.rb'
 
+# インストールディレクトリのファイルを参照するためのクラス
 class ResourceClass
   def initialize(directory)
     @directory = directory

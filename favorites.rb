@@ -2,6 +2,8 @@
 require 'observer'
 require_relative 'utility'
 
+# お気に入りチャンネルリストを表すクラス。
+# ファイルを読み書きする配列。
 class Favorites
   include Enumerable, Observable
 

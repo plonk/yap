@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 require 'observer'
 
+# オブジェクトのリストを受け取って、そのプロパティを表で表示したり、
+# リストを編集するためのウィジェット。
 class ObjectList < Gtk::ScrolledWindow
   include Gtk, GtkHelper, Observable
 
@@ -168,6 +170,7 @@ class ObjectList < Gtk::ScrolledWindow
     end
   end
 
+  # アイテム追加用サブダイアログ
   class AddItemDialog < Gtk::Dialog
     include Gtk::Stock, GtkHelper, Gtk
 

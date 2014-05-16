@@ -2,6 +2,7 @@
 require 'gtk2'
 require_relative 'gtk_helper'
 
+# プレーヤーの動作状況を把握する、プロセス管理ダイアログ
 class ProcessManager < Gtk::Dialog
   include Gtk, GtkHelper
 

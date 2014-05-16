@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# セルレンダラーをまとめたクラス
 class CellRendererSet
   include Pango, Gtk, GtkHelper
 

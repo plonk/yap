@@ -4,6 +4,7 @@ require_relative 'channel'
 require 'net/http'
 require 'uri'
 
+# YP を表すクラス
 class YellowPage
   attr_reader :name, :url
   attr_reader :timestamp

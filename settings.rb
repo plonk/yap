@@ -4,6 +4,7 @@ require 'observer'
 require 'yaml'
 require_relative 'extensions'
 
+# アプリケーション設定クラス
 class SettingsClass
   include Singleton, Observable
 

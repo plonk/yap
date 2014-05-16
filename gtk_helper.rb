@@ -46,6 +46,7 @@ module GtkHelper
   end
 end
 
+# 開いてモンキーパッチ
 class Gtk::Object
   def set(hash)
     hash.each_pair do |name, value|

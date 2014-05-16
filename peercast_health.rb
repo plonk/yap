@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 require 'socket'
 require 'timeout'
 
+# peercast ローカルサーバー起動確認クラス
 class PeercastHealth
   attr_reader :error_reason
 

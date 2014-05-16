@@ -3,11 +3,11 @@ require_relative 'gtk_helper'
 require_relative 'cell_renderer_set'
 require_relative 'channel_list_store'
 
-class ChannelListView < Gtk::TreeView
-end
+class ChannelListView < Gtk::TreeView; end
 
 require_relative 'clv_context_menu'
 
+# チャンネルリストのビュー
 class ChannelListView < Gtk::TreeView
   include Pango, Gtk, GtkHelper
   include Observable
@@ -52,16 +52,16 @@ class ChannelListView < Gtk::TreeView
   end
 
   def create_columns
-    @yp_column = TreeViewColumn.new('YP', @cr.yp)
-    @name_column = TreeViewColumn.new('名前', @cr.name, text: 0)
+    @yp_column       = TreeViewColumn.new('YP', @cr.yp)
+    @name_column     = TreeViewColumn.new('名前', @cr.name, text: 0)
       .set(resizable: true, min_width: 100, expand: true)
-    @genre_column = TreeViewColumn.new('ジャンル', @cr.genre, text: 1)
+    @genre_column    = TreeViewColumn.new('ジャンル', @cr.genre, text: 1)
       .set(resizable: true, min_width: 50, expand: true)
-    @detail_column = TreeViewColumn.new('配信内容', @cr.detail, text: 2)
+    @detail_column   = TreeViewColumn.new('配信内容', @cr.detail, text: 2)
       .set(resizable: true, min_width: 240, expand: true)
     @listener_column = TreeViewColumn.new('人数', @cr.listener, text: 3)
-    @time_column = TreeViewColumn.new('時間', @cr.time, text: 4)
-    @bitrate_column = TreeViewColumn.new('Bps', @cr.bitrate, text: 5)
+    @time_column     = TreeViewColumn.new('時間', @cr.time, text: 4)
+    @bitrate_column  = TreeViewColumn.new('Bps', @cr.bitrate, text: 5)
   end
 
   def connect_sort_changers

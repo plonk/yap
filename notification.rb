@@ -3,6 +3,7 @@ require 'gtk2'
 require_relative 'utility'
 require_relative 'gtk_helper'
 
+# カスタム InfoBar
 class Notification < Gtk::InfoBar
   include Gtk, GtkHelper
 

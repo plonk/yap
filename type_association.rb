@@ -2,6 +2,7 @@
 require 'singleton'
 require_relative 'launcher'
 
+# タイプ関連付けをルックアップするためのクラス
 class TypeAssociation
   include Singleton
 

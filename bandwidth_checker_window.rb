@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# 帯域測定進捗状況表示用ミニウィンドウ
 class BandwidthCheckerWindow < Gtk::Dialog
   include Gtk
   include GtkHelper

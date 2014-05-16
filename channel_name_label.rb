@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'gtk2'
 
+# チャンネル情報エリアで使うラベル
 class ChannelNameLabel < Gtk::Label
   include Gtk
   include GtkHelper

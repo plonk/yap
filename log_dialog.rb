@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# 動作ログを表示するダイアログだがたいてい無効にされている。
 class LogDialog < Gtk::Dialog
   include Gtk
 

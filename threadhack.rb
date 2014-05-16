@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'monitor'
 
+# スレッドセーフなキュー。Proc を詰める。
 class ThreadSafeQueue
   class EmptyQueueException < StandardError
   end

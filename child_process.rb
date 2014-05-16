@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 require 'shellwords'
 require 'observer'
 
+# プレーヤープロセスを表わすクラス
 class ChildProcess
   include Observable
 

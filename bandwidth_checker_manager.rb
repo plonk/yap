@@ -4,6 +4,7 @@ require 'nokogiri'
 require_relative 'bandwidth_checker_window'
 require_relative 'bandwidth_checker'
 
+# 帯域測定が必要かどうかチェックしてスケジュールする。
 class BandwidthCheckerManager
   def initialize(model)
     @model = model

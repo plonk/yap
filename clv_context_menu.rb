@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# チャンネルリストのコンテキストメニュー
 class ChannelListView::ContextMenu < Gtk::Menu
   include Gtk
 

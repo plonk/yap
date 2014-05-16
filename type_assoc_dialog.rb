@@ -3,6 +3,7 @@ require_relative 'relation'
 require_relative 'type'
 require_relative 'gtk_helper'
 
+# ストリームタイプとプレーヤーの対応付けを編集するためのダイアログ
 class TypeAssocDialog < Gtk::Dialog
   include Gtk, GtkHelper, Gtk::Stock
   include Relation

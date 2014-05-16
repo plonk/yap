@@ -3,6 +3,7 @@ require 'gtk2'
 require_relative 'utility'
 require_relative 'gtk_helper'
 
+# 一行入力ダイアログ
 class LinePrompt < Gtk::Dialog
   include Gtk, GtkHelper
   attr_accessor :validator

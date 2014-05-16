@@ -3,6 +3,7 @@ require_relative 'gtk_helper'
 require_relative 'list_edit_dialog'
 require_relative 'type'
 
+# イエローページ一覧編集ダイアログ
 class YellowPageManager < ListEditDialog
   include Gtk
   include GtkHelper
