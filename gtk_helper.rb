@@ -10,19 +10,7 @@ module GtkHelper
     end
     widget = klass.new(*args)
 
-    callbacks, normal = options.keys.partition { |sym| sym =~ /^on_/ }
-
-    # オプション引数の処理
-    callbacks.each do |name|
-      callback = options[name]
-      signal = name.to_s.sub(/\Aon_/, '')
-      widget.signal_connect(signal, &callback)
-    end
-
-    normal.each do |name|
-      value = options[name]
-      widget.send(name.to_s + '=', value)
-    end
+    widget.__set__(options)
 
     block.call(widget) if block
 
@@ -47,11 +35,24 @@ module GtkHelper
 end
 
 # 開いてモンキーパッチ
-class Gtk::Object
-  def set(hash)
-    hash.each_pair do |name, value|
+class GLib::Object
+  def set(options)
+    callbacks, normal = options.keys.partition { |sym| sym =~ /^on_/ }
+
+    # オプション引数の処理
+    callbacks.each do |name|
+      callback = options[name]
+      signal = name.to_s.sub(/\Aon_/, '')
+      signal_connect(signal, &callback)
+    end
+
+    normal.each do |name|
+      value = options[name]
       send(name.to_s + '=', value)
     end
+
     self
   end
+
+  alias_method :__set__, :set
 end
