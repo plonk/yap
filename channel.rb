@@ -2,6 +2,7 @@
 require 'digest/md5'
 require_relative 'launcher'
 require_relative 'type_association'
+require_relative 'extensions'
 
 # チャンネルクラス
 class Channel

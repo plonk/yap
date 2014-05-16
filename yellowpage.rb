@@ -1,6 +1,6 @@
 #!ruby
 # -*- coding: utf-8 -*-
-require_relative 'channel.rb'
+require_relative 'channel'
 require 'net/http'
 require 'uri'
 
