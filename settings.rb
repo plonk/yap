@@ -28,7 +28,7 @@ class SettingsClass
     USER_PEERCAST: '127.0.0.1:7144',
     REVERSE_LOOKUP_TIP: true,
     NOTIFICATION_AUTO_CLOSE_SECONDS: 15,
-    LIST_FONT: 'Sans 12',
+    LIST_FONT: 'Sans 10',
     ENABLE_AUTO_BANDWIDTH_CHECK: true,
     GRID_LINES: 1,
     RULES_HINT: true
