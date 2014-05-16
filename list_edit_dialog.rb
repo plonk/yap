@@ -16,92 +16,103 @@ class ListEditDialog < Gtk::Dialog
         widget.active?
       when Entry
         widget.text
+      else fail 'missing case'
       end
     end
 
     def initialize(parent_window, headers, types)
       super('アイテムを追加', parent_window)
 
+      @headers = headers
+      @types = types
       @views = []
 
-      vbox.spacing = 5
-      create(Table, 2, headers.size, row_spacings: 5, column_spacings: 10) do |table|
-        headers.each_with_index do |header, col_id|
-          create(Label, header, xalign: 1) do |legend|
-            table.attach_defaults(legend, 0, 1, col_id, col_id + 1)
-          end
-
-          case types[col_id]
-          when :text
-            create(Entry) do |entry|
-              entry.width_request = 150
-              @views << entry
-              table.attach_defaults(entry, 1, 2, col_id, col_id + 1)
-            end
-          when :toggle
-            create(CheckButton) do |toggle|
-              @views << toggle
-              table.attach_defaults(toggle, 1, 2, col_id, col_id + 1)
-            end
-          when :radio
-            create(CheckButton) do |toggle|
-              toggle.active = false
-              toggle.sensitive = false
-              @views << toggle
-              table.attach_defaults(toggle, 1, 2, col_id, col_id + 1)
-            end
-          else fail
-          end
-        end
-        vbox.pack_start(table, false)
-      end
-
-      add_button Stock::CANCEL, RESPONSE_CANCEL
-      @ok_button = add_button Stock::OK, RESPONSE_OK
-
-      set_alternative_button_order [RESPONSE_OK, RESPONSE_CANCEL]
+      do_layout
 
       @ok_button.signal_connect 'clicked' do
         @result = @views.map(&method(:value))
       end
+    end
+
+    def create_field_widget(type)
+      case type
+      when :text
+        create(Entry, width_request: 150)
+      when :toggle
+        create(CheckButton)
+      when :radio
+        create(CheckButton, active: false, sensitive: false)
+      else fail "unknown widget type (#{type})"
+      end
+    end
+
+    def do_layout
+      vbox.set(spacing: 5)
+      vbox.pack_start(create_table, false)
+      add_buttons
+    end
+
+    def create_table
+      create(Table, 2, @headers.size,
+             row_spacings: 5, column_spacings: 10) do |table|
+        @headers.each_with_index do |header, col_id|
+          table.attach_defaults(create(Label, header, xalign: 1),
+                                0, 1, col_id, col_id + 1)
+
+          widget = create_field_widget @types[col_id]
+          @views << widget
+          table.attach_defaults(widget, 1, 2, col_id, col_id + 1)
+        end
+      end
+    end
+
+    def add_buttons
+      add_button Stock::CANCEL, RESPONSE_CANCEL
+      @ok_button = add_button Stock::OK, RESPONSE_OK
+
+      set_alternative_button_order [RESPONSE_OK, RESPONSE_CANCEL]
     end
   end
 
   include Gtk
   include GtkHelper
 
+  def create_toggle_renderer(editable, col_id)
+    create(CellRendererToggle) do |cr|
+      cr.signal_connect 'toggled' do |_renderer, path|
+        iter = @liststore.get_iter path
+        iter[col_id] = !iter[col_id]
+      end if editable
+    end
+  end
+
+  def create_radio_renderer(editable, col_id)
+    create(CellRendererToggle, radio: true) do |cr|
+      cr.signal_connect 'toggled' do |_renderer, path|
+        @liststore.each do |_model, _path, iter|
+          iter[col_id] = false
+        end
+        iter = @liststore.get_iter path
+        iter[col_id] = true
+      end if editable
+    end
+  end
+
+  def create_text_renderer(editable, col_id)
+    create(CellRendererText, editable: editable) do |cr|
+      cr.signal_connect 'edited' do |_renderer, path, value|
+        @liststore.get_iter(path)[col_id] = value
+      end if editable
+    end
+  end
+
   def create_renderer(type, editable, col_id)
     case type
-    when :toggle
-      result = CellRendererToggle.new
-      if editable
-        result.signal_connect 'toggled' do |_renderer, path|
-          iter = @liststore.get_iter path
-          iter[col_id] = !iter[col_id]
-        end
-      end
-    when :radio
-      result = CellRendererToggle.new
-      result.radio = true
-      if editable
-        result.signal_connect 'toggled' do |_renderer, path|
-          @liststore.each do |_model, _path, iter|
-            iter[col_id] = false
-          end
-          iter = @liststore.get_iter path
-          iter[col_id] = true
-        end
-      end
-    when :text
-      result = CellRendererText.new
-      result.editable = editable
-      result.signal_connect 'edited' do |_renderer, path, value|
-        @liststore.get_iter(path)[col_id] = value
-      end
-    else
-      fail "unknown type #{type}"
+    when :toggle then create_toggle_renderer(editable, col_id)
+    when :radio  then create_radio_renderer(editable, col_id)
+    when :text   then create_text_renderer(editable, col_id)
+    else fail "unknown type #{type}"
     end
-    result
   end
 
   def options_consistent?(options)
@@ -142,6 +153,10 @@ class ListEditDialog < Gtk::Dialog
       self.vbox.add vbox
     end
 
+    add_buttons
+  end
+
+  def add_buttons
     add_button(Stock::CANCEL, RESPONSE_CANCEL)
     @ok_button = add_button(Stock::OK, RESPONSE_OK)
 
