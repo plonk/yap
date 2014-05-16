@@ -59,20 +59,28 @@ class SettingsDialog < Gtk::Dialog
       create(Button, '設定', on_clicked: method(:cb_file_assoc_button_clicked))
     @font_button        = create(FontButton, ::Settings[:LIST_FONT])
     @bandwidth_button   =
-      create(CheckButton, active: ::Settings[:ENABLE_AUTO_BANDWIDTH_CHECK])
+      create(CheckButton, '自動帯域チェック',
+             active: ::Settings[:ENABLE_AUTO_BANDWIDTH_CHECK])
     @grid_combo_box     = create_combo_box
-    @rules_check_button = create(CheckButton, active: ::Settings[:RULES_HINT])
+    @rules_check_button = create(CheckButton, '交互に暗色', tooltip_text: '一行ごとに背景を暗くする(テーマ依存)', active: ::Settings[:RULES_HINT])
   end
 
   def widget_table
     create_cell_widgets
 
-    [[head('接続先 Peercast ノード'), @peercast_entry],
-     [head('プレーヤー'), @file_assoc_button],
-     [head('自動帯域チェック'), @bandwidth_button],
-     [head('リストのフォント'), @font_button],
-     [head('罫線'), @grid_combo_box],
-     [head('交互に暗色', '一行ごとに背景を暗くする(テーマ依存)'), @rules_check_button]]
+    [[header('接続先ノード'), @peercast_entry],
+     [header('プレーヤー'), @file_assoc_button],
+     [nil, @bandwidth_button],
+     [header('リストのフォント'), @font_button],
+     [header('罫線'), @grid_combo_box],
+     [nil, @rules_check_button]]
+  end
+
+  def header(str, tooltip = '')
+    create(Label, str + ':',
+           xalign: 1,
+           yalign: 0.5,
+           tooltip_text: tooltip)
   end
 
   def create_table
@@ -83,7 +91,7 @@ class SettingsDialog < Gtk::Dialog
 
     definition.each_with_index do |row, y|
       row.each_with_index do |widget, x|
-        table.attach_defaults(widget, x, x + 1, y, y + 1)
+        table.attach_defaults(widget, x, x + 2 / row.size, y, y + 1) if widget
       end
     end
     table
