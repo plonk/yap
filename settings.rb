@@ -58,7 +58,6 @@ class SettingsClass
     @variables[sym] = value
     changed
     notify_observers
-    value
   end
 
   SETTINGS_YAML_FILE = SETTINGS_DIR / 'settings.yml'

@@ -59,8 +59,10 @@ class MainWindowModel
   end
 
   def settings_changed
-    @yellow_pages = active_yellow_pages
-    do_update_channel_list(false, false)
+    unless @yellow_pages.set_equal? active_yellow_pages
+      @yellow_pages = active_yellow_pages
+      do_update_channel_list(false, false)
+    end
     changed
     notify_observers(:settings_changed)
   end
