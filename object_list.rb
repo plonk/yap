@@ -141,6 +141,10 @@ class ObjectList < Gtk::ScrolledWindow
     @objects
   end
 
+  def can_add?
+    @constructor.to_bool
+  end
+
   def can_go_up?
     selected && @objects.index(selected) != 0
   end

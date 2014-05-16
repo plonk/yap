@@ -65,4 +65,8 @@ class Array
       fs.map { |f| f.call(*args) }
     end
   end
+
+  def set_equal?(other)
+    self - other == [] and other - self == []
+  end
 end

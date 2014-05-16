@@ -34,7 +34,7 @@ class TypeAssocDialog < Gtk::Dialog
     create(HBox, false, 5) do |hbox|
       hbox.pack_start(@assoc_list, true)
 
-      create(ObjectListControlBox, @assoc_list) do |control_box|
+      create(ObjectListControlBoxFull, @assoc_list) do |control_box|
         hbox.pack_start(control_box, false)
       end
 

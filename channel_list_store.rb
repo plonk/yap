@@ -86,8 +86,10 @@ class ChannelListStore < Gtk::ListStore
     filter = TreeModelFilter.new(self)
     esc_term = Regexp.escape(regularize(term))
     filter.set_visible_func do |_model, iter|
-      [FLD_CHNAME, FLD_GENRE, FLD_DETAIL]
-        .any? { |fld| regularize(iter[fld]) =~ /#{esc_term}/ }
+      [FLD_CHNAME, FLD_GENRE, FLD_DETAIL].any? do |fld|
+        # 何が起こっているのかわからないけど、とりあえず nil チェックすれば落ちない。
+        str = iter[fld] and regularize(str) =~ /#{esc_term}/
+      end
     end
     filter
   end

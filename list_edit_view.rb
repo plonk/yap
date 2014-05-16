@@ -11,6 +11,9 @@ class ListEditView < Gtk::TreeView
     @parent_window = parent_window
     check_options(options)
 
+    @movable_rows = options[:movable_rows].to_bool
+    @allow_add = options[:allow_add].to_bool
+    @allow_delete = options[:allow_delete].to_bool
     @types = options[:types]
     @headers = options[:headers]
     @editable = options[:editable]
@@ -173,6 +176,8 @@ class ListEditView < Gtk::TreeView
   # 以下 ObjectListControlBox とお話するためのインターフェイス
 
   def run_add_dialog(parent_window = @parent_window)
+    return unless @allow_add
+
     dialog = AddItemDialog.new(parent_window, @headers, @types).show_all
     dialog.run do |response|
       case response
@@ -186,7 +191,7 @@ class ListEditView < Gtk::TreeView
   end
 
   def delete
-    @list_store.remove selection.selected if selection.selected
+    @list_store.remove selection.selected if !@allow_delete && selection.selected
   end
 
   def go_up
@@ -214,16 +219,20 @@ class ListEditView < Gtk::TreeView
     notify_observers
   end
 
+  def can_add?
+    @allow_add
+  end
+
   def can_go_up?
-    selection.selected && selection.selected.path.to_s != '0'
+    @movable_rows && selection.selected && selection.selected.path.to_s != '0'
   end
 
   def can_go_down?
-    selection.selected && selection.selected.dup.next! != false
+    @movable_rows && selection.selected && selection.selected.dup.next! != false
   end
 
   def can_delete?
-    selection.selected.to_bool
+    @allow_delete && selection.selected.to_bool
   end
 
   # アイテム追加ダイアログ

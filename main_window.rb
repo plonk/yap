@@ -11,11 +11,13 @@ require_relative 'utility'
 require_relative 'notification'
 require_relative 'gtk_helper'
 require_relative 'about_dialog'
+require_relative 'column_settings_dialog'
 
 # メインウィンドウクラス。MainWindowModel とは深い仲。
 class MainWindow < Gtk::Window
   include Gtk
   include GtkHelper
+  include DispatchingObserver
 
   def initialize(model)
     super(Window::TOPLEVEL)
@@ -54,6 +56,7 @@ class MainWindow < Gtk::Window
       ['SettingsAction', Stock::PREFERENCES, '一般設定(_S)', '', nil, proc { open_settings_dialog }],
       ['TypeAssocAction', nil, 'プレーヤー設定(_T)', '', nil, proc {}],
       ['YellowPageAction', nil, 'YP 設定(_Y)', '', nil, proc { open_yellow_page_manager }],
+      ['ColumnSettingsAction', nil, 'カラム設定(_C)', '', nil, proc { open_column_settings_dialog }],
       ['ProcessManagerAction', nil, 'プロセスマネージャ(_P)', '', nil, proc { open_process_manager }],
 
       ['HelpMenuAction', Stock::HELP, 'ヘルプ(_H)', '', nil, proc {}],
@@ -217,17 +220,8 @@ class MainWindow < Gtk::Window
   def show_channel_info(ch)
     dialog = InfoDialog.new(self, ch)
     dialog.show_all
-    dialog.run do |_response|
+    dialog.signal_connect('response') do
       dialog.destroy
-    end
-  end
-
-  def update(message, *args)
-    if self.respond_to? message
-      # 別スレッドから呼ばれる可能性があるはず。
-      Gtk.queue do
-        __send__(message, *args)
-      end
     end
   end
 
@@ -250,6 +244,10 @@ class MainWindow < Gtk::Window
 
   def open_yellow_page_manager
     YellowPageManager.new(self).show_all
+  end
+
+  def open_column_settings_dialog
+    ColumnSettingsDialog.new(self).show_all
   end
 
   def setup_accel_keys

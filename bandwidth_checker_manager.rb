@@ -6,16 +6,14 @@ require_relative 'bandwidth_checker'
 
 # 帯域測定が必要かどうかチェックしてスケジュールする。
 class BandwidthCheckerManager
+  include DispatchingObserver
+
   def initialize(model)
     @model = model
     @model.add_observer(self, :update)
     @checking = []
     @finished_recently = []
     @running = false
-  end
-
-  def update(message, *args)
-    __send__(message, *args) if respond_to? message
   end
 
   def reject_finished(checkers)
