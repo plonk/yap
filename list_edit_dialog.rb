@@ -9,19 +9,19 @@ class ListEditDialog < Gtk::Dialog
   include GtkHelper
 
   def do_layout(options)
-    @treeview = ListEditView.new(self, options)
+    @list_edit_view = ListEditView.new(self, options)
 
     create(HBox, spacing: 5) do |hbox|
       create(ScrolledWindow,
              hscrollbar_policy: POLICY_AUTOMATIC,
              vscrollbar_policy: POLICY_AUTOMATIC) do |sw|
-        sw.add @treeview
+        sw.add @list_edit_view
 
         @scrolled_window = sw
         hbox.pack_start(sw, true)
       end
 
-      create(ObjectListControlBox, @treeview) do |control_box|
+      create(ObjectListControlBox, @list_edit_view) do |control_box|
         hbox.pack_start(control_box, false)
       end
 
@@ -39,7 +39,7 @@ class ListEditDialog < Gtk::Dialog
   end
 
   def result
-    @treeview.result
+    @list_edit_view.result
   end
 
   def initialize(parent_window, options)
@@ -50,7 +50,7 @@ class ListEditDialog < Gtk::Dialog
   end
 
   def update_size_request
-    width, height = @treeview.size_request
+    width, height = @list_edit_view.size_request
     @scrolled_window.set_size_request width + 15, height + 30
   end
 end
