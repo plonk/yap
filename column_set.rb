@@ -2,13 +2,14 @@
 class ColumnSet
   include Gtk
   include GtkHelper
+  include DispatchingObserver
 
-  attr_reader :cell_renderer
+  attr_reader :cell_renderer_set
 
   def initialize(mw_model, list_store)
     @list_store = list_store
     @mw_model  = mw_model
-    @cell_renderer = CellRendererSet.new(@mw_model)
+    @cell_renderer_set = CellRendererSet.new(@mw_model)
 
     create_columns
     connect_sort_changers
@@ -25,14 +26,6 @@ class ColumnSet
     @mw_model.delete_observer(self)
   end
     
-  def update(message, *args)
-    if self.respond_to? message
-      Gtk.queue do
-        __send__(message, *args)
-      end
-    end
-  end
-
   def each
     [@yp_column,
      @name_column,
@@ -46,20 +39,20 @@ class ColumnSet
   end
 
   def settings_changed
-    @column_set.cell_renderer.set_cell_renderer_font
+    cell_renderer_set.update_font
   end
 
   def create_columns
-    @yp_column       = TreeViewColumn.new('YP', @cell_renderer.yp)
-    @name_column     = TreeViewColumn.new('名前', @cell_renderer.name, text: 0)
+    @yp_column       = TreeViewColumn.new('YP', @cell_renderer_set.yp)
+    @name_column     = TreeViewColumn.new('名前', @cell_renderer_set.name, text: 0)
       .set(resizable: true, min_width: 100, expand: true)
-    @genre_column    = TreeViewColumn.new('ジャンル', @cell_renderer.genre, text: 1)
+    @genre_column    = TreeViewColumn.new('ジャンル', @cell_renderer_set.genre, text: 1)
       .set(resizable: true, min_width: 50, expand: true)
-    @detail_column   = TreeViewColumn.new('配信内容', @cell_renderer.detail, text: 2)
+    @detail_column   = TreeViewColumn.new('配信内容', @cell_renderer_set.detail, text: 2)
       .set(resizable: true, min_width: 240, expand: true)
-    @listener_column = TreeViewColumn.new('人数', @cell_renderer.listener, text: 3)
-    @time_column     = TreeViewColumn.new('時間', @cell_renderer.time, text: 4)
-    @bitrate_column  = TreeViewColumn.new('Bps', @cell_renderer.bitrate, text: 5)
+    @listener_column = TreeViewColumn.new('人数', @cell_renderer_set.listener, text: 3)
+    @time_column     = TreeViewColumn.new('時間', @cell_renderer_set.time, text: 4)
+    @bitrate_column  = TreeViewColumn.new('Bps', @cell_renderer_set.bitrate, text: 5)
   end
 
   def connect_sort_changers
@@ -76,15 +69,15 @@ class ColumnSet
   end
 
   def set_cell_data_funcs
-    [[@yp_column,       @cell_renderer.yp,       :yp_cell_data_func],
-     [@name_column,     @cell_renderer.name,     :name_cell_data_func],
-     [@genre_column,    @cell_renderer.genre,    :genre_cell_data_func],
-     [@detail_column,   @cell_renderer.detail,   :detail_cell_data_func],
-     [@listener_column, @cell_renderer.listener, :listener_cell_data_func],
-     [@time_column,     @cell_renderer.time,     :time_cell_data_func],
-     [@bitrate_column,  @cell_renderer.bitrate,  :bitrate_cell_data_func]]
+    [[@yp_column,       @cell_renderer_set.yp,       :yp_cell_data_func],
+     [@name_column,     @cell_renderer_set.name,     :name_cell_data_func],
+     [@genre_column,    @cell_renderer_set.genre,    :genre_cell_data_func],
+     [@detail_column,   @cell_renderer_set.detail,   :detail_cell_data_func],
+     [@listener_column, @cell_renderer_set.listener, :listener_cell_data_func],
+     [@time_column,     @cell_renderer_set.time,     :time_cell_data_func],
+     [@bitrate_column,  @cell_renderer_set.bitrate,  :bitrate_cell_data_func]]
       .each do |col, cr, sym|
-      col.set_cell_data_func(cr, &@cell_renderer.method(sym))
+      col.set_cell_data_func(cr, &@cell_renderer_set.method(sym))
     end
   end
 

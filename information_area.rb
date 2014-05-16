@@ -3,6 +3,7 @@
 class InformationArea < Gtk::VBox
   include Gtk
   include GtkHelper
+  include DispatchingObserver
 
   URL2PIXBUF = {} # contact URL to favicon pixbuf
 
@@ -78,15 +79,6 @@ class InformationArea < Gtk::VBox
         detail_vbox.pack_start(genre_hbox, false)
       end
       pack_start(detail_vbox, false)
-    end
-  end
-
-  def update(message, *args)
-    if self.respond_to? message
-      # 別スレッドから呼ばれる可能性があるはず。
-      Gtk.queue do
-        __send__(message, *args)
-      end
     end
   end
 

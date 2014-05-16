@@ -17,6 +17,7 @@ require_relative 'column_settings_dialog'
 class MainWindow < Gtk::Window
   include Gtk
   include GtkHelper
+  include DispatchingObserver
 
   def initialize(model)
     super(Window::TOPLEVEL)
@@ -221,15 +222,6 @@ class MainWindow < Gtk::Window
     dialog.show_all
     dialog.signal_connect('response') do
       dialog.destroy
-    end
-  end
-
-  def update(message, *args)
-    if self.respond_to? message
-      # 別スレッドから呼ばれる可能性があるはず。
-      Gtk.queue do
-        __send__(message, *args)
-      end
     end
   end
 

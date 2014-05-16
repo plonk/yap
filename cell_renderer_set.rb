@@ -120,7 +120,7 @@ class CellRendererSet
     renderer.markup = get_highlighted_markup(detail, @highlight_term)
   end
 
-  def set_cell_renderer_font
+  def update_font
     @name.font =
       @genre.font =
       @detail.font =
@@ -133,10 +133,10 @@ class CellRendererSet
     @name	= create CellRendererText, ellipsize: Layout::ELLIPSIZE_END
     @genre	= create CellRendererText, ellipsize: Layout::ELLIPSIZE_END
     @detail	= create CellRendererText, ellipsize: Layout::ELLIPSIZE_END
-    @listener = create CellRendererText, xalign: 1
+    @listener 	= create CellRendererText, xalign: 1
     @bitrate	= create CellRendererText, xalign: 1
-    @yp	= create CellRendererPixbuf
+    @yp		= create CellRendererPixbuf
     @time	= create CellRendererText, xalign: 1
-    set_cell_renderer_font
+    update_font
   end
 end

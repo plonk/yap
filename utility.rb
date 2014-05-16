@@ -101,3 +101,13 @@ module Environment
     end
   end
 end
+
+module DispatchingObserver
+  def update(message, *args)
+    if self.respond_to? message
+      Gtk.queue do
+        __send__(message, *args)
+      end
+    end
+  end
+end

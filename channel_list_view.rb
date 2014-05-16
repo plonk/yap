@@ -12,6 +12,7 @@ require_relative 'clv_context_menu'
 class ChannelListView < Gtk::TreeView
   include Pango, Gtk, GtkHelper
   include Observable
+  include DispatchingObserver
 
   attr_accessor :scrolled_window
   attr_accessor :list_store
@@ -21,14 +22,6 @@ class ChannelListView < Gtk::TreeView
      GRID_LINES_HORIZONTAL,
      GRID_LINES_VERTICAL,
      GRID_LINES_BOTH]
-
-  def update(message, *args)
-    if self.respond_to? message
-      Gtk.queue do
-        __send__(message, *args)
-      end
-    end
-  end
 
   def favorites_changed
     refresh
@@ -151,7 +144,7 @@ class ChannelListView < Gtk::TreeView
   end
 
   def search(term)
-    @cr.highlight_term = term
+    @column_set.cell_renderer_set.highlight_term = term
     if term == ''
       self.model = @list_store
     else
