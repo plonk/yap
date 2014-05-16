@@ -16,22 +16,6 @@ module GtkHelper
 
     widget
   end
-
-  def head(str, tooltip = nil)
-    label = Gtk::Label.new(str + ':')
-    label.xalign = 1
-    label.yalign = 0.5
-    label.tooltip_text = tooltip if tooltip
-    label
-  end
-
-  def cell(str)
-    label = Gtk::Label.new(str)
-    label.selectable = true
-    label.yalign = 0.5
-    label.xalign = 0
-    label
-  end
 end
 
 # 開いてモンキーパッチ
