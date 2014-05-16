@@ -134,7 +134,8 @@ class MainWindow < Gtk::Window
   end
 
   def connect_callbacks
-    @reload_toolbutton.signal_connect('clicked', &method(:reload_toolbutton_callback))
+    @reload_toolbutton
+      .signal_connect('clicked', &method(:reload_toolbutton_callback))
 
     if $ENABLE_VIEWLOG
       @viewlog_toolbutton.signal_connect('clicked') do
@@ -195,22 +196,12 @@ class MainWindow < Gtk::Window
 
   def create_status_icon_menu
     create(Menu) do |menu|
-      create(ImageMenuItem, Stock::INFO) do |info|
-        info.signal_connect('activate') do
-          run_about_dialog
-        end
-        menu.append(info)
-      end
-
-      menu.append(Gtk::SeparatorMenuItem.new)
-
-      create(ImageMenuItem, Stock::QUIT) do |quit|
-        quit.signal_connect('activate') { self.quit }
-        menu.append(quit)
-      end
-
-      menu.show_all
-    end
+      menu.append create(ImageMenuItem, Stock::INFO,
+                         on_activate: proc { run_about_dialog })
+      menu.append SeparatorMenuItem.new
+      menu.append create(ImageMenuItem, Stock::QUIT,
+                         on_activate: proc { quit })
+    end.show_all
   end
 
   def run_about_dialog
