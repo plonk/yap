@@ -42,7 +42,7 @@ class ObjectListControlBox < Gtk::VButtonBox
   end
 
   def declare_relations
-    relation '@delete_button.sensitive mimics @object_list.selected'
+    relation '@delete_button.sensitive mimics @object_list.can_delete?'
     relation '@up_button.sensitive mimics @object_list.can_go_up?'
     relation '@down_button.sensitive mimics @object_list.can_go_down?'
   end

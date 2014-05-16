@@ -182,6 +182,10 @@ class ObjectList < Gtk::ScrolledWindow
     notify_observers
   end
 
+  def can_delete?
+    selected ? true : false
+  end
+
   # アイテム追加用サブダイアログ
   class AddItemDialog < Gtk::Dialog
     include Gtk::Stock, GtkHelper, Gtk
