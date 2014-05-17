@@ -42,6 +42,18 @@ class ChannelListView::ContextMenu < Gtk::Menu
     end
     append(@fav)
 
+    ham = MenuItem.new('train ham')
+    ham.signal_connect('activate') do
+      @channel.train(:ham)
+    end
+    append(ham)
+
+    spam = MenuItem.new('train spam')
+    spam.signal_connect('activate') do
+      @channel.train(:spam)
+    end
+    append(spam)
+
     append(MenuItem.new)
 
     @info = MenuItem.new('チャンネル情報')

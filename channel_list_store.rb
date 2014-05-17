@@ -58,7 +58,7 @@ class ChannelListStore < Gtk::ListStore
     iter[FLD_BITRATE]  = ch.bitrate
     iter[FLD_CH_ID]    = ch.channel_id
     iter[FLD_YPNAME]   = ch.yp.name
-    iter[FLD_SCORE]    = 0.0
+    iter[FLD_SCORE]    = ch.score
   end
 
   def channel_to_path(ch)

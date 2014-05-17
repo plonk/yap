@@ -3,6 +3,7 @@ require 'digest/md5'
 require_relative 'launcher'
 require_relative 'type_association'
 require_relative 'extensions'
+require_relative 'bayesian'
 
 # チャンネルクラス
 class Channel
@@ -20,6 +21,16 @@ class Channel
   # A line consists of 19 fields seperated by "<>"
   NAME = 0
   ID = 1 # etc.
+  GENRE = 4
+  DETAIL = 5
+  COMMENT = 17
+
+  FEATURE_DATABASE_FILE = ENV['HOME'] / '.yap/feature_database.dat'
+  @@classifier = Classifier.new(FEATURE_DATABASE_FILE)
+
+  def self.save_classifier_state
+    @@classifier.save(FEATURE_DATABASE_FILE)
+  end
 
   def initialize(line, source_yp)
     load_line(line)
@@ -146,5 +157,17 @@ class Channel
     end
   rescue
     nil
+  end
+
+  def datum
+    @fields.values_at(NAME, GENRE, DETAIL, COMMENT).join(" ").strip
+  end
+
+  def score
+    @@classifier.score_text(datum)
+  end
+
+  def train(category)
+    @@classifier.train(datum, category)
   end
 end

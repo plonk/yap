@@ -32,6 +32,11 @@ class Classifier
     end
   end
 
+  def score_text text
+    _, score = classify text
+    score
+  end
+
   def classify text
     # Classify the text of a message as :spam, :ham, or :unsure.
     classification score extract_features text

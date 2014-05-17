@@ -131,6 +131,13 @@ class MainWindowModel
   end
 
   def play(channel)
+    channel.train(:ham)
+    changed
+    notify_observers(:channel_list_updated)
+    do_play(channel)
+  end
+
+  def do_play(channel)
     player = TypeAssociation.instance.launcher(channel.type)
     if player
       STDERR.puts "Launching #{player.interpolate(channel)}"
@@ -161,6 +168,8 @@ class MainWindowModel
   end
 
   def finalize
+    Channel.save_classifier_state
+
     @favorites.delete_observer(self)
     @favorites.save
 

@@ -6,7 +6,7 @@ class ColumnSet
 
   attr_reader :cell_renderer_set
 
-  ID_TO_NAME = ['YP', '名前', 'ジャンル', '配信内容', '人数', '時間', 'Bps'].freeze
+  ID_TO_NAME = ['YP', '名前', 'ジャンル', '配信内容', '人数', '時間', 'Bps', 'スコア'].freeze
   NUM_IDS = ID_TO_NAME.size
 
   def initialize(mw_model, list_store)
@@ -42,7 +42,8 @@ class ColumnSet
      @detail_column,
      @listener_column,
      @time_column,
-     @bitrate_column][id]
+     @bitrate_column,
+     @score_column][id]
   end
 
   def settings_changed
@@ -60,6 +61,7 @@ class ColumnSet
     @listener_column = TreeViewColumn.new('人数', @cell_renderer_set.listener, text: 3)
     @time_column     = TreeViewColumn.new('時間', @cell_renderer_set.time, text: 4)
     @bitrate_column  = TreeViewColumn.new('Bps', @cell_renderer_set.bitrate, text: 5)
+    @score_column    = TreeViewColumn.new('スコア', @cell_renderer_set.score, text: ChannelListStore::FLD_SCORE)
   end
 
   def connect_sort_changers
@@ -69,7 +71,8 @@ class ColumnSet
      [@detail_column,   ChannelListStore::FLD_DETAIL,   SORT_ASCENDING],
      [@listener_column, ChannelListStore::FLD_LISTENER, SORT_DESCENDING],
      [@time_column,     ChannelListStore::FLD_TIME,     SORT_DESCENDING],
-     [@bitrate_column,  ChannelListStore::FLD_BITRATE,  SORT_DESCENDING]]
+     [@bitrate_column,  ChannelListStore::FLD_BITRATE,  SORT_DESCENDING],
+     [@score_column,    ChannelListStore::FLD_SCORE,    SORT_ASCENDING]]
       .each do |col, fldnum, order|
       col.signal_connect('clicked', &sort_changer(fldnum, order))
     end
@@ -82,7 +85,8 @@ class ColumnSet
      [@detail_column,   @cell_renderer_set.detail,   :detail_cell_data_func],
      [@listener_column, @cell_renderer_set.listener, :listener_cell_data_func],
      [@time_column,     @cell_renderer_set.time,     :time_cell_data_func],
-     [@bitrate_column,  @cell_renderer_set.bitrate,  :bitrate_cell_data_func]]
+     [@bitrate_column,  @cell_renderer_set.bitrate,  :bitrate_cell_data_func],
+     [@score_column,    @cell_renderer_set.score,    :score_cell_data_func]]
       .each do |col, cr, sym|
       col.set_cell_data_func(cr, &@cell_renderer_set.method(sym))
     end

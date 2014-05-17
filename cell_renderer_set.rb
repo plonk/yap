@@ -4,7 +4,7 @@ class CellRendererSet
   include Pango, Gtk, GtkHelper
 
   attr_reader :name, :yp, :genre, :detail, :listener
-  attr_reader :time, :bitrate
+  attr_reader :time, :bitrate, :score
   attr_accessor :highlight_term
 
   TARGET_NAME_CELL_WIDTH = 16.0
@@ -120,13 +120,19 @@ class CellRendererSet
     renderer.markup = get_highlighted_markup(detail, @highlight_term)
   end
 
+  def score_cell_data_func(_col, renderer, _model, iter)
+    score = iter[ChannelListStore::FLD_SCORE]
+    renderer.text = format("%.1f", 100 - score * 100)
+  end
+
   def update_font
     @name.font =
       @genre.font =
       @detail.font =
       @listener.font =
       @bitrate.font =
-      @time.font = ::Settings[:LIST_FONT]
+      @time.font =
+      @score.font = ::Settings[:LIST_FONT]
   end
 
   def create_cell_renderers
@@ -137,6 +143,7 @@ class CellRendererSet
     @bitrate	= create CellRendererText, xalign: 1
     @yp		= create CellRendererPixbuf
     @time	= create CellRendererText, xalign: 1
+    @score	= create CellRendererText, xalign: 1
     update_font
   end
 end
