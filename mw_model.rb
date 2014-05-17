@@ -316,7 +316,7 @@ class MainWindowModel
   end
 
   def notify_observers(*args)
-    STDERR.puts "mw_model: notify_observers: #{args.inspect}"
+    # STDERR.puts "mw_model: notify_observers: #{args.inspect}"
     super
   end
 end
