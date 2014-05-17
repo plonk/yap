@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-## ベイジアンフィルター
-## 「Practical Common Lisp」から。
+## ベイジアンフィルター -  Peiter Siebel による spam.lisp に基く。
 require_relative 'jwords'
 
 class Classifier
