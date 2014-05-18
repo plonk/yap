@@ -32,7 +32,7 @@ class SettingsClass
     ENABLE_AUTO_BANDWIDTH_CHECK: true,
     GRID_LINES: 1,
     RULES_HINT: true,
-    COLUMN_PREFERENCE: [0, 1, 2, 3, 4, 5, 6]
+    COLUMN_PREFERENCE: [0, 1, 2, 3, 7, 4, 5, 6]
   }
 
   VAR_NAMES = VARIABLES.keys
