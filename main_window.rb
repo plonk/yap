@@ -22,10 +22,11 @@ class MainWindow < Gtk::Window
   include GtkHelper
   include DispatchingObserver
 
-  def initialize(model)
+  def initialize(model, ui)
     super(Window::TOPLEVEL)
 
     @model = model
+    @ui = ui
 
     widget_layout
 
@@ -52,14 +53,14 @@ class MainWindow < Gtk::Window
 
   def setup_ui
     @ui_manager = MainWindow::UIManager.new
-    @action_group = MainWindow::ActionGroup.new(@model, self)
+    @action_group = MainWindow::ActionGroup.new(@model, @ui)
     @ui_manager.insert_action_group(@action_group, 0)
   end
 
   def create_outermost_vbox
     create(VBox, false, 0) do |outermost_vbox|
       menubar = @ui_manager['/ui/menubar']
-      @toolbar = MainWindow::Toolbar.new(@model, self)
+      @toolbar = MainWindow::Toolbar.new(@model, @ui)
       @information_area = InformationArea.new(@model)
       @notebook = MainWindow::Notebook.new(@model)
       @notification = Notification.new(@model)
@@ -71,10 +72,6 @@ class MainWindow < Gtk::Window
     end
   end
 
-  def open_log_dialog
-    LogDialog.new(self).show_all
-  end
-
   def toggle_toolbar_visibility
     ::Settings[:TOOLBAR_VISIBLE] = !::Settings[:TOOLBAR_VISIBLE]
   end
@@ -83,47 +80,11 @@ class MainWindow < Gtk::Window
     ::Settings[:CHANNEL_INFO_VISIBLE] = !::Settings[:CHANNEL_INFO_VISIBLE]
   end
 
-  def run_about_dialog
-    YapAboutDialog.new.show_all
-  end
-
   def show_all
     super
     @toolbar.visible = ::Settings[:TOOLBAR_VISIBLE]
     @information_area.visible = ::Settings[:CHANNEL_INFO_VISIBLE]
-  end
-
-  def show_channel_info(ch)
-    dialog = InfoDialog.new(self, ch)
-    dialog.show_all
-    dialog.signal_connect('response') do
-      dialog.destroy
-    end
-  end
-
-  def run_favorite_dialog
-    dialog = FavoriteDialog.new(self, @model.favorites.to_a)
-    dialog.show_all
-    dialog.run do |response|
-      @model.favorites.replace(dialog.list) if response == Dialog::RESPONSE_OK
-    end
-    dialog.destroy
-  end
-
-  def open_settings_dialog
-    SettingsDialog.new(self).show_all
-  end
-
-  def open_yellow_page_manager
-    YellowPageManager.new(self).show_all
-  end
-
-  def open_column_settings_dialog
-    ColumnSettingsDialog.new(self).show_all
-  end
-
-  def open_process_manager
-    ProcessManager.new(self, @model).show_all
+    self
   end
 
   def finalize

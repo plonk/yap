@@ -5,9 +5,9 @@ class MainWindow < Gtk::Window
     include GtkHelper
     include DispatchingObserver
 
-    def initialize(model, main_window)
+    def initialize(model, ui)
       @model = model
-      @main_window = main_window
+      @ui = ui
 
       super()
 
@@ -48,11 +48,11 @@ class MainWindow < Gtk::Window
         .signal_connect('clicked', &method(:reload_toolbutton_callback))
 
       @viewlog_toolbutton.signal_connect('clicked') do
-        @main_window.open_log_dialog
+        @ui.open_log_dialog
       end if $ENABLE_VIEWLOG
 
       @settings_toolbutton.signal_connect('clicked') do
-        @main_window.open_settings_dialog
+        @ui.open_settings_dialog
       end
     end
 

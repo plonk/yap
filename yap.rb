@@ -13,6 +13,7 @@ require_relative 'threadhack'
 require_relative 'yellowpage'
 require_relative 'extensions'
 require_relative 'resource'
+require_relative 'ui'
 
 # STDOUT.external_encoding("Shift_JIS")
 $log = StringIO.new('', 'w')
@@ -35,34 +36,4 @@ QUESTION_16 = Gdk::Pixbuf.new Resource['question16.ico']
 QUESTION_64 = Gdk::Pixbuf.new Resource['question64.ico']
 LOADING_16 = Gdk::Pixbuf.new Resource['loading.ico']
 
-require_relative 'info_dialog'
-require_relative 'log_dialog'
-require_relative 'favorite_dialog'
-require_relative 'settings_dialog'
-
-# ------------------------------------------------------------------
-
-require_relative 'settings'
-
-require_relative 'main_window'
-require_relative 'bandwidth_checker_manager'
-
-model = MainWindowModel.new
-window = MainWindow.new model
-BandwidthCheckerManager.new model
-
-window.show_all unless defined? Ocra
-
-begin
-  puts 'Going into the main loop'
-  Gtk.main
-rescue Interrupt
-  # なんか変だ
-  window.finalize
-ensure
-  if $RUNNING_ON_RUBYW
-    File.open('outlog.txt', 'w') do |f|
-      f.write $log.string
-    end
-  end
-end
+UI.new(MainWindowModel.new).run
