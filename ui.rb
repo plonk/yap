@@ -10,6 +10,10 @@ require_relative 'main_window'
 class UI
   include Gtk
 
+  QUESTION_16 = Gdk::Pixbuf.new Resource['question16.ico']
+  QUESTION_64 = Gdk::Pixbuf.new Resource['question64.ico']
+  LOADING_16 = Gdk::Pixbuf.new Resource['loading.ico']
+
   def initialize(model)
     @model = model
 
@@ -22,13 +26,7 @@ class UI
     Gtk.main
   rescue Interrupt
     # なんか変だ
-    window.finalize
-  ensure
-    if $RUNNING_ON_RUBYW
-      File.open('outlog.txt', 'w') do |f|
-        f.write $log.string
-      end
-    end
+    @main_window.finalize
   end
 
   def open_log_dialog

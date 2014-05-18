@@ -29,7 +29,7 @@ class MainWindow < Gtk::Window
                "#{MainWindowModel::MANUAL_UPDATE_COUNT}回まで実行できます）",
                important: true)
 
-      if $ENABLE_VIEWLOG
+      if ::Settings[:ENABLE_VIEWLOG]
         @viewlog_toolbutton = create(ToolButton, Stock::JUSTIFY_LEFT,
                                      label: 'ログ',
                                      important: true)
@@ -39,7 +39,7 @@ class MainWindow < Gtk::Window
                                     important: true)
 
       add @reload_toolbutton
-      add @viewlog_toolbutton if $ENABLE_VIEWLOG
+      add @viewlog_toolbutton if ::Settings[:ENABLE_VIEWLOG]
       add @settings_toolbutton
     end
 
@@ -49,7 +49,7 @@ class MainWindow < Gtk::Window
 
       @viewlog_toolbutton.signal_connect('clicked') do
         @ui.open_log_dialog
-      end if $ENABLE_VIEWLOG
+      end if ::Settings[:ENABLE_VIEWLOG]
 
       @settings_toolbutton.signal_connect('clicked') do
         @ui.open_settings_dialog

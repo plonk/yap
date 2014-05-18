@@ -6,19 +6,6 @@ def every_nseconds n
   end
 end
 
-# このスクリプトを実行している ruby.exe とか rubyw.exe のパスを得る
-def exec_filename
-  if true
-    RbConfig.ruby
-  else
-    require 'Win32API'
-
-    buf = "\0" * 256
-    Win32API.new('kernel32', 'GetModuleFileName', 'LPL', 'L').call(0, buf, 256)
-    return  buf.rstrip
-  end
-end
-
 # 英字（全半）→かな（全半）→漢字の順でソートされるようにする
 def regularize(str)
   str.tr('Ａ-ｚ', 'A-z')
@@ -91,6 +78,23 @@ end
 
 module Environment
   class << self
+    def running_on_rubyw
+      File.basename(exec_filename).downcase == 'rubyw.exe'
+    end
+
+    # このスクリプトを実行している ruby.exe とか rubyw.exe のパスを得る
+    def exec_filename
+      if true
+        RbConfig.ruby
+      else
+        require 'Win32API'
+
+        buf = "\0" * 256
+        Win32API.new('kernel32', 'GetModuleFileName', 'LPL', 'L').call(0, buf, 256)
+        return  buf.rstrip
+      end
+    end
+
     # Open anything
     def open(arg)
       if RUBY_PLATFORM =~ /mingw/

@@ -43,7 +43,7 @@ class WebResourceClass
     end
   end
 
-  def get_pixbuf(url, fallback = QUESTION_64)
+  def get_pixbuf(url, fallback = UI::QUESTION_64)
     if PIXBUF_CACHE[url]
       return PIXBUF_CACHE[url]
     else

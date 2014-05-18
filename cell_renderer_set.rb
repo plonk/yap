@@ -111,7 +111,7 @@ class CellRendererSet
     else
       # リストの表示とイエローページのロードが非同期だから到達するだろう。
       STDERR.puts 'Warning: failed to get YP favicon pixbuf.'
-      renderer.pixbuf = QUESTION_16
+      renderer.pixbuf = UI::QUESTION_16
     end
   end
 

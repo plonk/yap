@@ -142,7 +142,7 @@ class MainWindow < Gtk::Window
       end
     end
 
-    def get_favicon_pixbuf_for(ch, fallback = QUESTION_16)
+    def get_favicon_pixbuf_for(ch, fallback = UI::QUESTION_16)
       if ch.favicon_url
         puts "favicon is specified for #{ch}"
         WebResource.get_pixbuf(ch.favicon_url, fallback)
