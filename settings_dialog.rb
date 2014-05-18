@@ -120,8 +120,4 @@ class SettingsDialog < Gtk::Dialog
       dialog.destroy
     end
   end
-
-  def show_all
-    super
-  end
 end

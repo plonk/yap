@@ -40,16 +40,14 @@ class UI
   end
 
   def show_channel_info(ch)
-    dialog = InfoDialog.new(@main_window, ch)
-    dialog.show_all
+    dialog = InfoDialog.new(@main_window, ch).show_all
     dialog.signal_connect('response') do
       dialog.destroy
     end
   end
 
   def run_favorite_dialog
-    dialog = FavoriteDialog.new(@main_window, @model.favorites.to_a)
-    dialog.show_all
+    dialog = FavoriteDialog.new(@main_window, @model.favorites.to_a).show_all
     dialog.run do |response|
       @model.favorites.replace(dialog.list) if response == Dialog::RESPONSE_OK
     end
