@@ -44,8 +44,6 @@ class MainWindow < Gtk::Window
   def widget_layout
     set_own_properties
 
-    MainWindow::StatusIcon.new(self)
-
     setup_ui
 
     add create_outermost_vbox
