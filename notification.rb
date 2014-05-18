@@ -3,39 +3,41 @@ require 'gtk2'
 require_relative 'utility'
 require_relative 'gtk_helper'
 
-# カスタム InfoBar
-class Notification < Gtk::InfoBar
-  include Gtk, GtkHelper
+class MainWindow < Gtk::Window
+  # カスタム InfoBar
+  class Notification < Gtk::InfoBar
+    include Gtk, GtkHelper
 
-  def initialize
-    super
+    def initialize
+      super
 
-    set_no_show_all true
-    @info_bar_label = create(Label, '', wrap: true)
-    @info_bar_label.show
-    add_button Stock::OK, Dialog::RESPONSE_OK
-    content_area.pack_start @info_bar_label
+      set_no_show_all true
+      @info_bar_label = create(Label, '', wrap: true)
+      @info_bar_label.show
+      add_button Stock::OK, Dialog::RESPONSE_OK
+      content_area.pack_start @info_bar_label
 
-    signal_connect('response', &method(:on_response))
-  end
-
-  def on_response(_widget, res)
-    case res
-    when Dialog::RESPONSE_OK
-      hide
-    else
-      fail 'unexpected response'
+      signal_connect('response', &method(:on_response))
     end
-  end
 
-  def put_up(message)
-    @info_bar_label.text = message
+    def on_response(_widget, res)
+      case res
+      when Dialog::RESPONSE_OK
+        hide
+      else
+        fail 'unexpected response'
+      end
+    end
 
-    show
-    # 一定時間後に自動的に閉じる。
-    Thread.new do
-      sleep ::Settings[:NOTIFICATION_AUTO_CLOSE_SECONDS]
-      Gtk.queue { hide if @info_bar_label.text == message }
+    def put_up(message)
+      @info_bar_label.text = message
+
+      show
+      # 一定時間後に自動的に閉じる。
+      Thread.new do
+        sleep ::Settings[:NOTIFICATION_AUTO_CLOSE_SECONDS]
+        Gtk.queue { hide if @info_bar_label.text == message }
+      end
     end
   end
 end

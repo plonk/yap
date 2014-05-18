@@ -25,5 +25,5 @@ task :uninstall do
 end
 
 task :stats do
-  sh 'wc -l *.rb | sort -nr'
+  sh 'wc -l *.rb */*.rb | sort -nr'
 end

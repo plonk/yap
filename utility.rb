@@ -110,4 +110,11 @@ module DispatchingObserver
       end
     end
   end
+
+  def observer_setup(model)
+    model.add_observer(self, :update)
+    signal_connect('destroy') do
+      model.delete_observer(self)
+    end
+  end
 end
