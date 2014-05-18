@@ -62,7 +62,7 @@ class MainWindow < Gtk::Window
       @toolbar = MainWindow::Toolbar.new(@model, self)
       @information_area = InformationArea.new(@model)
       @notebook = MainWindow::Notebook.new(@model)
-      @notification = Notification.new
+      @notification = Notification.new(@model)
 
       [menubar, @toolbar, @information_area, @notebook, @notification]
         .zip([false, false, false, true, false]).each do |widget, expand|
@@ -148,9 +148,5 @@ class MainWindow < Gtk::Window
     time = Time.now.strftime('%H時%M分')
     channels = @model.total_channel_count
     self.title = "YAP - #{time}現在 #{channels} chが配信中"
-  end
-
-  def notification_changed
-    @notification.put_up(@model.notification)
   end
 end
