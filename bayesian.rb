@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 ## ベイジアンフィルター -  Peiter Siebel による spam.lisp に基く。
-require_relative 'jwords'
+require_relative 'word_extractor'
+
 
 class Classifier
   require 'mathn'
@@ -66,14 +67,10 @@ class Classifier
     @feature_database[word] ||= WordFeature.new(word: word)
   end
 
+  WORD_EXTRACTOR = RegexpJapaneseAwareWordExtractor.new
+
   def extract_words text
-    return text.split.flat_map do |span|
-      if span =~ /\A[\x21-\x7e]+\z/
-        [span]
-      else
-        span.jwords
-      end
-    end
+    WORD_EXTRACTOR.(text)
   end
 
   def extract_features text
