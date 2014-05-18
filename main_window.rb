@@ -59,13 +59,12 @@ class MainWindow < Gtk::Window
 
   def create_outermost_vbox
     create(VBox, false, 0) do |outermost_vbox|
-      menubar = @ui_manager['/ui/menubar']
       @toolbar = MainWindow::Toolbar.new(@model, @ui)
       @information_area = InformationArea.new(@model)
       @notebook = MainWindow::Notebook.new(@model)
       @notification = Notification.new(@model)
 
-      [menubar, @toolbar, @information_area, @notebook, @notification]
+      [@ui_manager['/ui/menubar'], @toolbar, @information_area, @notebook, @notification]
         .zip([false, false, false, true, false]).each do |widget, expand|
         outermost_vbox.pack_start(widget, expand)
       end
