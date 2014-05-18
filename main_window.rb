@@ -87,18 +87,9 @@ class MainWindow < Gtk::Window
     self
   end
 
-  def finalize
-    @model.finalize
-  end
-
   def on_destroy(_widget)
     puts 'destroying main window'
     quit
-  end
-
-  def quit
-    finalize
-    Gtk.main_quit
   end
 
   def channel_list_updated

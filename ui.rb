@@ -27,7 +27,7 @@ class UI
     Gtk.main
   rescue Interrupt
     # なんか変だ
-    @main_window.finalize
+    finalize
   end
 
   def open_log_dialog
@@ -67,5 +67,14 @@ class UI
 
   def open_process_manager
     ProcessManager.new(@main_window, @model).show_all
+  end
+
+  def finalize
+    @model.finalize
+  end
+
+  def quit
+    finalize
+    Gtk.main_quit
   end
 end
