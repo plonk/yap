@@ -2,19 +2,25 @@
 # 動作ログを表示するダイアログだがたいてい無効にされている。
 class LogDialog < Gtk::Dialog
   include Gtk
+  include GtkHelper
 
   def initialize(parent)
     super('ログ', parent, MODAL)
-    add_button(Stock::OK, RESPONSE_OK)
-    buf = TextBuffer.new
-    buf.text = $log.string
-    textview = TextView.new(buf)
-    textview.wrap_mode = TextTag::WRAP_CHAR
-    scrolledwindow = ScrolledWindow.new
-    scrolledwindow.set_policy(POLICY_AUTOMATIC, POLICY_ALWAYS)
-    scrolledwindow.add textview
-    vbox.pack_start scrolledwindow
+
+    create(TextView,
+           create(TextBuffer, text: $stdout.string),
+           wrap_mode: TextTag::WRAP_CHAR) do |textview|
+      create(ScrolledWindow,
+             hscrollbar_policy: POLICY_AUTOMATIC,
+             vscrollbar_policy: POLICY_ALWAYS) do |scrolledwindow|
+        scrolledwindow.add textview
+        vbox.pack_start scrolledwindow
+      end
+    end
     set_default_size(512, 384)
+
+    add_button(Stock::OK, RESPONSE_OK)
+
     signal_connect('response') do
       destroy
     end
