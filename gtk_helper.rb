@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 require_relative 'gtk_helper'
+require 'gtk2'
 
 module GtkHelper
   def create(klass, *args, &block)

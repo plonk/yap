@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+require 'gtk2'
 require 'monitor'
 
 # スレッドセーフなキュー。Proc を詰める。

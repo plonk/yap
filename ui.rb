@@ -6,6 +6,7 @@ require_relative 'settings_dialog'
 require_relative 'settings'
 require_relative 'bandwidth_checker_manager'
 require_relative 'main_window'
+require_relative 'resource'
 
 class UI
   include Gtk

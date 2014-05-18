@@ -106,6 +106,8 @@ module Environment
   end
 end
 
+require_relative 'threadhack'
+
 module DispatchingObserver
   def update(message, *args)
     if self.respond_to? message

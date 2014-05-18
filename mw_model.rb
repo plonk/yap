@@ -5,6 +5,7 @@ require_relative 'launcher'
 require_relative 'type_association'
 require_relative 'child_process'
 require_relative 'peercast_health'
+require_relative 'yellowpage'
 
 # アプリケーションモデルとかプレゼンターとかそんなの。
 class MainWindowModel

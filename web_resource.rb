@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'uri'
+require 'dbm'
+require 'net/http'
 
 # ウェブリソース取得用クラス
 class WebResourceClass

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+require_relative 'web_resource'
 # セルレンダラーをまとめたクラス
 class CellRendererSet
   include Pango, Gtk, GtkHelper
