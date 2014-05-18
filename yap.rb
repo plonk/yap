@@ -1,4 +1,4 @@
-#!ruby
+#!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
 # イエローページビュアーあるいは yap (Yet Another PCYP)
 require 'gtk2'
