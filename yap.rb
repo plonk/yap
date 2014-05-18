@@ -16,7 +16,7 @@ require_relative 'resource'
 require_relative 'ui'
 require_relative 'web_resource'
 
-$stderr = $stdout = StringIO.new('', 'w') if ::Settings[:ENABLE_VIEWLOG]
+$stdout = StringIO.new('', 'w') if ::Settings[:ENABLE_VIEWLOG]
 Thread.abort_on_exception = true
 
 UI.new(MainWindowModel.new).run
