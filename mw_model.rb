@@ -130,8 +130,14 @@ class MainWindowModel
     notify_observers(:child_process_changed)
   end
 
+  def train_channel(channel, category)
+    channel.train(category)
+    changed
+    notify_observers(:channel_list_updated)
+  end
+
   def play(channel)
-    channel.train(:ham)
+    train_channel(channel, :ham)
     changed
     notify_observers(:channel_list_updated)
     do_play(channel)

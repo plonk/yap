@@ -46,13 +46,13 @@ class ChannelListView::ContextMenu < Gtk::Menu
 
     ham = MenuItem.new('Ham')
     ham.signal_connect('activate') do
-      @channel.train(:ham)
+      @mw_model.train_channel(@channel, :ham)
     end
     append(ham)
 
     spam = MenuItem.new('Spam')
     spam.signal_connect('activate') do
-      @channel.train(:spam)
+      @mw_model.train_channel(@channel, :spam)
     end
     append(spam)
 

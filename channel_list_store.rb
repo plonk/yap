@@ -28,7 +28,7 @@ class ChannelListStore < Gtk::ListStore
 
     super(*FIELD_TYPES)
 
-    set_sort_column_id FLD_CHNAME, SORT_ASCENDING
+    set_sort_column_id FLD_SCORE, SORT_ASCENDING
   end
 
   def replace(channel_list)
