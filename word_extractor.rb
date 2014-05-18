@@ -19,9 +19,9 @@ class RegexpJapaneseAwareWordExtractor
       if left =~ OKURI_REGEXP
         []
       elsif right =~ OKURI_REGEXP
-        left + right
+        [left + right]
       else
-        left
+        [left]
       end
     end
   end
