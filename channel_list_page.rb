@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require_relative 'channel_list_view'
 require_relative 'tab_label'
+require_relative 'search_field'
 
 # Notebook のページ。チャンネルリスト、検索フィールドを含む。
 # タブラベルにチャンネル数を通知する。
@@ -40,25 +41,11 @@ class ChannelListPage < Gtk::VBox
   end
 
   def do_layout
-    create(HBox, false, 1) do |hbox|
-      @search_label = Label.new('')
-      @search_field = Entry.new
-      @search_field.signal_connect('activate', &method(:search_field_activate_callback))
-      clear_icon = IconFactory
-        .lookup_default('gtk-clear')
-        .render_icon(style, Widget::TEXT_DIR_RTL, STATE_NORMAL, IconSize::MENU)
-      @clear_button = create(Button, image: Image.new(clear_icon),
-                                     tooltip_text: '入力欄をクリアして検索をやめる',
-                                     on_clicked: method(:clear_button_clicked_callback))
-
-      hbox.pack_end(@clear_button, false)
-      hbox.pack_end(@search_field, false)
-      hbox.pack_end(@search_label, false)
-
-      pack_start(hbox, false)
-    end
-
     @channel_list_view = ChannelListView.new(@model, @func)
+
+    @search_field = SearchField.new(@channel_list_view)
+    pack_start(@search_field, false)
+
     @channel_list_view.list_store.signal_connect('row-inserted') do
       changed
       notify_observers
@@ -75,22 +62,5 @@ class ChannelListPage < Gtk::VBox
       @channel_list_view.scrolled_window = sw
       pack_start(sw, true)
     end
-  end
-
-  def clear_button_clicked_callback(_widget)
-    @search_field.text = ''
-    @search_label.markup = ''
-    @channel_list_view.search(@search_field.text)
-  end
-
-  def search_field_activate_callback(_widget)
-    if @search_field.text == ''
-      @search_label.markup = ''
-    else
-      # 10pt bold
-      @search_label.markup =
-        '<span size="10000" background="yellow" font_weight="bold">検索中</span>'
-    end
-    @channel_list_view.search(@search_field.text)
   end
 end
