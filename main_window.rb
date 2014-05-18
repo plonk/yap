@@ -88,7 +88,7 @@ class MainWindow < Gtk::Window
 
   def on_destroy(_widget)
     puts 'destroying main window'
-    quit
+    @ui.quit
   end
 
   def channel_list_updated
