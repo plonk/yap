@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-# チャンネルリスト表示用データ
-class ChannelListStore < Gtk::ListStore
-  include Pango, Gtk, GtkHelper
-
+module ChannelListConstants
   FLD_CHNAME   = 0
   FLD_GENRE    = 1
   FLD_DETAIL   = 2
@@ -12,6 +9,13 @@ class ChannelListStore < Gtk::ListStore
   FLD_CH_ID    = 6
   FLD_YPNAME   = 7
   FLD_SCORE    = 8
+  FLD_TYPE     = 9
+end
+
+# チャンネルリスト表示用データ
+class ChannelListStore < Gtk::ListStore
+  include Pango, Gtk, GtkHelper
+  include ChannelListConstants
 
   FIELD_TYPES = [String,	# chname
                  String,	# genre
@@ -21,7 +25,8 @@ class ChannelListStore < Gtk::ListStore
                  Integer,	# bitrate
                  String,	# ch_id
                  String,	# ypname
-                 Float]         # score
+                 Float,         # score
+                 String]        # type
 
   def initialize(filter_fn)
     @filter_fn = filter_fn
@@ -59,6 +64,7 @@ class ChannelListStore < Gtk::ListStore
     iter[FLD_CH_ID]    = ch.channel_id
     iter[FLD_YPNAME]   = ch.yp.name
     iter[FLD_SCORE]    = ch.score
+    iter[FLD_TYPE]     = ch.type
   end
 
   def channel_to_path(ch)

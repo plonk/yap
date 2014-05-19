@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 require_relative 'web_resource'
+
 # セルレンダラーをまとめたクラス
 class CellRendererSet
   include Pango, Gtk, GtkHelper
 
   attr_reader :name, :yp, :genre, :detail, :listener
-  attr_reader :time, :bitrate, :score
+  attr_reader :time, :bitrate, :score, :type
   attr_accessor :highlight_term
 
   TARGET_NAME_CELL_WIDTH = 16.0
@@ -133,7 +134,8 @@ class CellRendererSet
       @listener.font =
       @bitrate.font =
       @time.font =
-      @score.font = ::Settings[:LIST_FONT]
+      @score.font =
+      @type.font = ::Settings[:LIST_FONT]
   end
 
   def create_cell_renderers
@@ -145,6 +147,7 @@ class CellRendererSet
     @yp		= create CellRendererPixbuf
     @time	= create CellRendererText, xalign: 1
     @score	= create CellRendererText, xalign: 1
+    @type	= create CellRendererText
     update_font
   end
 end
