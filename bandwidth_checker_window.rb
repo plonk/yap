@@ -6,8 +6,8 @@ class BandwidthCheckerWindow < Gtk::Dialog
 
   attr_reader :checker
 
-  def initialize(checker)
-    super("#{checker.channel.name}", nil)
+  def initialize(checker, parent_window)
+    super("#{checker.channel.name}", parent_window)
     do_layout
     @checker = checker
     @checker.add_observer(self, :update)

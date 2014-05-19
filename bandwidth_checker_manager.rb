@@ -8,7 +8,8 @@ require_relative 'bandwidth_checker'
 class BandwidthCheckerManager
   include DispatchingObserver
 
-  def initialize(model)
+  def initialize(model, main_window)
+    @main_window = main_window
     @model = model
     @model.add_observer(self, :update)
     @checking = []
@@ -59,7 +60,7 @@ class BandwidthCheckerManager
     checker = BandwidthChecker.new(ch)
     checker.add_observer(self, :checker_changed)
     @checking << checker
-    BandwidthCheckerWindow.new(checker).show_all
+    BandwidthCheckerWindow.new(checker, @main_window).show_all
     checker.run
   end
 end
