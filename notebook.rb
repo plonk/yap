@@ -16,6 +16,9 @@ class MainWindow < Gtk::Window
 
       fav_page = FavoriteListPage.new(@model, @ui)
       append_page(fav_page, fav_page.label)
+
+      yppage = YellowPagePage.new(@model, @ui)
+      append_page(yppage, yppage.label)
     end
   end
 end
