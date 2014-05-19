@@ -65,3 +65,10 @@ class ChannelListPage < Gtk::VBox
     end
   end
 end
+
+class FavoriteListPage < ChannelListPage
+  def initialize(model, ui)
+    filter_func = proc { |ch| model.favorites.include? ch.name }
+    super(model, ui, 'お気に入り', filter_func)
+  end
+end
