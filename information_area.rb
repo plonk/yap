@@ -123,7 +123,7 @@ class MainWindow < Gtk::Window
         if pixbuf
           @favicon_image.pixbuf = pixbuf
         else
-          @favicon_image.pixbuf = LOADING_16
+          @favicon_image.pixbuf = UI::LOADING_16
           Thread.start do
             pixbuf = get_favicon_pixbuf_for(ch)
             pixbuf = pixbuf.scale(16, 16, Gdk::Pixbuf::INTERP_NEAREST)
