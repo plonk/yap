@@ -62,9 +62,9 @@ class MainWindow < Gtk::Window
       @notebook = MainWindow::Notebook.new(@model)
       @notification = Notification.new(@model)
 
-      [@ui_manager['/ui/menubar'], @toolbar, @information_area, @notebook, @notification]
-        .zip([false, false, false, true, false]).each do |widget, expand|
-        outermost_vbox.pack_start(widget, expand)
+      [@ui_manager['/ui/menubar'], @toolbar, @information_area, @notebook,
+       @notification].each do |widget|
+        outermost_vbox.pack_start(widget, widget == @notebook)
       end
     end
   end
