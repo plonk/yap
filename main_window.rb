@@ -59,7 +59,7 @@ class MainWindow < Gtk::Window
     create(VBox, false, 0) do |outermost_vbox|
       @toolbar = MainWindow::Toolbar.new(@model, @ui)
       @information_area = InformationArea.new(@model)
-      @notebook = MainWindow::Notebook.new(@model)
+      @notebook = MainWindow::Notebook.new(@model, @ui)
       @notification = Notification.new(@model)
 
       [@ui_manager['/ui/menubar'], @toolbar, @information_area, @notebook,

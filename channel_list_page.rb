@@ -12,10 +12,11 @@ class ChannelListPage < Gtk::VBox
 
   attr_reader :title, :label
 
-  def initialize(model, title, func = proc { true })
+  def initialize(model, ui, title, func = proc { true })
     super()
 
     @model = model
+    @ui = ui
     @func = func
     set(homogeneous: false, spacing: 2)
     @base_title = title
@@ -41,7 +42,7 @@ class ChannelListPage < Gtk::VBox
   end
 
   def do_layout
-    @channel_list_view = ChannelListView.new(@model, @func)
+    @channel_list_view = ChannelListView.new(@model, @ui, @func)
 
     @search_field = SearchField.new(@channel_list_view)
     pack_start(@search_field, false)

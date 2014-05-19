@@ -54,11 +54,22 @@ class InfoDialog < Gtk::Dialog
     return '' if tip.empty?
 
     addr, port = tip.split(':')
+    return '' unless ip_address?(addr)
+
     begin
       hostname = Resolv.getname(addr)
       "\n(#{hostname}:#{port})"
     rescue
       "\n(reverse lookup failed)"
+    end
+  end
+
+  def ip_address? str
+    if str =~ /^(\d+).(\d+).(\d+).(\d+)$/ &&
+        [$1, $2, $3, $4].map(&:to_i).all? {|n| n.between?(0, 255) }
+      true
+    else
+      false
     end
   end
 

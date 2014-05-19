@@ -3,8 +3,9 @@
 class ChannelListView::ContextMenu < Gtk::Menu
   include Gtk
 
-  def initialize(mw_model)
+  def initialize(mw_model, ui)
     @mw_model = mw_model
+    @ui = ui
 
     super()
 
@@ -62,7 +63,7 @@ class ChannelListView::ContextMenu < Gtk::Menu
     @info.signal_connect('activate') do
       fail unless @channel
 
-      @mw_model.show_channel_info(@channel)
+      @ui.show_channel_info(@channel)
     end
     append(@info)
   end

@@ -57,7 +57,8 @@ class ChannelListView < Gtk::TreeView
     set(headers_clickable: true)
   end
 
-  def initialize(mw_model, filter_fn)
+  def initialize(mw_model, ui, filter_fn)
+    @ui = ui
     @mw_model = mw_model
     @mw_model.add_observer(self, :update)
 
@@ -78,7 +79,7 @@ class ChannelListView < Gtk::TreeView
   end
 
   def install_context_menu
-    @context_menu = ContextMenu.new(@mw_model).show_all
+    @context_menu = ContextMenu.new(@mw_model, @ui).show_all
 
     self.events = Gdk::Event::BUTTON_PRESS_MASK
     signal_connect('button_press_event', &method(:on_button_press_event))
