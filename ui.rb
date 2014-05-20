@@ -19,7 +19,7 @@ class UI
     @model = model
 
     @main_window = MainWindow.new(@model, self).show_all
-    MainWindow::StatusIcon.new(@main_window)
+    MainWindow::StatusIcon.new(@main_window, self)
     BandwidthCheckerManager.new @model, @main_window
   end
 

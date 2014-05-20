@@ -4,8 +4,9 @@ class MainWindow < Gtk::Window
     include Gtk
     include GtkHelper
 
-    def initialize(main_window)
+    def initialize(main_window, ui)
       @main_window = main_window
+      @ui = ui
 
       super()
       set(pixbuf: Gdk::Pixbuf.new(Resource['yap.png']),
@@ -13,7 +14,7 @@ class MainWindow < Gtk::Window
 
       # クリックされたらメインウィンドウの表示・非表示を切り替える。
       signal_connect('activate') do
-        if visible?
+        if @main_window.visible?
           @main_window.hide
         else
           @main_window.show
@@ -41,10 +42,10 @@ class MainWindow < Gtk::Window
     def create_status_icon_menu
       create(Menu) do |menu|
         menu.append create(ImageMenuItem, Stock::INFO,
-                           on_activate: proc { @main_window.run_about_dialog })
+                           on_activate: proc { @ui.run_about_dialog })
         menu.append SeparatorMenuItem.new
         menu.append create(ImageMenuItem, Stock::QUIT,
-                           on_activate: proc { @main_window.quit })
+                           on_activate: proc { @ui.quit })
       end.show_all
     end
   end
