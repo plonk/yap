@@ -2,7 +2,7 @@
 # Notebookのタブのラベル
 class TabLabel < Gtk::Label
   def initialize(page)
-    @page = page
+    @page = page.as Page
 
     super(@page.title)
 

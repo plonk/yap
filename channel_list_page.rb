@@ -2,23 +2,7 @@
 require_relative 'channel_list_view'
 require_relative 'tab_label'
 require_relative 'search_field'
-
-class Page < Gtk::VBox
-  include Observable
-  attr_reader :title, :label
-
-  def initialize
-    super()
-
-    @label = TabLabel.new(self)
-  end
-
-  def title= str
-    @title = str
-    changed
-    notify_observers
-  end
-end
+require_relative 'notebook_page'
 
 # Notebook のページ。チャンネルリスト、検索フィールドを含む。
 # タブラベルにチャンネル数を通知する。
@@ -82,6 +66,7 @@ end
 
 class YellowPagePage < Page
   include Gtk
+  include GtkHelper
   include DispatchingObserver
 
   def initialize(model, ui)
@@ -91,22 +76,31 @@ class YellowPagePage < Page
     super()
 
     @model.add_observer(self)
-    self.title = 'YPPage'
-    pack_start(@widget = widget, true)
-    update_widget_text
+    self.title = 'イエローページ'
+
+    do_layout
   end
 
-  def update_widget_text
-    @widget.text = @model.yellow_pages.map do |yp|
-      "#{yp.name} - #{yp.loaded? ? 'loaded' : 'empty'}, #{yp.count} channels"
-    end.join("\n")
+  def do_layout
+    align = Alignment.new(0.5, 0.5, 0, 0)
+    align.add create_table
+    pack_start(align, true)
   end
 
-  def widget
-    Label.new()
+  def create_table
+    create(Table, 2, @model.yellow_pages.size,
+           row_spacings: 5,
+           column_spacings: 10) do |table|
+      @model.yellow_pages.each_with_index do |yp, index|
+        label = Label.new("#{yp.name} - #{yp.loaded? ? 'loaded' : 'empty'}, #{yp.count} channels")
+        table.attach_defaults(label, 0, 1, index, index + 1)
+
+        button = Button.new("load")
+        table.attach_defaults(button, 1, 2, index, index + 1)
+      end
+    end
   end
 
   def settings_changed
-    update_widget_text
   end
 end
