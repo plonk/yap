@@ -103,10 +103,10 @@ class MainWindowModel
   end
 
   def show_channel_info(ch)
-    if master_table.include? ch
-      changed
-      notify_observers(:show_channel_info, ch)
-    end
+    return unless master_table.include? ch
+
+    changed
+    notify_observers(:show_channel_info, ch)
   end
 
   def select_channel(ch)

@@ -38,9 +38,9 @@ class ColumnSettingsDialog < ListEditDialog
   end
 
   def extern(rows)
-    rows.flat_map { |enabled, name|
+    rows.flat_map do |enabled, name|
       enabled ? [name_to_id(name)] : []
-    }
+    end
   end
 
   def on_response(_, response_id)

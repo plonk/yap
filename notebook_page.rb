@@ -8,7 +8,7 @@ class Page < Gtk::VBox
     @label = TabLabel.new(self)
   end
 
-  def title= str
+  def title=(str)
     @title = str
     changed
     notify_observers

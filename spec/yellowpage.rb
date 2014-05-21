@@ -8,7 +8,7 @@ require_relative 'test_data'
 
 index_txt = ORDINARY_CHANNEL_LINE + "\n"
 WebMock.stub_request(:get, 'http://naiyo.yoteichi.com/index.txt')
-  .to_return(:body => index_txt)
+  .to_return(body: index_txt)
 
 YP_NAME = 'モックYP'
 yp = YellowPage.get('モックYP', 'http://naiyo.yoteichi.com/', nil, 'getgmt.php?cn=')

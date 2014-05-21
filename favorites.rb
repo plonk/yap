@@ -29,11 +29,11 @@ class Favorites
 
   def <<(item)
     fail unless item.is_a? String
-    unless @list.include? item
-      @list << item
-      changed
-      notify_observers
-    end
+    return if @list.include? item
+
+    @list << item
+    changed
+    notify_observers
   end
 
   def each(&block)
@@ -70,10 +70,10 @@ class Favorites
   end
 
   def delete(name)
-    if @list.include? name
-      @list.delete(name)
-      changed
-      notify_observers
-    end
+    return unless @list.include? name
+
+    @list.delete(name)
+    changed
+    notify_observers
   end
 end

@@ -110,11 +110,9 @@ require_relative 'threadhack'
 
 module DispatchingObserver
   def update(message, *args)
-    if self.respond_to? message
-      Gtk.queue do
-        __send__(message, *args)
-      end
-    end
+    return unless self.respond_to? message
+
+    Gtk.queue { __send__(message, *args) }
   end
 
   def observer_setup(model)
