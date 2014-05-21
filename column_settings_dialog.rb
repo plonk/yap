@@ -24,7 +24,7 @@ class ColumnSettingsDialog < ListEditDialog
   end
 
   def intern(enabled_ids)
-    all_ids = (0..ColumnSet::NUM_IDS-1).to_a
+    all_ids = (0..ColumnSet::NUM_IDS - 1).to_a
     disabled_ids = all_ids - enabled_ids
 
     enabled_ids.map { |column_id| [true, ColumnSet::ID_TO_NAME[column_id]] } +

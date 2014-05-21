@@ -9,66 +9,59 @@ class ChannelListView::ContextMenu < Gtk::Menu
 
     super()
 
-    @play = MenuItem.new('再生')
-    @play.signal_connect('activate') do
-      @mw_model.play(@channel) if @channel
-    end
-    append(@play)
+    do_layout
+  end
 
-    append(MenuItem.new) # separator
+  def do_layout
+    create_menu_items
+    append_menu_items
+    connect_callbacks
+  end
 
-    @contact_url = MenuItem.new('コンタクトURLを開く')
-    @contact_url.signal_connect('activate') do
-      Environment.open(@channel.contact_url) if @channel
-    end
-    append(@contact_url)
+  def separator
+    MenuItem.new
+  end
 
-    @chat_url = MenuItem.new('チャットURLを開く')
-    @chat_url.signal_connect('activate') do
-      Environment.open(@channel.chat_url) if @channel
-    end
-    append(@chat_url)
+  def append_menu_items
+    [@play, separator, @contact_url, @chat_url, @stat_url, separator,
+     @fav, separator, @ham, @spam, separator, @info].each(&method(:append))
+  end
 
-    @stat_url = MenuItem.new('統計URLを開く')
-    @stat_url.signal_connect('activate') do
-      Environment.open(@channel.stat_url) if @channel
-    end
-    append(@stat_url)
+  def create_menu_items
+    @play        = MenuItem.new '再生'
+    @contact_url = MenuItem.new 'コンタクトURLを開く'
+    @chat_url    = MenuItem.new 'チャットURLを開く'
+    @stat_url    = MenuItem.new '統計URLを開く'
+    @fav         = MenuItem.new 'お気に入りに追加/削除'
+    @ham         = MenuItem.new 'Ham'
+    @spam        = MenuItem.new 'Spam'
+    @info        = MenuItem.new 'チャンネル情報'
+  end
 
-    append(MenuItem.new)
+  def on_activate(item, &block)
+    item.signal_connect('activate', &block)
+  end
 
-    @fav = MenuItem.new('お気に入りに追加/削除')
-    @fav.signal_connect('activate') do
-      @mw_model.toggle_favorite
-    end
-    append(@fav)
+  def connect_callbacks
+    on_activate(@play) { @mw_model.play(@channel) }
+    on_activate(@contact_url) { Environment.open(@channel.contact_url) }
+    on_activate(@chat_url) { Environment.open(@channel.chat_url) }
+    on_activate(@stat_url) { Environment.open(@channel.stat_url) }
+    on_activate(@fav) { @mw_model.toggle_favorite }
+    on_activate(@ham) { @mw_model.train_channel(@channel, :ham) }
+    on_activate(@spam) { @mw_model.train_channel(@channel, :spam) }
+    on_activate(@info) { @ui.show_channel_info(@channel) }
+  end
 
-    append(MenuItem.new)
+  def popup(*args)
+    return unless @channel
 
-    ham = MenuItem.new('Ham')
-    ham.signal_connect('activate') do
-      @mw_model.train_channel(@channel, :ham)
-    end
-    append(ham)
-
-    spam = MenuItem.new('Spam')
-    spam.signal_connect('activate') do
-      @mw_model.train_channel(@channel, :spam)
-    end
-    append(spam)
-
-    append(MenuItem.new)
-
-    @info = MenuItem.new('チャンネル情報')
-    @info.signal_connect('activate') do
-      fail unless @channel
-
-      @ui.show_channel_info(@channel)
-    end
-    append(@info)
+    super(*args)
   end
 
   def associate(channel)
+    return unless channel
+
     @contact_url.sensitive = channel.contact_url != ''
     @chat_url   .sensitive = channel.chat_url != ''
     @stat_url   .sensitive = channel.stat_url != ''

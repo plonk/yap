@@ -35,7 +35,7 @@ but bayesian.rb is under the terms of the first, GNU GPL. bayesian.rb is
 covered by the second license.
 MSG
     hr = "\n" + '-' * 79 + "\n\n"
-    message + hr +GPL_LICENSE + hr + PCL_LICENSE
+    message + hr + GPL_LICENSE + hr + PCL_LICENSE
   end
 
   GPL_LICENSE = <<GPL

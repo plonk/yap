@@ -124,10 +124,8 @@ class ChannelListView < Gtk::TreeView
   end
 
   def handle_right_click(event)
-    if selected_channel
-      @context_menu.associate(selected_channel)
-      @context_menu.popup(nil, nil, event.button, event.time)
-    end
+    @context_menu.associate(selected_channel)
+    @context_menu.popup(nil, nil, event.button, event.time)
     true
   end
 

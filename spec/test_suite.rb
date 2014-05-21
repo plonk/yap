@@ -14,4 +14,3 @@ describe MainWindow, 'duration_on_air' do
     MainWindow.duration_on_air(60).should eq('1時間0分経過')
   end
 end
-

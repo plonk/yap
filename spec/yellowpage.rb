@@ -13,7 +13,7 @@ WebMock.stub_request(:get, 'http://naiyo.yoteichi.com/index.txt')
 YP_NAME = 'モックYP'
 yp = YellowPage.get('モックYP', 'http://naiyo.yoteichi.com/', nil, 'getgmt.php?cn=')
 yp.retrieve
-ord, uptest = yp.to_a
+ord, _uptest = yp.to_a
 
 describe YellowPage do
   it "'s name matches the first arg to new" do

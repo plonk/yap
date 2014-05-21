@@ -95,7 +95,7 @@ class YellowPagePage < Page
         label = Label.new("#{yp.name} - #{yp.loaded? ? 'loaded' : 'empty'}, #{yp.count} channels")
         table.attach_defaults(label, 0, 1, index, index + 1)
 
-        button = Button.new("load")
+        button = Button.new('load')
         table.attach_defaults(button, 1, 2, index, index + 1)
       end
     end

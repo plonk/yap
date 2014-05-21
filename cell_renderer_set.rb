@@ -122,7 +122,7 @@ class CellRendererSet
 
   def score_cell_data_func(_col, renderer, _model, iter)
     score = iter[ChannelListStore::FLD_SCORE]
-    renderer.text = format("%.1f", 100 - score * 100)
+    renderer.text = format('%.1f', 100 - score * 100)
   end
 
   def update_font
@@ -140,7 +140,7 @@ class CellRendererSet
     @name	= create CellRendererText, ellipsize: Layout::ELLIPSIZE_END
     @genre	= create CellRendererText, ellipsize: Layout::ELLIPSIZE_END
     @detail	= create CellRendererText, ellipsize: Layout::ELLIPSIZE_END
-    @listener 	= create CellRendererText, xalign: 1
+    @listener   = create CellRendererText, xalign: 1
     @bitrate	= create CellRendererText, xalign: 1
     @yp		= create CellRendererPixbuf
     @time	= create CellRendererText, xalign: 1

@@ -8,7 +8,15 @@ class ColumnSet
 
   attr_reader :cell_renderer_set
 
-  ID_TO_NAME = ['YP', '名前', 'ジャンル', '配信内容', '人数', '時間', 'Bps', 'スコア', 'タイプ'].freeze
+  ID_TO_NAME = ['YP',
+                '名前',
+                'ジャンル',
+                '配信内容',
+                '人数',
+                '時間',
+                'Bps',
+                'スコア',
+                'タイプ'].freeze
   NUM_IDS = ID_TO_NAME.size
 
   COL_YP       = 0
@@ -41,7 +49,7 @@ class ColumnSet
   def finalize
     @mw_model.delete_observer(self)
   end
-    
+
   def each
     ::Settings[:COLUMN_PREFERENCE].each do |i|
       yield id_to_column(i)
@@ -73,7 +81,9 @@ class ColumnSet
   end
 
   def create_column(column_id, attr, props = {})
-    TreeViewColumn.new(ID_TO_NAME[column_id], @cell_renderer_set.send(attr), props)
+    TreeViewColumn.new(ID_TO_NAME[column_id],
+                       @cell_renderer_set.send(attr),
+                       props)
   end
 
   def create_columns

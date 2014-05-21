@@ -2,7 +2,6 @@
 ## ベイジアンフィルター -  Peiter Siebel による spam.lisp に基く。
 require_relative 'word_extractor'
 
-
 class Classifier
   require 'mathn'
 
@@ -51,7 +50,7 @@ class Classifier
     attr_accessor :ham_count
 
     def initialize(params)
-      raise "Must supply :word" unless params[:word]
+      fail 'Must supply :word' unless params[:word]
 
       @word = params[:word]
       @spam_count = params[:spam_count] || 0
@@ -89,7 +88,7 @@ class Classifier
     when :ham then feature.ham_count += 1
     when :spam then feature.spam_count += 1
     else
-      raise "unknown type"
+      fail 'unknown type'
     end
   end
 
@@ -98,7 +97,7 @@ class Classifier
     when :ham then @total_hams += 1
     when :spam then @total_spams += 1
     else
-      raise "unknown type"
+      fail 'unknown type'
     end
   end
 
@@ -113,12 +112,12 @@ class Classifier
     # frequencies will appear in a spam assuming spams and hams are
     # otherwise equally probable. One of the two frequencies must be
     # non-zero.
-    spam_frequency = feature.spam_count / [1,@total_spams].max
-    ham_frequency = feature.ham_count / [1,@total_hams].max
+    spam_frequency = feature.spam_count / [1, @total_spams].max
+    ham_frequency = feature.ham_count / [1, @total_hams].max
     spam_frequency / (spam_frequency + ham_frequency)
   end
 
-  def bayesian_spam_probability(feature, assumed_probability = 1/2, weight = 1)
+  def bayesian_spam_probability(feature, assumed_probability = 1 / 2, weight = 1)
     # Bayesian adjustment of a given probability given the number of
     # data points that went into it, an assumed probability, and a
     # weight we give that assumed probability.
@@ -134,12 +133,11 @@ class Classifier
     number_of_probs = 0
 
     features.each do |feature|
-      unless untrained? feature
-        spam_prob = bayesian_spam_probability(feature).to_f
-        spam_probs.unshift spam_prob
-        ham_probs.unshift(1 - spam_prob)
-        number_of_probs += 1
-      end
+      next if untrained? feature
+      spam_prob = bayesian_spam_probability(feature).to_f
+      spam_probs.unshift spam_prob
+      ham_probs.unshift(1 - spam_prob)
+      number_of_probs += 1
     end
     h = 1 - fisher(spam_probs, number_of_probs)
     s = 1 - fisher(ham_probs, number_of_probs)
@@ -147,41 +145,47 @@ class Classifier
   end
 
   def untrained?(feature)
-    feature.spam_count==0 and feature.ham_count==0
+    feature.spam_count == 0 && feature.ham_count == 0
   end
 
   def fisher(probs, number_of_probs)
     # Fisher computation described by Robinson.
-    inverse_chi_square(-2 * probs.map(&Math.method(:log)).inject(0,:+),
+    inverse_chi_square(-2 * probs.map(&Math.method(:log)).inject(0, :+),
                        2 * number_of_probs)
   end
 
-  def inverse_chi_square value, degrees_of_freedom
+  def inverse_chi_square(value, degrees_of_freedom)
     # Probability that chi_square >= value with given
     # degrees_of_freedom.  Based on Gary Robinson's Python
     # implementation.
-    raise "not even degrees of freedom" unless degrees_of_freedom.even?
+    fail 'not even degrees of freedom' unless degrees_of_freedom.even?
 
     # Due to rounding errors in the multiplication and exponentiation
     # the sum computed in the loop may end up a shade above 1.0 which we
     # can't have since it's supposed to represent a probability.
     sum = 0
     m = value / 2
-    prob = Math::E ** -m
+    prob = Math::E**-m
     i = 0
     while i < degrees_of_freedom / 2
       sum += prob
 
       i += 1
-      prob *= m/i
+      prob *= m / i
     end
     [1.0, sum].min
   end
 
-  def classification score
-    [ if score <= @max_ham_score then :ham
-      elsif score >= @min_spam_score then :spam
-      else :unsure end,
-      score ]
+  def classification(score)
+    category =
+      if score <= @max_ham_score
+        :ham
+      elsif score >= @min_spam_score
+        :spam
+      else
+        :unsure
+      end
+
+    [category, score]
   end
 end

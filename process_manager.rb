@@ -7,10 +7,21 @@ class ProcessManager < Gtk::Dialog
   include Gtk, GtkHelper
 
   def initialize(parent, model)
-    super('プロセス管理', parent)
-
     @model = model
 
+    super('プロセス管理', parent)
+
+    do_layout
+
+    @object_list.set @model.child_processes
+
+    @model.add_observer(self, :model_update)
+    signal_connect('destroy') { @model.delete_observer(self) }
+
+    signal_connect('response') { destroy }
+  end
+
+  def do_layout
     set_size_request(480, 320)
 
     create(HBox, false, 5) do |hbox|
@@ -43,19 +54,8 @@ class ProcessManager < Gtk::Dialog
 
       vbox.pack_start hbox
     end
-    @object_list.set @model.child_processes
-
-    @model.add_observer(self, :model_update)
 
     add_button(Stock::OK, RESPONSE_OK)
-
-    signal_connect('destroy') do
-      @model.delete_observer(self)
-    end
-
-    signal_connect('response') do
-      destroy
-    end
   end
 
   def object_list_update
