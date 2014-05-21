@@ -4,7 +4,7 @@ task default: ['yap']
 
 SRC = Dir.glob('*.rb')
 
-file 'yap' => SRC do |task|
+file 'yap' => SRC do
   sh 'ruby rc.rb -o yap yap.rb'
 end
 

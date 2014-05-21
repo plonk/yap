@@ -43,7 +43,8 @@ class Launcher
   }
 
   def self.var_pattern
-    regexp = '(' + VAR_DEFINITION.keys.map(&Regexp.method(:escape)).join('|') + ')'
+    selection = VAR_DEFINITION.keys.map(&Regexp.method(:escape)).join('|')
+    regexp = '(' + selection + ')'
     Regexp.new regexp
   end
 

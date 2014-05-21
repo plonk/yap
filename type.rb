@@ -26,8 +26,8 @@ module Type
       if ary == []
         self.is_a? Array
       elsif ary.size == 1
-        elementExample = ary[0]
-        self.is_a? Array and self.all? { |e| e.is_type? elementExample }
+        element_example = ary[0]
+        self.is_a? Array and self.all? { |e| e.is_type? element_example }
       else
         tuple = ary
         self.is_a? Array and size == tuple.size and zip(ary).all? { |e, x| e.is_type? x }
@@ -37,7 +37,7 @@ module Type
       if hash == {}
         self.is_a? Hash
       else
-        fail ArgumentError.new('Hash constraint contains >1 key-value pairs') unless hash.size == 1
+        fail ArgumentError, 'Hash constraint contains >1 key-value pairs' unless hash.size == 1
         key = hash.keys[0]
         value = hash.values[0]
         self.is_a? Hash and self.all? { |k, v| k.is_type? key and v.is_type? value }

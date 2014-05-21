@@ -29,7 +29,8 @@ module Relation
 
   def do_add_relation(listener, writer, subject, reader, transform)
     @_relations ||= []
-    listener.__send__(writer, transform.call(subject.__send__(reader))) # first sync
+    # first sync
+    listener.__send__(writer, transform.call(subject.__send__(reader)))
     @_relations << [listener, writer, subject, reader, transform]
   end
 

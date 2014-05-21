@@ -64,7 +64,7 @@ class InfoDialog < Gtk::Dialog
     end
   end
 
-  def ip_address? str
+  def ip_address?(str)
     if str =~ /^(\d+).(\d+).(\d+).(\d+)$/ &&
         [$1, $2, $3, $4].map(&:to_i).all? { |n| n.between?(0, 255) }
       true

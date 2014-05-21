@@ -113,7 +113,7 @@ class ObjectList < Gtk::ScrolledWindow
 
   def copy_to_obj(iter, obj)
     @writer_list.each_with_index do |writer, i|
-      @writer_list[i].call(obj, iter[i+1])
+      writer.call(obj, iter[i + 1])
     end
   end
 

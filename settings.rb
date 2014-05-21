@@ -65,7 +65,8 @@ class SettingsClass
 
   def load
     data = YAML.load_file(SETTINGS_YAML_FILE)
-    @variables = @variables.merge Hash[*data.flat_map { |str, val| [str.to_sym, val] }]
+    from_file = Hash[*data.flat_map { |str, val| [str.to_sym, val] }]
+    @variables = @variables.merge from_file
     changed
     notify_observers
   rescue Errno::ENOENT

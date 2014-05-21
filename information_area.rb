@@ -54,7 +54,7 @@ class MainWindow < Gtk::Window
                                            sensitive: false,
                                            draw_indicator: false,
                                            on_toggled: method(:on_favorite_toggle_button_toggled))
-          @favorite_toggle_button.child.set_markup(' <span foreground="gray" size="xx-large">★</span> ')
+          @favorite_toggle_button.child.set_markup(GRAY_STAR_MARKUP)
 
           align.add @favorite_toggle_button
           hbox.pack_start(align, false, false)

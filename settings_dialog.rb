@@ -62,7 +62,10 @@ class SettingsDialog < Gtk::Dialog
       create(CheckButton, '自動帯域チェック',
              active: ::Settings[:ENABLE_AUTO_BANDWIDTH_CHECK])
     @grid_combo_box     = create_combo_box
-    @rules_check_button = create(CheckButton, '交互に暗色', tooltip_text: '一行ごとに背景を暗くする(テーマ依存)', active: ::Settings[:RULES_HINT])
+    @rules_check_button =
+      create(CheckButton, '交互に暗色',
+             tooltip_text: '一行ごとに背景を暗くする(テーマ依存)',
+             active: ::Settings[:RULES_HINT])
   end
 
   def widget_table

@@ -19,4 +19,3 @@ class MainWindow < Gtk::Window
     end
   end
 end
-

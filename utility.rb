@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-def every_nseconds n
+def every_nseconds(n)
   loop do
     yield
     sleep n

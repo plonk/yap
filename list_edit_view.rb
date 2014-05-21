@@ -191,7 +191,9 @@ class ListEditView < Gtk::TreeView
   end
 
   def delete
-    @list_store.remove selection.selected if !@allow_delete && selection.selected
+    return unless can_delete?
+
+    @list_store.remove selection.selected
   end
 
   def go_up

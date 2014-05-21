@@ -93,7 +93,7 @@ class Channel
     else
       print "#{name}: failed to parse time #{@fields[15].inspect}\n"
       -1
-#      raise "time format error"
+      # raise "time format error"
     end
   end
 
@@ -160,7 +160,7 @@ class Channel
   end
 
   def datum
-    @fields.values_at(NAME, GENRE, DETAIL, COMMENT).join(" ").strip
+    @fields.values_at(NAME, GENRE, DETAIL, COMMENT).join(' ').strip
   end
 
   def score
