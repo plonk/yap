@@ -18,12 +18,10 @@ class CellRendererSet
   end
 
   def set_font_size(chname, font)
-    half_widths = measure_width(chname)
+    return unless (half_widths = measure_width chname) > TARGET_NAME_CELL_WIDTH
 
-    if half_widths > TARGET_NAME_CELL_WIDTH
-      factor = TARGET_NAME_CELL_WIDTH / half_widths
-      font.size = [10 * factor, 8].max * 1000
-    end
+    factor = TARGET_NAME_CELL_WIDTH / half_widths
+    font.size = [10 * factor, 8].max * 1000
   end
 
   # foreground, background, weight

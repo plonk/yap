@@ -32,12 +32,12 @@ class Classifier
     end
   end
 
-  def score_text text
+  def score_text(text)
     _, score = classify text
     score
   end
 
-  def classify text
+  def classify(text)
     # Classify the text of a message as :spam, :ham, or :unsure.
     classification score extract_features text
   end
@@ -50,7 +50,7 @@ class Classifier
     # Number of hams we have seen this feature in.
     attr_accessor :ham_count
 
-    def initialize params
+    def initialize(params)
       raise "Must supply :word" unless params[:word]
 
       @word = params[:word]
@@ -63,28 +63,28 @@ class Classifier
     end
   end
 
-  def intern_feature word
+  def intern_feature(word)
     @feature_database[word] ||= WordFeature.new(word: word)
   end
 
   WORD_EXTRACTOR = RegexpJapaneseAwareWordExtractor.new
 
-  def extract_words text
-    WORD_EXTRACTOR.(text)
+  def extract_words(text)
+    WORD_EXTRACTOR.call(text)
   end
 
-  def extract_features text
+  def extract_features(text)
     extract_words(text).map(&method(:intern_feature))
   end
 
-  def train text, type
+  def train(text, type)
     extract_features(text).each do |feature|
       increment_count feature, type
     end
     increment_total_count type
   end
 
-  def increment_count feature, type
+  def increment_count(feature, type)
     case type
     when :ham then feature.ham_count += 1
     when :spam then feature.spam_count += 1
@@ -93,7 +93,7 @@ class Classifier
     end
   end
 
-  def increment_total_count type
+  def increment_total_count(type)
     case type
     when :ham then @total_hams += 1
     when :spam then @total_spams += 1
@@ -108,7 +108,7 @@ class Classifier
     @total_hams = 0
   end
 
-  def spam_probability feature
+  def spam_probability(feature)
     # Basic robability that a feature with the given relative
     # frequencies will appear in a spam assuming spams and hams are
     # otherwise equally probable. One of the two frequencies must be
@@ -118,7 +118,7 @@ class Classifier
     spam_frequency / (spam_frequency + ham_frequency)
   end
 
-  def bayesian_spam_probability feature, assumed_probability = 1/2, weight = 1
+  def bayesian_spam_probability(feature, assumed_probability = 1/2, weight = 1)
     # Bayesian adjustment of a given probability given the number of
     # data points that went into it, an assumed probability, and a
     # weight we give that assumed probability.
@@ -128,7 +128,7 @@ class Classifier
      data_points * basic_probability) / (weight + data_points)
   end
 
-  def score features
+  def score(features)
     spam_probs = []
     ham_probs = []
     number_of_probs = 0
@@ -146,11 +146,11 @@ class Classifier
     ((1 - h) + s).fdiv(2)
   end
 
-  def untrained? feature
+  def untrained?(feature)
     feature.spam_count==0 and feature.ham_count==0
   end
 
-  def fisher probs, number_of_probs
+  def fisher(probs, number_of_probs)
     # Fisher computation described by Robinson.
     inverse_chi_square(-2 * probs.map(&Math.method(:log)).inject(0,:+),
                        2 * number_of_probs)
@@ -160,9 +160,7 @@ class Classifier
     # Probability that chi_square >= value with given
     # degrees_of_freedom.  Based on Gary Robinson's Python
     # implementation.
-    unless degrees_of_freedom.even?
-      raise "not even degrees of freedom"
-    end
+    raise "not even degrees of freedom" unless degrees_of_freedom.even?
 
     # Due to rounding errors in the multiplication and exponentiation
     # the sum computed in the loop may end up a shade above 1.0 which we
