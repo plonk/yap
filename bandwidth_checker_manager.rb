@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-require 'mechanize'
-require 'nokogiri'
 require_relative 'bandwidth_checker_window'
 require_relative 'bandwidth_checker'
 

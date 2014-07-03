@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 # YP4G の uptest で帯域測定をする。
+require 'mechanize'
+require 'nokogiri'
+
 class BandwidthChecker
   include Observable
 
