@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-require 'singleton'
 require 'observer'
 require 'yaml'
 require_relative 'extensions'
 
 # アプリケーション設定クラス
 class SettingsClass
-  include Singleton, Observable
+  include Observable
 
   SETTINGS_DIR = ENV['HOME'] / '.yap'
 
@@ -39,8 +38,6 @@ class SettingsClass
   VAR_NAMES = VARIABLES.keys
 
   def initialize
-    super
-
     unless File.exist? SETTINGS_DIR
       puts "#{SETTINGS_DIR}を作りました。"
       Dir.mkdir(SETTINGS_DIR)
@@ -81,5 +78,5 @@ class SettingsClass
   end
 end
 
-Settings = SettingsClass.instance
+Settings = SettingsClass.new
 Settings.load
