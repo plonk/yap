@@ -7,8 +7,6 @@ require_relative 'extensions'
 class SettingsClass
   include Observable
 
-  SETTINGS_DIR = ENV['HOME'] / '.yap'
-
   VARIABLES = {
     TYPE_ASSOC: [['WMV|FLV', 'mplayer $Y'],
                  ['OPV', 'xdg-open $3']],
@@ -37,13 +35,19 @@ class SettingsClass
 
   VAR_NAMES = VARIABLES.keys
 
-  def initialize
-    unless File.exist? SETTINGS_DIR
-      puts "#{SETTINGS_DIR}を作りました。"
-      Dir.mkdir(SETTINGS_DIR)
-    end
+  def initialize(directory)
+    @dir = directory
+
+    make_sure_exists @dir
 
     @variables = VARIABLES
+  end
+
+  def make_sure_exists dir
+    return if File.exist? dir
+
+    puts "#{dir}を作りました。"
+    Dir.mkdir(dir)
   end
 
   def [](sym)
@@ -58,7 +62,7 @@ class SettingsClass
     notify_observers
   end
 
-  SETTINGS_YAML_FILE = SETTINGS_DIR / 'settings.yml'
+  SETTINGS_YAML_FILE = @dir / 'settings.yml'
 
   def load
     data = YAML.load_file(SETTINGS_YAML_FILE)
@@ -71,12 +75,12 @@ class SettingsClass
   end
 
   def save
-    File.open(SETTINGS_DIR / 'settings.yml', 'w') do |f|
+    File.open(@dir / 'settings.yml', 'w') do |f|
       data = Hash[*@variables.flat_map { |sym, val| [sym.to_s, val] }]
       f.write YAML.dump(data)
     end
   end
 end
 
-Settings = SettingsClass.new
+Settings = SettingsClass.new($SETTINGS_DIR)
 Settings.load
