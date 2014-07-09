@@ -25,7 +25,7 @@ class Channel
   DETAIL = 5
   COMMENT = 17
 
-  FEATURE_DATABASE_FILE = ENV['HOME'] / '.yap/feature_database.dat'
+  FEATURE_DATABASE_FILE = $SETTINGS_DIR / 'feature_database.dat'
   @@classifier = Classifier.new(FEATURE_DATABASE_FILE)
 
   def self.save_classifier_state

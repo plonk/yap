@@ -7,7 +7,7 @@ require 'net/http'
 class WebResourceClass
   include Singleton
 
-  PAGE_CACHE = DBM.new(ENV['HOME'] / '.yap/pagecache') # URL to HTML text
+  PAGE_CACHE = DBM.new($SETTINGS_DIR / 'pagecache') # URL to HTML text
   PIXBUF_CACHE = {}
 
   def initialize
