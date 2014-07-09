@@ -2,6 +2,7 @@
 require 'observer'
 require 'yaml'
 require_relative 'extensions'
+require_relative 'config'
 
 # アプリケーション設定クラス
 class SettingsClass
@@ -62,16 +63,18 @@ class SettingsClass
     notify_observers
   end
 
-  SETTINGS_YAML_FILE = @dir / 'settings.yml'
+  def settings_yaml_file
+    @dir / 'settings.yml'
+  end
 
   def load
-    data = YAML.load_file(SETTINGS_YAML_FILE)
+    data = YAML.load_file(settings_yaml_file)
     from_file = Hash[*data.flat_map { |str, val| [str.to_sym, val] }]
     @variables = @variables.merge from_file
     changed
     notify_observers
   rescue Errno::ENOENT
-    STDERR.puts "Warning: #{SETTINGS_YAML_FILE} not found"
+    STDERR.puts "Warning: #{settings_yaml_file} not found"
   end
 
   def save
