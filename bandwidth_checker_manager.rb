@@ -17,20 +17,15 @@ class BandwidthCheckerManager
     @running = false
   end
 
-  def reject_finished(checkers)
-    checkers.reject { |checker| checker.state =~ /finished/ }
-  end
-
   def update_lists
-    finished  = @checking.group_by { |c| (c.state =~ /finished/).to_bool }
-    @finished_recently += finished[true] || []
-    @checking = finished[false] || []
+    finished, @checking = @checking.partition { |c| c.state =~ /finished/ }
+    @finished_recently += finished
 
-    old = @finished_recently.group_by { |c| (Time.now - c.finished_time) > 60 }
-    (old[true] || []).each do |checker|
+    old, @finished_recently =
+      @finished_recently.partition { |c| (Time.now - c.finished_time) > 60 }
+    old.each do |checker|
       checker.delete_observer(self)
     end
-    @finished_recently = (old[false] || [])
   end
 
   def checker_changed
