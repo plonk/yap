@@ -34,10 +34,10 @@ class FavoriteDialog < Gtk::Dialog
     button_hbox = create(HButtonBox, layout_style: ButtonBox::END, spacing: 10)
     add_button = create(Button, '追加',
                         width_request: 60,
-                        on_clicked: method(:open_add_dialog))
+                        on_clicked: proc { open_add_dialog } )
     del_button = create(Button, '削除',
                         width_request: 60,
-                        on_clicked: method(:open_del_dialog))
+                        on_clicked: proc { open_del_dialog } )
     button_hbox.pack_end(add_button, false)
     button_hbox.pack_end(del_button, false)
     vbox.pack_start(button_hbox, false)
