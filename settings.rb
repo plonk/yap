@@ -8,9 +8,23 @@ require_relative 'config'
 class SettingsClass
   include Observable
 
+  def self.type_assoc_platform
+    case RUBY_PLATFORM
+    when /mingw/
+      [['WMV', '"C:/Program Files/Windows Media Player/wmplayer.exe" $Y'],
+       ['OPV', 'start "" $3']]
+    else
+      [['WMV|FLV', 'mplayer $Y'],
+       ['OPV', 'xdg-open $3']]
+    end
+  end
+
+  def self.list_font_platform
+    (RUBY_PLATFORM =~ /mingw/) ? 'Meiryo 9' : 'Sans 10'
+  end
+
   VARIABLES = {
-    TYPE_ASSOC: [['WMV|FLV', 'mplayer $Y'],
-                 ['OPV', 'xdg-open $3']],
+    TYPE_ASSOC: type_assoc_platform,
     TOOLBAR_VISIBLE: true,
     CHANNEL_INFO_VISIBLE: true,
     YELLOW_PAGES:
@@ -26,7 +40,7 @@ class SettingsClass
     USER_PEERCAST: '127.0.0.1:7144',
     REVERSE_LOOKUP_TIP: true,
     NOTIFICATION_AUTO_CLOSE_SECONDS: 15,
-    LIST_FONT: 'Sans 10',
+    LIST_FONT: list_font_platform,
     ENABLE_AUTO_BANDWIDTH_CHECK: true,
     GRID_LINES: 1,
     RULES_HINT: true,

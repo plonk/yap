@@ -18,9 +18,24 @@ class UI
   def initialize(model)
     @model = model
 
+    gtk_init_platform
+
     @main_window = MainWindow.new(@model, self).show_all
     MainWindow::StatusIcon.new(@main_window, self)
     BandwidthCheckerManager.new @model, @main_window
+  end
+
+  def gtk_init_platform
+    case RUBY_PLATFORM
+    when /mingw/
+      RC.parse_string <<EOD
+style "meiryo-font"
+{
+  font_name = "Meiryo Not-Rotated 9"
+}
+widget_class "*" style "meiryo-font"
+EOD
+    end
   end
 
   def run
