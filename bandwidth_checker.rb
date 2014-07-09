@@ -47,11 +47,12 @@ class BandwidthChecker
     Mechanize.new.get(normal_post_url) do |page|
       self.state = 'submitting form'
       check_result = page.form_with(name: 'uptest').submit
-
-      @finished_time = Time.now
-      self.state = "finished (#{extract_kbps(check_result.body)})"
+      speed = extract_kbps check_result.body
+      self.state = "finished (#{speed})"
     end
   rescue
     self.state = 'finished (error)'
+  ensure
+    @finished_time = Time.now
   end
 end
